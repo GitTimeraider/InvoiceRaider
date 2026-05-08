@@ -2,7 +2,7 @@ name: invio
 
 services:
   invio:
-    build: .
+    image: ghcr.io/kittendevv/invio:latest
     env_file:
       - .env
     volumes:
