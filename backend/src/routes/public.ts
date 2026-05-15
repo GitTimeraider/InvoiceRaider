@@ -6,6 +6,7 @@ import { getSettings } from "../controllers/settings.ts";
 import { buildInvoiceHTML, generatePDF } from "../utils/pdf.ts";
 import { generateUBLInvoiceXML } from "../utils/ubl.ts"; // legacy direct import (will be removed after deprecation window)
 import { generateInvoiceXML, listXMLProfiles } from "../utils/xmlProfiles.ts";
+import { resolveInDataRoot } from "../utils/dataPaths.ts";
 import {
   contentTypeFromLogoPath,
   normalizeStoredLogoReference,
@@ -68,7 +69,7 @@ publicRoutes.get("/_template-assets/:id/:version/*", async (c) => {
     return c.notFound();
   }
 
-  const baseDir = resolve("./data/templates");
+  const baseDir = resolveInDataRoot("templates");
   const candidate = resolve(baseDir, id, version, normalizedRest);
   const relativePath = relative(baseDir, candidate);
   if (!relativePath || relativePath.startsWith("..")) {

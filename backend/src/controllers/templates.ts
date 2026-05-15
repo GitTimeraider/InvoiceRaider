@@ -1,5 +1,6 @@
 import { getDatabase } from "../database/init.ts";
 import { Template, TemplateType } from "../types/index.ts";
+import { resolveInDataRoot } from "../utils/dataPaths.ts";
 import { generateUUID } from "../utils/uuid.ts";
 import { parse as parseYaml } from "yaml";
 import { dirname, isAbsolute, normalize, relative, resolve } from "std/path";
@@ -194,7 +195,7 @@ export async function installTemplateFromManifest(manifestUrl: string) {
   const html = new TextDecoder().decode(htmlBuf);
   basicHtmlSanity(html);
 
-  const baseDir = resolve("./data/templates", manifestId, manifestVersion);
+  const baseDir = resolveInDataRoot("templates", manifestId, manifestVersion);
   const outPath = resolve(baseDir, manifestPath);
   const rel = relative(baseDir, outPath);
   if (!rel || rel.startsWith("..")) {
@@ -506,7 +507,7 @@ export const deleteTemplate = (id: string) => {
   db.query("DELETE FROM templates WHERE id = ?", [id]);
   // Best-effort cleanup of stored files for this template id (all versions)
   try {
-    const dir = `./data/templates/${id}`;
+    const dir = resolveInDataRoot("templates", id);
     // Remove recursively if exists
     Deno.removeSync(dir, { recursive: true });
   } catch (_e) {
@@ -671,7 +672,7 @@ export async function installLocalTemplateFromZip(
     basicHtmlSanity(html);
 
     // Store template files on disk
-    const baseDir = resolve("./data/templates", manifestId, manifestVersion);
+    const baseDir = resolveInDataRoot("templates", manifestId, manifestVersion);
     const outPath = resolve(baseDir, htmlPath);
     const rel = relative(baseDir, outPath);
     if (!rel || rel.startsWith("..")) {

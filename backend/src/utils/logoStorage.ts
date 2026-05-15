@@ -1,7 +1,8 @@
 import { extname, normalize, relative, resolve } from "std/path";
+import { resolveInDataRoot } from "./dataPaths.ts";
 
 const LOGO_PUBLIC_PREFIX = "/api/v1/public/assets/logos/";
-const LOGO_BASE_DIR = resolve("./data/logos");
+const LOGO_BASE_DIR = resolveInDataRoot("logos");
 
 const MIME_TO_EXT: Record<string, string> = {
   "image/png": ".png",
