@@ -522,8 +522,6 @@
               </div>
               <select name="locale" class="select select-bordered w-full" bind:value={settings.locale} disabled={!canUpdateSettings}>
                 <option value="en">{t("English")}</option>
-                <option value="nl">{t("Nederlands")}</option>
-                <option value="de">{t("Deutsch")}</option>
               </select>
             </label>
             <label class="form-control"
