@@ -767,6 +767,9 @@ export const updateInvoice = async (
     throw new Error("Voided invoices cannot be modified.");
   }
 
+  const isIssued = existing.status !== "draft";
+  const allowProtectedChanges = isInvoiceProtectionOverrideEnabled();
+
   // Validate status transitions
   if (data.status && data.status !== existing.status) {
     const from = existing.status;
@@ -779,13 +782,19 @@ export const updateInvoice = async (
       paid: ["complete"],
       voided: [],
     };
-    if (!(allowed[from] || []).includes(to)) {
+    // When editing protection is overridden, also allow reversing finalized statuses
+    const allowedOverride: Record<string, string[]> = {
+      complete: ["sent", "paid"],
+      paid: ["sent", "complete"],
+      overdue: ["sent", "paid"],
+    };
+    const effectiveAllowed = allowProtectedChanges
+      ? [...(allowed[from] || []), ...(allowedOverride[from] || [])]
+      : (allowed[from] || []);
+    if (!effectiveAllowed.includes(to)) {
       throw new Error(`Cannot change status from '${from}' to '${to}'.`);
     }
   }
-
-  const isIssued = existing.status !== "draft";
-  const allowProtectedChanges = isInvoiceProtectionOverrideEnabled();
   if (isIssued && !allowProtectedChanges) {
     const forbidden = [
       "items",
