@@ -1419,7 +1419,7 @@ function getCustomerById(id: string) {
   let rows: unknown[][] = [];
   try {
     rows = db.query(
-      "SELECT id, name, contact_name, email, phone, address, country_code, tax_id, created_at, city, postal_code FROM customers WHERE id = ?",
+      "SELECT id, name, contact_name, email, phone, address, country_code, tax_id, created_at, city, postal_code, payment_email FROM customers WHERE id = ?",
       [id],
     ) as unknown[][];
   } catch (_e) {
@@ -1450,6 +1450,7 @@ function getCustomerById(id: string) {
     createdAt: new Date(row[8] as string),
     city: (row[9] ?? undefined) as string | undefined,
     postalCode: (row[10] ?? undefined) as string | undefined,
+    paymentEmail: (row[11] ?? undefined) as string | undefined,
   };
 }
 
