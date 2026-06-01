@@ -16,15 +16,17 @@ export const load: PageServerLoad = async ({ locals }) => {
   let productCategories = [];
   let productUnits = [];
   let xmlProfiles = [];
+  let emailConfigs = [];
   let error = null;
 
-  const [sRes, tRes, taxRes, pcRes, puRes, xpRes] = await Promise.allSettled([
+  const [sRes, tRes, taxRes, pcRes, puRes, xpRes, ecRes] = await Promise.allSettled([
     backendGet("/api/v1/settings", auth),
     backendGet("/api/v1/templates", auth),
     backendGet("/api/v1/tax-definitions", auth),
     backendGet("/api/v1/product-categories", auth),
     backendGet("/api/v1/product-units", auth),
     backendGet("/api/v1/xml-profiles", auth),
+    backendGet("/api/v1/email-configs", auth),
   ]);
 
   settings = sRes.status === "fulfilled" ? sRes.value || {} : {};
@@ -33,6 +35,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   productCategories = pcRes.status === "fulfilled" ? pcRes.value || [] : [];
   productUnits = puRes.status === "fulfilled" ? puRes.value || [] : [];
   xmlProfiles = xpRes.status === "fulfilled" ? xpRes.value || [] : [];
+  emailConfigs = ecRes.status === "fulfilled" ? ecRes.value || [] : [];
 
   // Keep localization settings stable even if /settings fetch has transient issues.
   const localization = locals.localization || {};
@@ -59,6 +62,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     productCategories,
     productUnits,
     xmlProfiles,
+    emailConfigs,
     error,
     hasTemplates: templates.length > 0,
   };

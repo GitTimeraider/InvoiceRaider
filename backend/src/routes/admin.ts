@@ -66,7 +66,14 @@ import {
   updateUnit,
 } from "../controllers/productOptions.ts";
 import { buildInvoiceHTML, generatePDF } from "../utils/pdf.ts";
-import { isEmailConfigured, sendEmail } from "../utils/email.ts";
+import { isEmailConfigured, sendEmail, sendEmailWithConfig } from "../utils/email.ts";
+import {
+  createEmailConfig,
+  deleteEmailConfig,
+  getEmailConfigById,
+  listEmailConfigs,
+  updateEmailConfig,
+} from "../controllers/emailConfigs.ts";
 import { generateUBLInvoiceXML } from "../utils/ubl.ts"; // legacy direct import
 import { generateInvoiceXML, listXMLProfiles } from "../utils/xmlProfiles.ts";
 import { availableInvoiceLocales } from "../i18n/translations.ts";
@@ -317,6 +324,9 @@ adminRoutes.use("/product-units/*", requireAdminAuth);
 adminRoutes.use("/settings", requireAdminAuth);
 
 adminRoutes.use("/settings/*", requireAdminAuth);
+
+adminRoutes.use("/email-configs", requireAdminAuth);
+adminRoutes.use("/email-configs/*", requireAdminAuth);
 
 // Protect admin alias routes as well
 adminRoutes.use("/admin/*", requireAdminAuth);
@@ -1656,18 +1666,119 @@ adminRoutes.get(
   },
 );
 
-// Send invoice via email (SMTP2GO)
+// =============================================
+// Email configuration CRUD
+// =============================================
+
+adminRoutes.get("/email-configs", requirePermission("settings", "read"), (c) => {
+  const configs = listEmailConfigs();
+  return c.json(configs);
+});
+
+adminRoutes.post("/email-configs", requirePermission("settings", "update"), async (c) => {
+  let body: Record<string, unknown>;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: "Invalid request body" }, 400);
+  }
+
+  const name = typeof body.name === "string" ? body.name.trim() : "";
+  const host = typeof body.host === "string" ? body.host.trim() : "";
+  const port = Number(body.port) || 587;
+  const username = typeof body.username === "string" ? body.username.trim() || null : null;
+  const password = typeof body.password === "string" ? body.password || null : null;
+  const fromAddress = typeof body.fromAddress === "string" ? body.fromAddress.trim() : "";
+  const fromName = typeof body.fromName === "string" ? body.fromName.trim() || null : null;
+  const secure = Boolean(body.secure);
+  const defaultSubject = typeof body.defaultSubject === "string" ? body.defaultSubject.trim() || null : null;
+  const defaultBody = typeof body.defaultBody === "string" ? body.defaultBody.trim() || null : null;
+
+  if (!name) return c.json({ error: "Name is required" }, 400);
+  if (!host) return c.json({ error: "Host is required" }, 400);
+  if (!fromAddress || !fromAddress.includes("@")) return c.json({ error: "Valid From Address is required" }, 400);
+
+  const config = createEmailConfig({ name, host, port, username, password, fromAddress, fromName, secure, defaultSubject, defaultBody });
+  return c.json(config, 201);
+});
+
+adminRoutes.put("/email-configs/:id", requirePermission("settings", "update"), async (c) => {
+  const id = c.req.param("id");
+  let body: Record<string, unknown>;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: "Invalid request body" }, 400);
+  }
+
+  const data: Record<string, unknown> = {};
+  if (typeof body.name === "string") data.name = body.name.trim();
+  if (typeof body.host === "string") data.host = body.host.trim();
+  if (body.port !== undefined) data.port = Number(body.port) || 587;
+  if (Object.prototype.hasOwnProperty.call(body, "username")) {
+    data.username = typeof body.username === "string" ? body.username.trim() || null : null;
+  }
+  if (typeof body.password === "string" && body.password !== "") {
+    data.password = body.password;
+  }
+  if (typeof body.fromAddress === "string") data.fromAddress = body.fromAddress.trim();
+  if (Object.prototype.hasOwnProperty.call(body, "fromName")) {
+    data.fromName = typeof body.fromName === "string" ? body.fromName.trim() || null : null;
+  }
+  if (body.secure !== undefined) data.secure = Boolean(body.secure);
+  if (Object.prototype.hasOwnProperty.call(body, "defaultSubject")) {
+    data.defaultSubject = typeof body.defaultSubject === "string" ? body.defaultSubject.trim() || null : null;
+  }
+  if (Object.prototype.hasOwnProperty.call(body, "defaultBody")) {
+    data.defaultBody = typeof body.defaultBody === "string" ? body.defaultBody.trim() || null : null;
+  }
+
+  const updated = updateEmailConfig(id, data);
+  if (!updated) return c.json({ error: "Email configuration not found" }, 404);
+  return c.json(updated);
+});
+
+adminRoutes.delete("/email-configs/:id", requirePermission("settings", "update"), (c) => {
+  const id = c.req.param("id");
+  const existing = getEmailConfigById(id);
+  if (!existing) return c.json({ error: "Email configuration not found" }, 404);
+  deleteEmailConfig(id);
+  return c.json({ deleted: true });
+});
+
+adminRoutes.post("/email-configs/:id/test", requirePermission("settings", "update"), async (c) => {
+  const id = c.req.param("id");
+  const config = getEmailConfigById(id);
+  if (!config) return c.json({ error: "Email configuration not found" }, 404);
+
+  let testTo: string = "";
+  try {
+    const body = await c.req.json();
+    testTo = typeof body.to === "string" ? body.to.trim() : "";
+  } catch {
+    // ignore, use from address as fallback
+  }
+  if (!testTo || !testTo.includes("@")) testTo = config.fromAddress;
+
+  try {
+    await sendEmailWithConfig(config, {
+      to: [testTo],
+      subject: "Invio: Test Email",
+      htmlBody: "<p>This is a test email from Invio. Your email configuration is working correctly.</p>",
+      textBody: "This is a test email from Invio. Your email configuration is working correctly.",
+    });
+    return c.json({ sent: true, to: testTo });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return c.json({ error: "Test email failed", details: msg }, 502);
+  }
+});
+
+// Send invoice via email
 adminRoutes.post(
   "/invoices/:id/send-email",
   requirePermission("invoices", "export"),
   async (c) => {
-    if (!isEmailConfigured()) {
-      return c.json(
-        { error: "Email is not configured. Set SMTP2GO_API_KEY and EMAIL_FROM_ADDRESS." },
-        503,
-      );
-    }
-
     const id = c.req.param("id");
     const invoice = getInvoiceById(id);
     if (!invoice) return c.json({ error: "Invoice not found" }, 404);
@@ -1675,13 +1786,29 @@ adminRoutes.post(
     let to: string[] = [];
     let subject = "";
     let message = "";
+    let parsedEmailConfigId: string | null = null;
     try {
       const body = await c.req.json();
       to = Array.isArray(body.to) ? body.to.filter((e: unknown) => typeof e === "string" && e.includes("@")) : [];
       subject = typeof body.subject === "string" ? body.subject.trim() : "";
       message = typeof body.message === "string" ? body.message.trim() : "";
+      parsedEmailConfigId = typeof body.emailConfigId === "string" ? body.emailConfigId : null;
     } catch {
       return c.json({ error: "Invalid request body" }, 400);
+    }
+
+    // Resolve email config
+    let resolvedDbConfig: Awaited<ReturnType<typeof getEmailConfigById>> | null = null;
+    if (parsedEmailConfigId) {
+      resolvedDbConfig = getEmailConfigById(parsedEmailConfigId);
+      if (!resolvedDbConfig) return c.json({ error: "Email configuration not found" }, 404);
+    } else if (!isEmailConfigured()) {
+      const dbConfigs = listEmailConfigs();
+      if (dbConfigs.length === 0) {
+        return c.json({ error: "Email is not configured. Add an email configuration in Settings." }, 503);
+      }
+      // Use first available DB config as fallback
+      resolvedDbConfig = getEmailConfigById(dbConfigs[0].id);
     }
 
     if (to.length === 0) {
@@ -1811,18 +1938,24 @@ adminRoutes.post(
       shareLink ? `\nView online: ${shareLink}` : "",
     ].filter((l) => l !== undefined).join("\n").trim();
 
+    const emailPayload = {
+      to,
+      subject,
+      htmlBody,
+      textBody,
+      attachment: {
+        filename: `invoice-${invoiceNumber}.pdf`,
+        content: pdfBuffer,
+        mimeType: "application/pdf",
+      },
+    };
+
     try {
-      await sendEmail({
-        to,
-        subject,
-        htmlBody,
-        textBody,
-        attachment: {
-          filename: `invoice-${invoiceNumber}.pdf`,
-          content: pdfBuffer,
-          mimeType: "application/pdf",
-        },
-      });
+      if (resolvedDbConfig) {
+        await sendEmailWithConfig(resolvedDbConfig, emailPayload);
+      } else {
+        await sendEmail(emailPayload);
+      }
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       console.error("Email send failed:", msg);

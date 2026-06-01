@@ -16,6 +16,16 @@ export interface SendEmailOptions {
   attachment?: EmailAttachment;
 }
 
+export interface SmtpConfig {
+  host: string;
+  port: number;
+  secure: boolean;
+  username?: string | null;
+  password?: string | null;
+  fromAddress: string;
+  fromName?: string | null;
+}
+
 export function isEmailConfigured(): boolean {
   return Boolean(
     getEnv("SMTP_HOST", "") &&
@@ -38,9 +48,10 @@ function getSmtpConfig() {
   return { host, port, secure, user, pass, fromAddress, fromName };
 }
 
-export async function sendEmail(opts: SendEmailOptions): Promise<void> {
-  const cfg = getSmtpConfig();
-
+async function sendWithSmtp(
+  cfg: { host: string; port: number; secure: boolean; user?: string | null; pass?: string | null; fromAddress: string; fromName?: string | null },
+  opts: SendEmailOptions,
+): Promise<void> {
   const transporter = nodemailer.createTransport({
     host: cfg.host,
     port: cfg.port,
@@ -73,3 +84,27 @@ export async function sendEmail(opts: SendEmailOptions): Promise<void> {
     attachments,
   });
 }
+
+export async function sendEmail(opts: SendEmailOptions): Promise<void> {
+  const cfg = getSmtpConfig();
+  await sendWithSmtp({ ...cfg, user: cfg.user, pass: cfg.pass }, opts);
+}
+
+export async function sendEmailWithConfig(
+  config: SmtpConfig,
+  opts: SendEmailOptions,
+): Promise<void> {
+  await sendWithSmtp(
+    {
+      host: config.host,
+      port: config.port,
+      secure: config.secure,
+      user: config.username,
+      pass: config.password,
+      fromAddress: config.fromAddress,
+      fromName: config.fromName,
+    },
+    opts,
+  );
+}
+

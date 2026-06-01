@@ -14,9 +14,10 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
   }
 
   try {
-    const [invoiceRes, settingsRes] = await Promise.allSettled([
+    const [invoiceRes, settingsRes, emailConfigsRes] = await Promise.allSettled([
       backendGet(`/api/v1/invoices/` + params.id, locals.authHeader),
       backendGet("/api/v1/settings", locals.authHeader),
+      backendGet("/api/v1/email-configs", locals.authHeader),
     ]);
     if (invoiceRes.status !== "fulfilled") {
       throw error(404, "Invoice not found");
@@ -25,6 +26,8 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
       settingsRes.status === "fulfilled"
         ? (settingsRes.value as Record<string, unknown>)
         : {};
+    const emailConfigs: Array<{ id: string; name: string; fromAddress: string; defaultSubject: string | null; defaultBody: string | null }> =
+      emailConfigsRes.status === "fulfilled" ? (emailConfigsRes.value as any[]) || [] : [];
     const allowProtectedInvoiceChanges =
       String(settings.allowProtectedInvoiceChanges || "false").toLowerCase() ===
       "true";
@@ -33,7 +36,8 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
       invoice: invoiceRes.value,
       showPublishedBanner,
       allowProtectedInvoiceChanges,
-      emailEnabled: Boolean(env.SMTP_HOST && env.EMAIL_FROM_ADDRESS),
+      emailEnabled: emailConfigs.length > 0 || Boolean(env.SMTP_HOST && env.EMAIL_FROM_ADDRESS),
+      emailConfigs,
     };
   } catch (err: any) {
     throw error(404, "Invoice not found");
@@ -108,6 +112,7 @@ export const actions: Actions = {
         const toRaw = String(data.get("emailTo") ?? "").trim();
         const subject = String(data.get("emailSubject") ?? "").trim();
         const message = String(data.get("emailMessage") ?? "").trim();
+        const emailConfigId = String(data.get("emailConfigId") ?? "").trim() || undefined;
 
         const to = toRaw
           .split(",")
@@ -126,6 +131,7 @@ export const actions: Actions = {
             to,
             subject,
             message,
+            ...(emailConfigId ? { emailConfigId } : {}),
           });
           return { emailSent: true, emailRecipients: to };
         } catch (e) {

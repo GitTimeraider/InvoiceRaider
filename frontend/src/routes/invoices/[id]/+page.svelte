@@ -43,8 +43,28 @@
   let emailEnabled = $derived(Boolean(data.emailEnabled));
   let canExport = $derived(hasPermission(user, "invoices", "export"));
 
+  type EmailConfig = { id: string; name: string; fromAddress: string; defaultSubject: string | null; defaultBody: string | null };
+  let emailConfigs = $derived((data as any).emailConfigs as EmailConfig[] ?? []);
+  let selectedEmailConfigId = $state<string>("");
+
+  // When configs load or change, default to first config
+  $effect(() => {
+    const configs = emailConfigs;
+    if (configs.length > 0 && !selectedEmailConfigId) {
+      selectedEmailConfigId = configs[0].id;
+    }
+  });
+
+  let selectedEmailConfig = $derived(
+    emailConfigs.find((c) => c.id === selectedEmailConfigId) ?? null
+  );
+
   let defaultEmailSubject = $derived(
-    invoice ? `Invoice #${invoice.invoiceNumber || invoice.id}` : "Invoice",
+    selectedEmailConfig?.defaultSubject ||
+    (invoice ? `Invoice #${invoice.invoiceNumber || invoice.id}` : "Invoice"),
+  );
+  let defaultEmailBody = $derived(
+    selectedEmailConfig?.defaultBody ?? ""
   );
   let defaultEmailTo = $derived(
     invoice?.customer?.email ?? "",
@@ -131,6 +151,25 @@
         }}
       >
         <input type="hidden" name="intent" value="send-email" />
+        <input type="hidden" name="emailConfigId" value={selectedEmailConfigId} />
+
+        {#if emailConfigs.length > 0}
+          <div class="form-control mb-3">
+            <label class="label pb-1" for="emailConfigSelect">
+              <span class="label-text font-medium">{t("Send from")}</span>
+            </label>
+            <select
+              id="emailConfigSelect"
+              class="select select-bordered w-full"
+              bind:value={selectedEmailConfigId}
+              disabled={emailSending}
+            >
+              {#each emailConfigs as cfg (cfg.id)}
+                <option value={cfg.id}>{cfg.name} ({cfg.fromAddress})</option>
+              {/each}
+            </select>
+          </div>
+        {/if}
 
         <div class="form-control mb-3">
           <label class="label pb-1" for="emailTo">
@@ -176,7 +215,7 @@
             rows="4"
             placeholder={t("Add a personal note...")}
             disabled={emailSending}
-          ></textarea>
+          >{defaultEmailBody}</textarea>
         </div>
 
         <div class="text-base-content/60 mb-4 flex items-center gap-2 text-sm">

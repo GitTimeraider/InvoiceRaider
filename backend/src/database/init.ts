@@ -452,6 +452,31 @@ function migrateInvoicesForVoided(database: DB): void {
   }
 }
 
+function ensureEmailConfigsTable(database: DB): void {
+  try {
+    database.execute(`
+      CREATE TABLE IF NOT EXISTS email_configs (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        host TEXT NOT NULL,
+        port INTEGER NOT NULL DEFAULT 587,
+        username TEXT,
+        password TEXT,
+        from_address TEXT NOT NULL,
+        from_name TEXT,
+        secure INTEGER NOT NULL DEFAULT 0,
+        default_subject TEXT,
+        default_body TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (!/already exists/i.test(msg)) console.warn("Could not create email_configs table:", msg);
+  }
+}
+
 function ensureSchemaUpgrades(database: DB): void {
   try {
     ensureCustomerColumns(database);
@@ -463,6 +488,7 @@ function ensureSchemaUpgrades(database: DB): void {
     ensureInvoiceItemColumns(database);
     ensureUserColumns(database);
     ensureStatusHistoryTable(database);
+    ensureEmailConfigsTable(database);
   } catch (e) {
     console.warn("Schema upgrade check failed:", e);
   }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Save, CircleAlert, Building2, Palette, Sun, Languages, LayoutTemplate, CreditCard, Percent, Package, Hash, FileCodeCorner, Shield } from "lucide-svelte";
+  import { Save, CircleAlert, Building2, Palette, Sun, Languages, LayoutTemplate, CreditCard, Percent, Package, Hash, FileCodeCorner, Shield, Mail } from "lucide-svelte";
   import { getContext } from "svelte";
   import { invalidateAll } from "$app/navigation";
   import { page } from "$app/state";
@@ -9,6 +9,7 @@
   import ProductOptionsManager from "./components/ProductOptionsManager.svelte";
   import TemplateOptionsManager from "./components/TemplateOptionsManager.svelte";
   import BrandingManager from "./components/BrandingManager.svelte";
+  import EmailConfigManager from "./components/EmailConfigManager.svelte";
 
   let { data } = $props();
   let t = getContext("i18n") as (key: string) => string;
@@ -218,6 +219,7 @@
       condition: () => data.hasTemplates,
     },
     { id: "payments", label: "Payments", icon: CreditCard },
+    { id: "email", label: "Email", icon: Mail },
     { id: "tax", label: "Tax", icon: Percent },
     { id: "products", label: "Products", icon: Package },
     { id: "numbering", label: "Numbering", icon: Hash },
@@ -314,6 +316,10 @@
     {:else if section === "products"}
       <div class="bg-base-100 rounded-box border-base-200 max-w-4xl border p-6">
         <ProductOptionsManager productCategories={data.productCategories} productUnits={data.productUnits} />
+      </div>
+    {:else if section === "email"}
+      <div class="bg-base-100 rounded-box border-base-200 max-w-4xl border p-6">
+        <EmailConfigManager emailConfigs={(data as any).emailConfigs || []} />
       </div>
     {:else if section === "templates"}
       <div class="bg-base-100 rounded-box border-base-200 max-w-4xl border p-6">
