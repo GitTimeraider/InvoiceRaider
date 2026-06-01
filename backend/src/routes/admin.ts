@@ -1889,7 +1889,6 @@ adminRoutes.post(
     // Build email body
     const companyName = businessSettings.companyName;
     const invoiceNumber = invoice.invoiceNumber || invoice.id;
-    const total = `${Number(invoice.total || 0).toFixed(2)} ${invoice.currency || ""}`.trim();
     const issueDate = invoice.issueDate
       ? new Date(invoice.issueDate).toISOString().slice(0, 10)
       : "";
@@ -1902,8 +1901,25 @@ adminRoutes.post(
       ? `${origin}/public/invoices/${invoice.shareToken}`
       : null;
 
-    const messageHtml = message
-      ? `<p style="white-space:pre-wrap;">${message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>`
+    // Substitute template variables in subject and message
+    function interpolate(text: string): string {
+      return text
+        .replace(/\{\{invoiceNumber\}\}/g, String(invoiceNumber))
+        .replace(/\{\{companyName\}\}/g, companyName)
+        .replace(/\{\{issueDate\}\}/g, issueDate)
+        .replace(/\{\{dueDate\}\}/g, dueDate ?? "")
+        .replace(/\{\{customerName\}\}/g, invoice.customer?.name ?? "");
+    }
+
+    const resolvedSubject = interpolate(subject);
+    const resolvedMessage = interpolate(message);
+
+    function escapeHtml(s: string): string {
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    const messageHtml = resolvedMessage
+      ? `<p>${escapeHtml(resolvedMessage).replace(/\n/g, "<br>")}</p>`
       : "";
     const shareLinkHtml = shareLink
       ? `<p><a href="${shareLink}" style="color:#2563eb;">View invoice online</a></p>`
@@ -1914,13 +1930,12 @@ adminRoutes.post(
 <html>
 <head><meta charset="utf-8"></head>
 <body style="font-family:sans-serif;color:#111;max-width:600px;margin:0 auto;padding:24px;">
-  <h2 style="margin-top:0;">${companyName}</h2>
+  <h2 style="margin-top:0;">${escapeHtml(companyName)}</h2>
   ${messageHtml}
   <table style="border-collapse:collapse;margin:16px 0;width:auto;">
-    <tr><td style="padding:4px 8px;color:#6b7280;">Invoice</td><td style="padding:4px 8px;font-weight:600;">#${invoiceNumber}</td></tr>
+    <tr><td style="padding:4px 8px;color:#6b7280;">Invoice</td><td style="padding:4px 8px;font-weight:600;">#${escapeHtml(String(invoiceNumber))}</td></tr>
     <tr><td style="padding:4px 8px;color:#6b7280;">Issue date</td><td style="padding:4px 8px;">${issueDate}</td></tr>
     ${dueDateHtml}
-    <tr><td style="padding:4px 8px;color:#6b7280;">Total</td><td style="padding:4px 8px;font-weight:600;">${total}</td></tr>
   </table>
   ${shareLinkHtml}
   <p style="color:#6b7280;font-size:13px;">The invoice PDF is attached to this email.</p>
@@ -1930,17 +1945,16 @@ adminRoutes.post(
     const textBody = [
       companyName,
       "",
-      message || "",
+      resolvedMessage || "",
       `Invoice: #${invoiceNumber}`,
       `Issue date: ${issueDate}`,
       dueDate ? `Due date: ${dueDate}` : "",
-      `Total: ${total}`,
       shareLink ? `\nView online: ${shareLink}` : "",
     ].filter((l) => l !== undefined).join("\n").trim();
 
     const emailPayload = {
       to,
-      subject,
+      subject: resolvedSubject,
       htmlBody,
       textBody,
       attachment: {
