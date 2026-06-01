@@ -34,10 +34,11 @@
 
     /* ── Header ─────────────────────────────────────── */
     .hd { display: table; width: 100%; margin-bottom: 22px; padding-bottom: 18px; border-bottom: 1px solid var(--rule); }
-    .hd-company { display: table-cell; vertical-align: top; width: 55%; }
+    .hd-company { display: table-cell; vertical-align: top; width: 55%; position: relative; padding-left: 76px; }
     .hd-meta    { display: table-cell; vertical-align: top; text-align: right; }
 
-    .logo { display: block; max-height: 40px; max-width: 160px; margin-bottom: 9px; object-fit: contain; }
+    .co-logo-box { position: absolute; left: 0; top: 0; bottom: 0; width: 68px; padding-right: 8px; }
+    .logo { height: 100%; max-width: 100%; object-fit: contain; display: block; }
 
     .co-name { font-size: 14px; font-weight: 800; color: var(--ink); margin-bottom: 4px; letter-spacing: -0.01em; }
     .co-detail { color: var(--ink-2); font-size: 10px; line-height: 1.65; }
@@ -186,7 +187,7 @@
   <!-- ── Header ──────────────────────────────────────── -->
   <div class="hd">
     <div class="hd-company">
-      {{#logoUrl}}<img class="logo" src="{{logoUrl}}" alt="{{companyName}}">{{/logoUrl}}
+      {{#logoUrl}}<div class="co-logo-box"><img class="logo" src="{{logoUrl}}" alt="{{companyName}}"></div>{{/logoUrl}}
       <div class="co-name">{{companyName}}</div>
       <div class="co-detail">
         {{#companyAddress}}<span>{{{companyAddress}}}</span>{{/companyAddress}}
