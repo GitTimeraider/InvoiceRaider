@@ -1,3 +1,9 @@
+## Fork to implement personal features and fixes like:
+- Fixing the editing button and allowing more changes afterwards
+- Adding sending mails from within the software
+------
+Below information might not reflext current status anymore.
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/kittendevv/Invio/refs/heads/main/assets/banner-default.png" alt="Invio" width="100%" />
 </p>
