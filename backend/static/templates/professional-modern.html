@@ -31,31 +31,27 @@
         width: 62%;
       }
 
-      /* brand row with optional logo; absolute-positioned logo fits company-info height */
+      /* brand row with optional logo; flex layout so logo takes only its natural width */
       .brand {
-        position: relative;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
         margin-right: 276px;
-        padding-left: 143px;
         margin-bottom: 6px;
       }
       .brand .logo-box {
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 140px;
-        padding-right: 0px;
+        flex-shrink: 0;
       }
       .brand .company-info {
         float: none;
         width: auto;
       }
       .brand img.logo {
-        height: 100%;
         width: auto;
+        max-width: 130px;
+        max-height: 80px;
         object-fit: contain;
         display: block;
-        max-width: 220px;
       }
 
       .company-name { font-size:20px; font-weight:800; color:var(--highlight-color); margin-bottom:4px; letter-spacing:-0.02em; }
