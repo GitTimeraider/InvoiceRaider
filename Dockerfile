@@ -13,7 +13,7 @@ RUN bun run build
 
 
 # ---------- Base runtime (Debian + deps + Deno + Bun + Supervisor) ----------
-FROM debian:12-slim
+FROM debian:13-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
