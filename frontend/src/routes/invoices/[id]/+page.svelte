@@ -99,7 +99,7 @@
 
   function confirmEditNavigation(event: MouseEvent) {
     if (!allowProtectedInvoiceChanges || !isRetentionProtectedInvoice) return;
-    if (!confirm(t("You are about to edit a sent/paid invoice. Ensure this is legally allowed in your jurisdiction. Continue?"))) {
+    if (!confirm(t("You are about to edit a sent/paid/complete invoice. Ensure this is legally allowed in your jurisdiction. Continue?"))) {
       event.preventDefault();
     }
   }
@@ -301,7 +301,7 @@
       class="hidden"
       use:enhance={confirmAction(() =>
         isRetentionProtectedInvoice
-          ? t("You are about to delete a sent/paid invoice. This may violate invoice retention laws and cannot be undone. Continue?")
+          ? t("You are about to delete a sent/paid/complete invoice. This may violate invoice retention laws and cannot be undone. Continue?")
           : t("Delete this invoice? This cannot be undone."),
       )}
     >

@@ -71,7 +71,7 @@
       for (const [key, value] of Object.entries(current)) {
         if (key === "allowProtectedInvoiceChanges") {
           const normalized = Boolean(value);
-          const baselineNormalized = Boolean(baseline[key]);
+          const baselineNormalized = asBool(baseline[key]);
           if (normalized !== baselineNormalized) {
             payload[key] = normalized;
           }
@@ -560,11 +560,11 @@
             <h2 class="text-xl font-semibold">{t("Payments & Texts")}</h2>
             <div class="alert alert-warning">
               <CircleAlert size={16} />
-              <span>{t("Allowing edits/deletes for sent or paid invoices can violate invoice retention laws. Only enable this if you understand the legal impact.")}</span>
+              <span>{t("Allowing edits/deletes for sent, paid, or complete invoices can violate invoice retention laws. Only enable this if you understand the legal impact.")}</span>
             </div>
             <label class="label cursor-pointer justify-start gap-4">
               <input type="checkbox" class="checkbox" bind:checked={settings.allowProtectedInvoiceChanges} disabled={!canUpdateSettings} />
-              <span class="label-text">{t("Allow editing and deleting sent/paid invoices")}</span>
+              <span class="label-text">{t("Allow editing and deleting sent/paid/complete invoices")}</span>
             </label>
             <label class="form-control"
               ><div class="label">

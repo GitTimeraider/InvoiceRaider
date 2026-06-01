@@ -20,7 +20,7 @@
 
 {#if data.allowProtectedInvoiceChanges && data.invoice && data.invoice.status !== "draft" && data.invoice.status !== "voided"}
   <div class="alert alert-warning mb-6">
-    <span>{t("Warning: you are editing a sent/paid invoice. Ensure this is legally allowed in your jurisdiction.")}</span>
+    <span>{t("Warning: you are editing a sent/paid/complete invoice. Ensure this is legally allowed in your jurisdiction.")}</span>
   </div>
 {/if}
 
