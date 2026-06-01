@@ -566,10 +566,10 @@
               <CircleAlert size={16} />
               <span>{t("Allowing edits/deletes for sent, paid, or complete invoices can violate invoice retention laws. Only enable this if you understand the legal impact.")}</span>
             </div>
-            <label class="label cursor-pointer justify-start gap-4">
+            <div class="flex items-center gap-4">
               <input type="checkbox" class="checkbox" bind:checked={settings.allowProtectedInvoiceChanges} disabled={!canUpdateSettings} />
               <span class="label-text">{t("Allow editing and deleting sent/paid/complete invoices")}</span>
-            </label>
+            </div>
             <label class="form-control"
               ><div class="label">
                 <span class="label-text">{t("Payment Methods")}</span>
