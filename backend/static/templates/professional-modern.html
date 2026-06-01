@@ -236,9 +236,19 @@
       .footer { border-top:1px solid var(--border-color); padding-top:12px; color:var(--text-light); font-size:10.5px; }
 
       .footer-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
+        display: table;
+        width: 100%;
+        border-spacing: 0;
+      }
+
+      .footer-section {
+        display: table-cell;
+        vertical-align: top;
+        padding-right: 24px;
+      }
+
+      .footer-section:last-child {
+        padding-right: 0;
       }
 
       .footer-section h4 {
