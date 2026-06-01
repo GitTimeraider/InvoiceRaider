@@ -326,5 +326,7 @@
   "From": "From",
   "User": "User",
   "Send from": "Send from",
-  "e.g. Company Mail": "e.g. Company Mail"
+  "e.g. Company Mail": "e.g. Company Mail",
+  "Payment Email": "Payment Email",
+  "Used for invoice emails": "Used for invoice emails"
 }

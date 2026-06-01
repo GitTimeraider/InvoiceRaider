@@ -1,5 +1,5 @@
-{
-  "Active": "Actief",
+{}
+
   "Add at least one item with a description.": "Voeg minstens één item met een omschrijving toe.",
   "Add category": "Categorie toevoegen",
   "Add item": "Item toevoegen",
@@ -351,5 +351,7 @@
   "You are about to edit a sent/paid/complete invoice. Ensure this is legally allowed in your jurisdiction. Continue?": "Je staat op het punt een verzonden/betaalde factuur te bewerken. Controleer of dit juridisch is toegestaan in jouw rechtsgebied. Doorgaan?",
   "password": "wachtwoord",
   "username": "gebruikersnaam",
-  "{{count}} item(s)": "{{count}} artikel(en)"
+  "{{count}} item(s)": "{{count}} artikel(en)",
+  "Payment Email": "Betalings-e-mail",
+  "Used for invoice emails": "Gebruikt voor factuur-e-mails"
 }

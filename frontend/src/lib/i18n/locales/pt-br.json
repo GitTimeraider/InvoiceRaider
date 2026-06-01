@@ -1,5 +1,5 @@
-{
-  "Active": "Ativo",
+{}
+
   "Add at least one item with a description.": "Adicione pelo menos um item com descrição.",
   "Add category": "Adicionar categoria",
   "Add item": "Adicionar item",
@@ -351,5 +351,7 @@
   "You are about to edit a sent/paid/complete invoice. Ensure this is legally allowed in your jurisdiction. Continue?": "Você está prestes a editar uma fatura enviada/paga. Garanta que isso seja legalmente permitido na sua jurisdição. Continuar?",
   "password": "senha",
   "username": "usuário",
-  "{{count}} item(s)": "{{count}} item(ns)"
+  "{{count}} item(s)": "{{count}} item(ns)",
+  "Payment Email": "E-mail de pagamento",
+  "Used for invoice emails": "Usado para e-mails de fatura"
 }

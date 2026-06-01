@@ -160,6 +160,7 @@ function ensureCustomerColumns(database: DB): void {
   addColumnIfMissing(database, "customers", "country_code", "TEXT");
   addColumnIfMissing(database, "customers", "city", "TEXT");
   addColumnIfMissing(database, "customers", "postal_code", "TEXT");
+  addColumnIfMissing(database, "customers", "payment_email", "TEXT");
 }
 
 function ensureInvoiceColumns(database: DB): void {

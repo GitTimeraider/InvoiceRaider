@@ -57,11 +57,19 @@
         </div>
 
         <div class="form-control w-full">
-          <label class="label pb-1" for="phone">
-            <span class="label-text">{t("Phone")}</span>
+          <label class="label pb-1" for="paymentEmail">
+            <span class="label-text">{t("Payment Email")}</span>
+            <span class="label-text-alt opacity-60">{t("Used for invoice emails")}</span>
           </label>
-          <input type="text" id="phone" name="phone" class="input input-sm input-bordered w-full" value={c.phone || ""} />
+          <input type="email" id="paymentEmail" name="paymentEmail" class="input input-sm input-bordered w-full" value={c.paymentEmail || ""} />
         </div>
+      </div>
+
+      <div class="form-control w-full">
+        <label class="label pb-1" for="phone">
+          <span class="label-text">{t("Phone")}</span>
+        </label>
+        <input type="text" id="phone" name="phone" class="input input-sm input-bordered w-full" value={c.phone || ""} />
       </div>
 
       <div class="form-control w-full">

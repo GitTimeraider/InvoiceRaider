@@ -67,7 +67,7 @@
     selectedEmailConfig?.defaultBody ?? ""
   );
   let defaultEmailTo = $derived(
-    invoice?.customer?.email ?? "",
+    invoice?.customer?.paymentEmail ?? invoice?.customer?.email ?? "",
   );
 
   $effect(() => {

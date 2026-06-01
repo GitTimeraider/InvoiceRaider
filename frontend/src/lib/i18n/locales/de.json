@@ -1,5 +1,5 @@
-{
-  "Active": "Aktiv",
+{}
+
   "Add at least one item with a description.": "Fügen Sie mindestens eine Position mit Beschreibung hinzu.",
   "Add category": "Kategorie hinzufügen",
   "Add item": "Position hinzufügen",
@@ -351,5 +351,7 @@
   "You are about to edit a sent/paid/complete invoice. Ensure this is legally allowed in your jurisdiction. Continue?": "Sie sind dabei, eine gesendete/bezahlte Rechnung zu bearbeiten. Stellen Sie sicher, dass dies in Ihrer Rechtsordnung zulässig ist. Fortfahren?",
   "password": "Passwort",
   "username": "Benutzername",
-  "{{count}} item(s)": "{{count}} Position(en)"
+  "{{count}} item(s)": "{{count}} Position(en)",
+  "Payment Email": "Zahlungs-E-Mail",
+  "Used for invoice emails": "Wird für Rechnungs-E-Mails verwendet"
 }

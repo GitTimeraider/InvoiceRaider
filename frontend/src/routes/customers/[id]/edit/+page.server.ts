@@ -40,6 +40,7 @@ export const actions: Actions = {
       name: String(form.get("name") || ""),
       contactName: String(form.get("contactName") || ""),
       email: String(form.get("email") || ""),
+      paymentEmail: String(form.get("paymentEmail") || ""),
       phone: String(form.get("phone") || ""),
       address: String(form.get("address") || ""),
       city: String(form.get("city") || ""),

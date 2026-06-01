@@ -3,6 +3,7 @@ export interface Customer {
   name: string;
   contactName?: string;
   email?: string;
+  paymentEmail?: string; // Email used for sending invoice emails
   phone?: string;
   address?: string;
   city?: string;
@@ -286,6 +287,7 @@ export interface CreateCustomerRequest {
   name: string;
   contactName?: string;
   email?: string;
+  paymentEmail?: string;
   phone?: string;
   address?: string;
   city?: string;

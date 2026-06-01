@@ -29,6 +29,7 @@ export const actions: Actions = {
     const name = String(form.get("name") || "");
     const contactName = String(form.get("contactName") || "");
     const email = String(form.get("email") || "");
+    const paymentEmail = String(form.get("paymentEmail") || "");
     const phone = String(form.get("phone") || "");
     const address = String(form.get("address") || "");
     const city = String(form.get("city") || "");
@@ -46,6 +47,7 @@ export const actions: Actions = {
         name,
         contactName: contactName || undefined,
         email: email || undefined,
+        paymentEmail: paymentEmail || undefined,
         phone: phone || undefined,
         address: address || undefined,
         city: city || undefined,
