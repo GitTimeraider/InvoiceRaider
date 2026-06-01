@@ -35,12 +35,12 @@
       .brand {
         display: flex;
         align-items: center;
-        gap: 24px;
         margin-right: 276px;
         margin-bottom: 6px;
       }
       .brand .logo-box {
         flex-shrink: 0;
+        margin-right: 24px;
       }
       .brand .company-info {
         float: none;
@@ -335,7 +335,7 @@
       .brand .logo {
         height: 100%;
         max-height: none;
-        max-width: 220px;
+        max-width: 275px;
         object-fit: contain;
         display: block;
       }
@@ -518,7 +518,7 @@
               logo.style.height = "auto";
               var h = info.offsetHeight;
               if (h && h > 0) {
-                logo.style.height = h + "px";
+                logo.style.height = Math.round(h * 1.25) + "px";
                 logo.style.width = "auto";
               }
             } catch (e) {}
