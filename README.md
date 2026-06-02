@@ -1,6 +1,8 @@
-## Fork to implement personal features and fixes like:
+## Fork for personal use
 - Fixing the editing button and allowing more changes afterwards
-- Adding sending mails from within the software
+- Adding sending mails from within the software (different setups/profiles can be created) and using specific company mails for it
+- Small adjustments to default templates
+- Some small GUI changes
 ------
 Below information might not reflext current status anymore.
 
