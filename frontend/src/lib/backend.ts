@@ -32,6 +32,23 @@ export async function backendPost(
   return await res.json();
 }
 
+export async function backendPostFormData(
+  path: string,
+  authHeader: string | null,
+  body: FormData,
+) {
+  const headers: Record<string, string> = {};
+  if (authHeader) headers["Authorization"] = authHeader;
+
+  const res = await fetch(`${BACKEND_URL}${path}`, {
+    method: "POST",
+    headers,
+    body,
+  });
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  return await res.json();
+}
+
 export async function backendDelete(path: string, authHeader: string | null) {
   const headers: Record<string, string> = {};
   if (authHeader) headers["Authorization"] = authHeader;

@@ -39,6 +39,7 @@
   let paidPaymentMethod = $state("");
   let emailSending = $state(false);
   let emailDialog: HTMLDialogElement;
+  let selectedEmailAttachments = $state<File[]>([]);
 
   let emailEnabled = $derived(Boolean(data.emailEnabled));
   let canExport = $derived(hasPermission(user, "invoices", "export"));
@@ -78,6 +79,17 @@
 
   function openEmailModal() {
     emailDialog?.showModal();
+  }
+
+  function onEmailAttachmentsChange(event: Event) {
+    const input = event.currentTarget as HTMLInputElement;
+    selectedEmailAttachments = input.files ? Array.from(input.files) : [];
+  }
+
+  function formatFileSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
   function fmtDate(d?: string | Date) {
@@ -141,12 +153,16 @@
 
       <form
         method="post"
+        enctype="multipart/form-data"
         use:enhance={() => {
           emailSending = true;
           return async ({ result, update }) => {
             await update({ reset: false });
             emailSending = false;
-            if (result.type === "success") emailDialog?.close();
+            if (result.type === "success") {
+              selectedEmailAttachments = [];
+              emailDialog?.close();
+            }
           };
         }}
       >
@@ -221,6 +237,32 @@
         <div class="text-base-content/60 mb-4 flex items-center gap-2 text-sm">
           <FileText size={14} />
           <span>{t("The invoice PDF will be attached automatically.")}</span>
+        </div>
+
+        <div class="form-control mb-4">
+          <label class="label pb-1" for="emailAttachments">
+            <span class="label-text font-medium">{t("Additional attachments")}</span>
+            <span class="label-text-alt opacity-60">{t("Optional")}</span>
+          </label>
+          <input
+            id="emailAttachments"
+            type="file"
+            name="attachments"
+            class="file-input file-input-bordered w-full"
+            multiple
+            disabled={emailSending}
+            onchange={onEmailAttachmentsChange}
+          />
+          {#if selectedEmailAttachments.length > 0}
+            <div class="bg-base-200/60 mt-2 rounded-lg px-3 py-2 text-xs">
+              <p class="mb-1 font-medium">{selectedEmailAttachments.length} {t("file(s) selected")}</p>
+              <ul class="space-y-1 opacity-80">
+                {#each selectedEmailAttachments as file (file.name + file.size)}
+                  <li class="truncate">{file.name} ({formatFileSize(file.size)})</li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
         </div>
 
         <div class="modal-action mt-0">

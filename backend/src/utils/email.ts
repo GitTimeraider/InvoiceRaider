@@ -14,6 +14,7 @@ export interface SendEmailOptions {
   htmlBody: string;
   textBody: string;
   attachment?: EmailAttachment;
+  attachments?: EmailAttachment[];
 }
 
 export interface SmtpConfig {
@@ -65,15 +66,16 @@ async function sendWithSmtp(
     ? `"${cfg.fromName}" <${cfg.fromAddress}>`
     : cfg.fromAddress;
 
-  const attachments = opts.attachment
-    ? [
-        {
-          filename: opts.attachment.filename,
-          content: Buffer.from(opts.attachment.content),
-          contentType: opts.attachment.mimeType,
-        },
-      ]
-    : [];
+  const normalizedAttachments = [
+    ...(opts.attachment ? [opts.attachment] : []),
+    ...(opts.attachments ?? []),
+  ];
+
+  const attachments = normalizedAttachments.map((attachment) => ({
+    filename: attachment.filename,
+    content: Buffer.from(attachment.content),
+    contentType: attachment.mimeType,
+  }));
 
   await transporter.sendMail({
     from,

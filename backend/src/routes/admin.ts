@@ -67,6 +67,7 @@ import {
 } from "../controllers/productOptions.ts";
 import { buildInvoiceHTML, generatePDF } from "../utils/pdf.ts";
 import { isEmailConfigured, sendEmail, sendEmailWithConfig } from "../utils/email.ts";
+import type { EmailAttachment } from "../utils/email.ts";
 import {
   createEmailConfig,
   deleteEmailConfig,
@@ -1787,12 +1788,62 @@ adminRoutes.post(
     let subject = "";
     let message = "";
     let parsedEmailConfigId: string | null = null;
+    const additionalAttachments: EmailAttachment[] = [];
+    const parseRecipients = (raw: string): string[] => raw
+      .split(",")
+      .map((entry) => entry.trim())
+      .filter((entry) => entry.includes("@"));
+    const sanitizeFilename = (input: string): string => {
+      const trimmed = input.trim();
+      if (!trimmed) return "attachment";
+      return trimmed.replace(/[\\/:*?"<>|\r\n]+/g, "_");
+    };
+    const MAX_ADDITIONAL_ATTACHMENTS = 10;
+    const MAX_ATTACHMENT_SIZE_BYTES = 15 * 1024 * 1024;
     try {
-      const body = await c.req.json();
-      to = Array.isArray(body.to) ? body.to.filter((e: unknown) => typeof e === "string" && e.includes("@")) : [];
-      subject = typeof body.subject === "string" ? body.subject.trim() : "";
-      message = typeof body.message === "string" ? body.message.trim() : "";
-      parsedEmailConfigId = typeof body.emailConfigId === "string" ? body.emailConfigId : null;
+      const contentType = c.req.header("content-type")?.toLowerCase() || "";
+      if (contentType.includes("multipart/form-data")) {
+        const formData = await c.req.formData();
+        to = parseRecipients(String(formData.get("to") ?? ""));
+        subject = String(formData.get("subject") ?? "").trim();
+        message = String(formData.get("message") ?? "").trim();
+        const rawEmailConfigId = String(formData.get("emailConfigId") ?? "").trim();
+        parsedEmailConfigId = rawEmailConfigId || null;
+
+        const files = formData.getAll("attachments");
+        if (files.length > MAX_ADDITIONAL_ATTACHMENTS) {
+          return c.json(
+            { error: `You can attach up to ${MAX_ADDITIONAL_ATTACHMENTS} additional files.` },
+            400,
+          );
+        }
+
+        for (const entry of files) {
+          if (!(entry instanceof File)) continue;
+          if (entry.size > MAX_ATTACHMENT_SIZE_BYTES) {
+            return c.json(
+              { error: `Attachment '${entry.name}' exceeds 15 MB.` },
+              400,
+            );
+          }
+          const content = new Uint8Array(await entry.arrayBuffer());
+          additionalAttachments.push({
+            filename: sanitizeFilename(entry.name),
+            content,
+            mimeType: entry.type || "application/octet-stream",
+          });
+        }
+      } else {
+        const body = await c.req.json();
+        if (Array.isArray(body.to)) {
+          to = body.to.filter((e: unknown) => typeof e === "string" && e.includes("@"));
+        } else if (typeof body.to === "string") {
+          to = parseRecipients(body.to);
+        }
+        subject = typeof body.subject === "string" ? body.subject.trim() : "";
+        message = typeof body.message === "string" ? body.message.trim() : "";
+        parsedEmailConfigId = typeof body.emailConfigId === "string" ? body.emailConfigId : null;
+      }
     } catch {
       return c.json({ error: "Invalid request body" }, 400);
     }
@@ -1957,11 +2008,14 @@ adminRoutes.post(
       subject: resolvedSubject,
       htmlBody,
       textBody,
-      attachment: {
-        filename: `invoice-${invoiceNumber}.pdf`,
-        content: pdfBuffer,
-        mimeType: "application/pdf",
-      },
+      attachments: [
+        {
+          filename: `invoice-${invoiceNumber}.pdf`,
+          content: pdfBuffer,
+          mimeType: "application/pdf",
+        },
+        ...additionalAttachments,
+      ],
     };
 
     try {
