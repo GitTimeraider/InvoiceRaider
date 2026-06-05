@@ -62,18 +62,6 @@ jobs:
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
             type=ref,event=tag
 
-      - name: Determine cache-to
-        id: cache-target
-        run: |
-          if [ "${{ github.event.pull_request.head.repo.fork }}" == "true" ]; then
-            echo "config=type=gha,mode=max" >> $GITHUB_OUTPUT
-          else
-            echo "config<<EOF" >> $GITHUB_OUTPUT
-            echo "type=registry,ref=ghcr.io/${{ steps.repo.outputs.name }}:buildcache,mode=max" >> $GITHUB_OUTPUT
-            echo "type=gha,mode=max" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-          fi
-
       - name: Build and push combined image
         uses: docker/build-push-action@v6.18.0
         with:
@@ -81,9 +69,7 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
           push: ${{ !github.event.pull_request.head.repo.fork }}
-          cache-from: |
-            type=registry,ref=ghcr.io/${{ steps.repo.outputs.name }}:buildcache
-            type=gha
-          cache-to: ${{ steps.cache-target.outputs.config }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
