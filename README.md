@@ -1,6 +1,6 @@
 ## Fork for personal use
 - Fixing the editing button and allowing more changes afterwards
-- Adding sending mails from within the software (different setups/profiles can be created) and using specific company mails for it
+- Adding sending mails from within the software (different setups/profiles can be created) and using specific company mails for it. Also allows for adding additional attachments to the mail.
 - Small adjustments to default templates
 - Some small GUI changes
 ------
