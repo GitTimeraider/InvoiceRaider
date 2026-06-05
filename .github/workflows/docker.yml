@@ -6,12 +6,16 @@ on:
     branches: [main, develop]
     paths-ignore:
       - ".github/dependabot.yml"
-      - "**.md"
+      - "README.md"
+      - "**/README.md"
+      - "**/*.md"
   pull_request:
     branches: [main, develop]
     paths-ignore:
       - ".github/dependabot.yml"
-      - "**.md"
+      - "README.md"
+      - "**/README.md"
+      - "**/*.md"
   release:
     types: [released]
 
