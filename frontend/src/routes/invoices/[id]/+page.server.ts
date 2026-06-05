@@ -1,6 +1,7 @@
 import {
   backendGet,
   backendPost,
+  backendPostFormData,
   backendPut,
   backendDelete,
 } from "$lib/backend";
@@ -113,6 +114,7 @@ export const actions: Actions = {
         const subject = String(data.get("emailSubject") ?? "").trim();
         const message = String(data.get("emailMessage") ?? "").trim();
         const emailConfigId = String(data.get("emailConfigId") ?? "").trim() || undefined;
+        const attachments = data.getAll("attachments").filter((entry): entry is File => entry instanceof File);
 
         const to = toRaw
           .split(",")
@@ -127,12 +129,16 @@ export const actions: Actions = {
         }
 
         try {
-          await backendPost(`/api/v1/invoices/${id}/send-email`, locals.authHeader, {
-            to,
-            subject,
-            message,
-            ...(emailConfigId ? { emailConfigId } : {}),
-          });
+          const payload = new FormData();
+          payload.set("to", to.join(","));
+          payload.set("subject", subject);
+          payload.set("message", message);
+          if (emailConfigId) payload.set("emailConfigId", emailConfigId);
+          for (const file of attachments) {
+            if (file.size > 0) payload.append("attachments", file, file.name);
+          }
+
+          await backendPostFormData(`/api/v1/invoices/${id}/send-email`, locals.authHeader, payload);
           return { emailSent: true, emailRecipients: to };
         } catch (e) {
           return fail(502, { emailError: `Failed to send: ${String(e)}` });
