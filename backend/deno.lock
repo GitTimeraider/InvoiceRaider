@@ -8,11 +8,11 @@
     "jsr:@std/path@^1.1.1": "1.1.2",
     "npm:@tailwindcss/postcss@^4.1.7": "4.1.12",
     "npm:cssnano@^7.0.7": "7.1.1_postcss@8.5.6",
-    "npm:daisyui@^5.0.54": "5.0.54",
-    "npm:otpauth@^9.4.1": "9.5.1",
+    "npm:daisyui@^5.5.23": "5.5.23",
+    "npm:otpauth@^9.5.1": "9.5.1",
     "npm:pdf-lib@^1.17.1": "1.17.1",
     "npm:postcss@^8.5.3": "8.5.6",
-    "npm:tailwindcss@^4.1.12": "4.1.12"
+    "npm:tailwindcss@^4.3.1": "4.3.1"
   },
   "jsr": {
     "@pakornv/fresh-plugin-tailwindcss@1.0.3": {
@@ -129,7 +129,7 @@
         "lightningcss",
         "magic-string",
         "source-map-js",
-        "tailwindcss"
+        "tailwindcss@4.1.12"
       ]
     },
     "@tailwindcss/oxide-android-arm64@4.1.12": {
@@ -228,7 +228,7 @@
         "@tailwindcss/node",
         "@tailwindcss/oxide",
         "postcss",
-        "tailwindcss"
+        "tailwindcss@4.1.12"
       ]
     },
     "@tybys/wasm-util@0.10.0": {
@@ -364,8 +364,8 @@
         "css-tree@2.2.1"
       ]
     },
-    "daisyui@5.0.54": {
-      "integrity": "sha512-03iuq06+lLq/VczY/+YpADgLXVC1HYO63PNiH6A9hn/+f6IkVoONVc+Jh08xizkLQQCVVMMUBp+KeIdcWSBLcg=="
+    "daisyui@5.5.23": {
+      "integrity": "sha512-xuheNUSL4T6ZVtWXoioqcNkjoyGX85QTDz4HTw2aBPfqk4fuMjax5HDo8qCmpV6M1YN8bGvfx5BpYCoDeRlt+A=="
     },
     "detect-libc@2.0.4": {
       "integrity": "sha512-3UDv+G9CsCKO1WKMGw9fwq/SWJYbI0c5Y7LU1AXYoDdbhE2AHQ6N6Nb34sG8Fj7T5APy8qXDCKuuIHd1BR0tVA=="
@@ -805,6 +805,9 @@
     "tailwindcss@4.1.12": {
       "integrity": "sha512-DzFtxOi+7NsFf7DBtI3BJsynR+0Yp6etH+nRPTbpWnS2pZBaSksv/JGctNwSWzbFjp0vxSqknaUylseZqMDGrA=="
     },
+    "tailwindcss@4.3.1": {
+      "integrity": "sha512-hk+TB1m+K8CYNrP6rjQaq/Y+4Zylwpa87mLYBKCunwnnQ9p+fHb7kmSfGqyEJoxF/O6CDyABWVFEafNSYKll+Q=="
+    },
     "tapable@2.2.3": {
       "integrity": "sha512-ZL6DDuAlRlLGghwcfmSn9sK3Hr6ArtyudlSAiCqQ6IfE+b+HHbydbYDIG15IfS5do+7XQQBdBiubF/cV2dnDzg=="
     },
@@ -1143,10 +1146,10 @@
   "workspace": {
     "dependencies": [
       "jsr:@pakornv/fresh-plugin-tailwindcss@^1.0.3",
-      "npm:daisyui@^5.0.54",
-      "npm:otpauth@^9.4.1",
+      "npm:daisyui@^5.5.23",
+      "npm:otpauth@^9.5.1",
       "npm:pdf-lib@^1.17.1",
-      "npm:tailwindcss@^4.1.12"
+      "npm:tailwindcss@^4.3.1"
     ]
   }
 }
