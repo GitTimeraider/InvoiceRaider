@@ -9,7 +9,7 @@
     "npm:@tailwindcss/postcss@^4.1.7": "4.1.12",
     "npm:cssnano@^7.0.7": "7.1.1_postcss@8.5.6",
     "npm:daisyui@^5.5.23": "5.5.23",
-    "npm:otpauth@^9.4.1": "9.5.1",
+    "npm:otpauth@^9.5.1": "9.5.1",
     "npm:pdf-lib@^1.17.1": "1.17.1",
     "npm:postcss@^8.5.3": "8.5.6",
     "npm:tailwindcss@^4.3.1": "4.3.1"
@@ -1147,7 +1147,7 @@
     "dependencies": [
       "jsr:@pakornv/fresh-plugin-tailwindcss@^1.0.3",
       "npm:daisyui@^5.5.23",
-      "npm:otpauth@^9.4.1",
+      "npm:otpauth@^9.5.1",
       "npm:pdf-lib@^1.17.1",
       "npm:tailwindcss@^4.3.1"
     ]
