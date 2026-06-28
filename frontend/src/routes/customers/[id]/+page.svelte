@@ -94,5 +94,12 @@
         <div class="font-medium">{c.countryCode || "-"}</div>
       </div>
     </div>
+
+    {#if c.notes}
+      <div class="mt-4 border-t border-base-200 pt-4">
+        <div class="mb-1 text-sm opacity-70">{t("Notes")}</div>
+        <div class="font-medium whitespace-pre-wrap">{c.notes}</div>
+      </div>
+    {/if}
   </div>
 {/if}

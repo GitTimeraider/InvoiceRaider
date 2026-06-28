@@ -36,6 +36,7 @@ export const actions: Actions = {
     const postalCode = String(form.get("postalCode") || "");
     const taxId = String(form.get("taxId") || "");
     const countryCode = String(form.get("countryCode") || "");
+    const notes = String(form.get("notes") || "");
 
     if (!name) {
       return fail(400, { error: "Name is required" });
@@ -54,6 +55,7 @@ export const actions: Actions = {
         postalCode: postalCode || undefined,
         taxId: taxId || undefined,
         countryCode: countryCode || undefined,
+        notes: notes || undefined,
       });
     } catch (e: any) {
       if (e && typeof e === "object" && "status" in e && "location" in e)

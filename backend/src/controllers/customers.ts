@@ -16,6 +16,7 @@ const mapRowToCustomer = (row: unknown[]): Customer => ({
   city: (row[9] ?? undefined) as string | undefined,
   postalCode: (row[10] ?? undefined) as string | undefined,
   paymentEmail: (row[11] ?? undefined) as string | undefined,
+  notes: (row[12] ?? undefined) as string | undefined,
 });
 
 export const getCustomers = () => {
@@ -24,7 +25,7 @@ export const getCustomers = () => {
   let results: unknown[][] = [];
   try {
     results = db.query(
-      "SELECT id, name, contact_name, email, phone, address, country_code, tax_id, created_at, city, postal_code, payment_email FROM customers ORDER BY created_at DESC",
+      "SELECT id, name, contact_name, email, phone, address, country_code, tax_id, created_at, city, postal_code, payment_email, notes FROM customers ORDER BY created_at DESC",
     ) as unknown[][];
   } catch (_e) {
     // fallback older schema
@@ -46,7 +47,7 @@ export const getCustomerById = (id: string): Customer | null => {
   let results: unknown[][] = [];
   try {
     results = db.query(
-      "SELECT id, name, contact_name, email, phone, address, country_code, tax_id, created_at, city, postal_code, payment_email FROM customers WHERE id = ?",
+      "SELECT id, name, contact_name, email, phone, address, country_code, tax_id, created_at, city, postal_code, payment_email, notes FROM customers WHERE id = ?",
       [id],
     ) as unknown[][];
   } catch (_e) {
@@ -87,12 +88,13 @@ export const createCustomer = (data: CreateCustomerRequest): Customer => {
   const city = toNullable((data as { city?: string }).city);
   const postal = toNullable((data as { postalCode?: string }).postalCode);
   const taxId = toNullable(data.taxId);
+  const notes = toNullable(data.notes);
 
   try {
     db.query(
       `
-      INSERT INTO customers (id, name, contact_name, email, phone, address, country_code, tax_id, created_at, city, postal_code, payment_email)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO customers (id, name, contact_name, email, phone, address, country_code, tax_id, created_at, city, postal_code, payment_email, notes)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
       [
         customerId,
@@ -107,6 +109,7 @@ export const createCustomer = (data: CreateCustomerRequest): Customer => {
         city,
         postal,
         paymentEmail,
+        notes,
       ],
     );
   } catch (_e) {
@@ -155,6 +158,7 @@ export const createCustomer = (data: CreateCustomerRequest): Customer => {
     createdAt: now,
     city: city ?? undefined,
     postalCode: postal ?? undefined,
+    notes: notes ?? undefined,
   };
 };
 
@@ -214,12 +218,16 @@ export const updateCustomer = (
     (data as { postalCode?: string }).postalCode !== undefined
       ? toNullable((data as { postalCode?: string }).postalCode)
       : (existing.postalCode ?? null);
+  const notes =
+    data.notes !== undefined
+      ? toNullable(data.notes)
+      : (existing.notes ?? null);
 
   try {
     db.query(
       `
       UPDATE customers SET
-        name = ?, contact_name = ?, email = ?, phone = ?, address = ?, country_code = ?, tax_id = ?, city = ?, postal_code = ?, payment_email = ?
+        name = ?, contact_name = ?, email = ?, phone = ?, address = ?, country_code = ?, tax_id = ?, city = ?, postal_code = ?, payment_email = ?, notes = ?
       WHERE id = ?
     `,
       [
@@ -233,6 +241,7 @@ export const updateCustomer = (
         city,
         postal,
         paymentEmail,
+        notes,
         id,
       ],
     );

@@ -104,5 +104,13 @@
       </label>
       <input type="text" id="countryCode" name="countryCode" placeholder={t("e.g. US, NL, DE")} class="input input-sm input-bordered w-full" />
     </div>
+
+    <div class="form-control w-full">
+      <label class="label pb-1" for="notes">
+        <span class="label-text">{t("Notes")}</span>
+        <span class="label-text-alt opacity-60">{t("Internal only, not shown on invoices")}</span>
+      </label>
+      <textarea id="notes" name="notes" class="textarea textarea-bordered w-full" rows="4"></textarea>
+    </div>
   </div>
 </form>

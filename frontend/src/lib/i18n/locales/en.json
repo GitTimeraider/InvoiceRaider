@@ -328,5 +328,6 @@
   "Send from": "Send from",
   "e.g. Company Mail": "e.g. Company Mail",
   "Payment Email": "Payment Email",
-  "Used for invoice emails": "Used for invoice emails"
+  "Used for invoice emails": "Used for invoice emails",
+  "Internal only, not shown on invoices": "Internal only, not shown on invoices"
 }

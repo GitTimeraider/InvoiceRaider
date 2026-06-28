@@ -47,6 +47,7 @@ export const actions: Actions = {
       postalCode: String(form.get("postalCode") || ""),
       taxId: String(form.get("taxId") || ""),
       countryCode: String(form.get("countryCode") || ""),
+      notes: String(form.get("notes") || ""),
     };
 
     if (!payload.name) return fail(400, { error: "Name is required" });
