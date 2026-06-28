@@ -11,6 +11,7 @@ export interface Customer {
   countryCode?: string; // ISO 3166-1 alpha-2
   taxId?: string;
   reference?: string; // BuyerReference or order ref
+  notes?: string; // Internal notes, not shown on invoices
   createdAt: Date;
 }
 
@@ -294,6 +295,7 @@ export interface CreateCustomerRequest {
   postalCode?: string;
   countryCode?: string; // ISO alpha-2
   taxId?: string;
+  notes?: string;
 }
 
 export interface CreateProductRequest {

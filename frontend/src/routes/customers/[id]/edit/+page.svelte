@@ -108,6 +108,14 @@
         </label>
         <input type="text" id="countryCode" name="countryCode" placeholder={t("e.g. US, NL, DE")} class="input input-sm input-bordered w-full" value={c.countryCode || ""} />
       </div>
+
+      <div class="form-control w-full">
+        <label class="label pb-1" for="notes">
+          <span class="label-text">{t("Notes")}</span>
+          <span class="label-text-alt opacity-60">{t("Internal only, not shown on invoices")}</span>
+        </label>
+        <textarea id="notes" name="notes" class="textarea textarea-bordered w-full" rows="4" value={c.notes || ""}></textarea>
+      </div>
     </div>
   </form>
 {:else if data.error}
