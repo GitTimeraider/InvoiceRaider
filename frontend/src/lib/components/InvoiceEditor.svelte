@@ -21,7 +21,13 @@
     status: initInvoice?.status || "draft",
     issueDate: initInvoice?.issueDate ? new Date(initInvoice.issueDate).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
     dueDate: initInvoice?.dueDate ? new Date(initInvoice.dueDate).toISOString().slice(0, 10) : "",
-    taxMode: initInvoice?.taxMode || "line",
+    taxMode: initInvoice
+      ? initInvoice.items?.some((i: any) => i.taxes?.length > 0)
+        ? "line"
+        : Number(initInvoice.taxRate) > 0
+          ? "invoice"
+          : "line"
+      : "line",
     taxRate: initInvoice?.taxRate || 0,
     pricesIncludeTax: initInvoice?.pricesIncludeTax ? "true" : "false",
     roundingMode: initInvoice?.roundingMode || "line",
@@ -36,6 +42,9 @@
           id: generateId(),
           unit: i.unit || "",
           productId: i.productId || "",
+          // The UI supports one tax per line; take the first entry if multiple exist
+          taxPercent: i.taxes?.length ? Number(i.taxes[0].percent || 0) : 0,
+          taxDefinitionId: i.taxes?.length ? (i.taxes[0].taxDefinitionId || "") : "",
         }))
       : [
           {
@@ -88,8 +97,10 @@
     if (form.taxMode === "line" && product.taxDefinitionId) {
       const taxDef = taxDefinitions.find((t: any) => t.id === product.taxDefinitionId);
       item.taxPercent = Number(taxDef?.percent || 0);
+      item.taxDefinitionId = product.taxDefinitionId;
     } else {
       item.taxPercent = 0;
+      item.taxDefinitionId = "";
     }
   }
 
@@ -185,8 +196,16 @@
           quantity: Number(i.quantity),
           unit: typeof i.unit === "string" ? i.unit.trim() : "",
           unitPrice: Number(i.unitPrice),
-          taxPercent: Number(i.taxPercent || 0),
           notes: i.notes,
+          taxes:
+            form.taxMode === "line" && Number(i.taxPercent || 0) > 0
+              ? [
+                  {
+                    percent: Number(i.taxPercent),
+                    taxDefinitionId: i.taxDefinitionId || undefined,
+                  },
+                ]
+              : undefined,
         })),
       };
       const url = initInvoice ? "/api/v1/invoices/" + initInvoice.id : "/api/v1/invoices";
