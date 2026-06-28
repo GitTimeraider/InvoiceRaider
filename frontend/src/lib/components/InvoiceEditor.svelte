@@ -21,7 +21,7 @@
     status: initInvoice?.status || "draft",
     issueDate: initInvoice?.issueDate ? new Date(initInvoice.issueDate).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
     dueDate: initInvoice?.dueDate ? new Date(initInvoice.dueDate).toISOString().slice(0, 10) : "",
-    taxMode: initInvoice?.taxMode || "invoice",
+    taxMode: initInvoice?.taxMode || "line",
     taxRate: initInvoice?.taxRate || 0,
     pricesIncludeTax: initInvoice?.pricesIncludeTax ? "true" : "false",
     roundingMode: initInvoice?.roundingMode || "line",
@@ -70,10 +70,16 @@
 
   function applyProductSelection(item: any, productId: string) {
     item.productId = productId;
-    if (!productId) return;
+    if (!productId) {
+      item.taxPercent = 0;
+      return;
+    }
 
     const product = products.find((p: any) => p.id === productId);
-    if (!product) return;
+    if (!product) {
+      item.taxPercent = 0;
+      return;
+    }
 
     item.description = product.name || item.description;
     item.unitPrice = Number(product.unitPrice ?? product.unit_price ?? item.unitPrice ?? 0);
@@ -81,9 +87,9 @@
 
     if (form.taxMode === "line" && product.taxDefinitionId) {
       const taxDef = taxDefinitions.find((t: any) => t.id === product.taxDefinitionId);
-      if (taxDef) {
-        item.taxPercent = Number(taxDef.percent || 0);
-      }
+      item.taxPercent = Number(taxDef?.percent || 0);
+    } else {
+      item.taxPercent = 0;
     }
   }
 
