@@ -46,6 +46,7 @@ export const actions: Actions = {
       city: String(form.get("city") || ""),
       postalCode: String(form.get("postalCode") || ""),
       taxId: String(form.get("taxId") || ""),
+      companyId: String(form.get("companyId") || ""),
       countryCode: String(form.get("countryCode") || ""),
       notes: String(form.get("notes") || ""),
     };

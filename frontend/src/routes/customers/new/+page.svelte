@@ -99,6 +99,13 @@
     </div>
 
     <div class="form-control w-full">
+      <label class="label pb-1" for="companyId">
+        <span class="label-text">{t("Company ID")}</span>
+      </label>
+      <input type="text" id="companyId" name="companyId" class="input input-sm input-bordered w-full" />
+    </div>
+
+    <div class="form-control w-full">
       <label class="label pb-1" for="countryCode">
         <span class="label-text">{t("Country Code (ISO alpha-2)")}</span>
       </label>

@@ -35,6 +35,7 @@ export const actions: Actions = {
     const city = String(form.get("city") || "");
     const postalCode = String(form.get("postalCode") || "");
     const taxId = String(form.get("taxId") || "");
+    const companyId = String(form.get("companyId") || "");
     const countryCode = String(form.get("countryCode") || "");
     const notes = String(form.get("notes") || "");
 
@@ -54,6 +55,7 @@ export const actions: Actions = {
         city: city || undefined,
         postalCode: postalCode || undefined,
         taxId: taxId || undefined,
+        companyId: companyId || undefined,
         countryCode: countryCode || undefined,
         notes: notes || undefined,
       });
