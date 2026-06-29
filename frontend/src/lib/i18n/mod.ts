@@ -55,6 +55,7 @@ export type LocalizationConfig = {
   numberFormat: "comma" | "period";
   dateFormat: string;
   postalCityFormat: "auto" | "city-postal" | "postal-city";
+  currency: string;
 };
 
 export const DEFAULT_LOCALIZATION: LocalizationConfig = {
@@ -62,6 +63,7 @@ export const DEFAULT_LOCALIZATION: LocalizationConfig = {
   numberFormat: "comma",
   dateFormat: "YYYY-MM-DD",
   postalCityFormat: "auto",
+  currency: "USD",
 };
 
 export function resolveLocalization(
@@ -69,6 +71,7 @@ export function resolveLocalization(
   numberFormat?: string,
   dateFormat?: string,
   postalCityFormat?: string,
+  currency?: string,
 ): LocalizationConfig {
   const { locale: normalized, messages, t } = createTranslator(locale);
   const nf = numberFormat === "period" ? "period" : "comma";
@@ -80,6 +83,7 @@ export function resolveLocalization(
     postalCityFormat === "city-postal" || postalCityFormat === "postal-city"
       ? postalCityFormat
       : "auto";
+  const curr = typeof currency === "string" && currency.trim() ? currency : "USD";
   return {
     locale: normalized,
     messages,
@@ -87,5 +91,6 @@ export function resolveLocalization(
     numberFormat: nf,
     dateFormat: df,
     postalCityFormat: pcf,
+    currency: curr,
   };
 }

@@ -544,9 +544,6 @@
             {[invoice.customer?.address, formatPostalCityLine(invoice.customer?.city, invoice.customer?.postalCode, invoice.customer?.countryCode, getLoc()?.postalCityFormat)]
               .filter(Boolean)
               .join("\n")}
-            {#if invoice.customer?.countryCode}
-              <br />{invoice.customer.countryCode}
-            {/if}
           {/if}
         </div>
       </div>

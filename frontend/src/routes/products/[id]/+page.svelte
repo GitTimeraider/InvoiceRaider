@@ -11,15 +11,15 @@
   let p = $derived(data.product);
   let taxDef = $derived(data.taxDefinition);
   let user = $derived(data.user);
+  let currency = $derived(data.localization?.currency || "USD");
   let canUpdate = $derived(hasPermission(user, "products", "update"));
   let canDelete = $derived(hasPermission(user, "products", "delete"));
 
-  function fmtMoney(cur: string | undefined, n: number) {
-    if (!cur) cur = "USD";
+  function fmtMoney(n: number) {
     try {
-      return new Intl.NumberFormat(data.localization?.numberFormat === "period" ? "de-DE" : "en-US", { style: "currency", currency: cur }).format(n || 0);
+      return new Intl.NumberFormat(data.localization?.numberFormat === "period" ? "de-DE" : "en-US", { style: "currency", currency: currency }).format(n || 0);
     } catch {
-      return `${cur} ${Number(n || 0).toFixed(2)}`;
+      return `${currency} ${Number(n || 0).toFixed(2)}`;
     }
   }
 
@@ -81,7 +81,7 @@
       <div>
         <div class="mb-1 text-sm opacity-70">{t("Unit Price")}</div>
         <div class="font-medium">
-          {fmtMoney(data.settings?.currency, p.unitPrice)}
+          {fmtMoney(p.unitPrice)}
         </div>
       </div>
       <div>

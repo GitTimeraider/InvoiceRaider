@@ -17,20 +17,23 @@ export function formatPostalCityLine(
 ): string {
   const place = (city || "").trim();
   const postal = (postalCode || "").trim();
-  if (!place && !postal) return "";
-  if (!place) return postal;
-  if (!postal) return place;
-
-  if (format === "city-postal") {
-    return `${place} ${postal}`;
-  }
-  if (format === "postal-city") {
-    return `${postal} ${place}`;
-  }
-
   const country = (countryCode || "").trim().toUpperCase();
-  if (CITY_FIRST_POSTAL_COUNTRIES.has(country)) {
-    return `${place} ${postal}`;
+  
+  if (!place && !postal) return "";
+  if (!place && !postal) return country;
+  
+  let line = "";
+  if (format === "city-postal") {
+    line = postal ? `${place} ${postal}` : place;
+  } else if (format === "postal-city") {
+    line = `${postal} ${place}`;
+  } else {
+    if (CITY_FIRST_POSTAL_COUNTRIES.has(country)) {
+      line = postal ? `${place} ${postal}` : place;
+    } else {
+      line = postal ? `${postal} ${place}` : place;
+    }
   }
-  return `${postal} ${place}`;
+  
+  return country ? `${line}, ${country}` : line;
 }
