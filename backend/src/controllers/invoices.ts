@@ -1419,7 +1419,7 @@ function getCustomerById(id: string) {
   let rows: unknown[][] = [];
   try {
     rows = db.query(
-      "SELECT id, name, contact_name, email, phone, address, country_code, tax_id, created_at, city, postal_code, payment_email FROM customers WHERE id = ?",
+      "SELECT id, name, contact_name, email, phone, address, country_code, tax_id, created_at, city, postal_code, payment_email, company_id FROM customers WHERE id = ?",
       [id],
     ) as unknown[][];
   } catch (_e) {
@@ -1438,19 +1438,52 @@ function getCustomerById(id: string) {
   }
   if (rows.length === 0) return null;
   const row = rows[0] as unknown[];
+
+  // Latest schema
+  if (row.length >= 13) {
+    return {
+      id: row[0] as string,
+      name: row[1] as string,
+      contactName: (row[2] ?? undefined) as string | undefined,
+      email: (row[3] ?? undefined) as string | undefined,
+      phone: (row[4] ?? undefined) as string | undefined,
+      address: (row[5] ?? undefined) as string | undefined,
+      countryCode: (row[6] ?? undefined) as string | undefined,
+      taxId: (row[7] ?? undefined) as string | undefined,
+      createdAt: new Date(row[8] as string),
+      city: (row[9] ?? undefined) as string | undefined,
+      postalCode: (row[10] ?? undefined) as string | undefined,
+      paymentEmail: (row[11] ?? undefined) as string | undefined,
+      companyId: (row[12] ?? undefined) as string | undefined,
+    };
+  }
+
+  // Legacy schema with city/postal but without contact_name/payment_email/company_id
+  if (row.length >= 10) {
+    return {
+      id: row[0] as string,
+      name: row[1] as string,
+      email: (row[2] ?? undefined) as string | undefined,
+      phone: (row[3] ?? undefined) as string | undefined,
+      address: (row[4] ?? undefined) as string | undefined,
+      countryCode: (row[5] ?? undefined) as string | undefined,
+      taxId: (row[6] ?? undefined) as string | undefined,
+      createdAt: new Date(row[7] as string),
+      city: (row[8] ?? undefined) as string | undefined,
+      postalCode: (row[9] ?? undefined) as string | undefined,
+    };
+  }
+
+  // Oldest schema
   return {
     id: row[0] as string,
     name: row[1] as string,
-    contactName: (row[2] ?? undefined) as string | undefined,
-    email: (row[3] ?? undefined) as string | undefined,
-    phone: (row[4] ?? undefined) as string | undefined,
-    address: (row[5] ?? undefined) as string | undefined,
-    countryCode: (row[6] ?? undefined) as string | undefined,
-    taxId: (row[7] ?? undefined) as string | undefined,
-    createdAt: new Date(row[8] as string),
-    city: (row[9] ?? undefined) as string | undefined,
-    postalCode: (row[10] ?? undefined) as string | undefined,
-    paymentEmail: (row[11] ?? undefined) as string | undefined,
+    email: (row[2] ?? undefined) as string | undefined,
+    phone: (row[3] ?? undefined) as string | undefined,
+    address: (row[4] ?? undefined) as string | undefined,
+    countryCode: (row[5] ?? undefined) as string | undefined,
+    taxId: (row[6] ?? undefined) as string | undefined,
+    createdAt: new Date(row[7] as string),
   };
 }
 
