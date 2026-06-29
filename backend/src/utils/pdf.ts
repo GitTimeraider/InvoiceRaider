@@ -109,6 +109,19 @@ function formatAddressLine(
   return `${addr}, ${postal}`;
 }
 
+function formatTaxCompanyIdLine(
+  taxId?: string,
+  companyId?: string,
+  taxLabel: string = "Tax ID",
+): string | undefined {
+  const tax = (taxId || "").trim();
+  const company = (companyId || "").trim();
+  if (tax && company) return `${taxLabel}: ${tax} || Company ID: ${company}`;
+  if (tax) return `${taxLabel}: ${tax}`;
+  if (company) return `Company ID: ${company}`;
+  return undefined;
+}
+
 const BLOCKED_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
 
 function isPrivateIPv4Host(hostname: string): boolean {
@@ -361,6 +374,11 @@ function buildContext(
     companyEmail: settings?.companyEmail || "",
     companyPhone: settings?.companyPhone || "",
     companyTaxId: settings?.companyTaxId || "",
+    companyTaxCompanyIdLine: formatTaxCompanyIdLine(
+      settings?.companyTaxId,
+      settings?.companyCompanyId,
+      labels.taxIdLabel,
+    ),
 
     // Invoice
     invoiceNumber: invoice.invoiceNumber,
@@ -395,6 +413,11 @@ function buildContext(
     ),
     customerCompanyId: (invoice.customer.companyId || "").trim() || undefined,
     customerTaxId: invoice.customer.taxId,
+    customerTaxCompanyIdLine: formatTaxCompanyIdLine(
+      invoice.customer.taxId,
+      invoice.customer.companyId,
+      labels.taxIdLabel,
+    ),
 
     // Items
     items: invoice.items.map((i) => ({

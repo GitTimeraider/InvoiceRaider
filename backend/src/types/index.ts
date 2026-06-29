@@ -343,6 +343,7 @@ export interface TemplateContext {
   companyEmail: string;
   companyPhone: string;
   companyTaxId?: string;
+  companyTaxCompanyIdLine?: string;
 
   // Invoice info
   invoiceNumber: string;
@@ -364,6 +365,7 @@ export interface TemplateContext {
   customerAddressLine?: string;
   customerCompanyId?: string; // Added Customer ID field
   customerTaxId?: string;
+  customerTaxCompanyIdLine?: string;
 
   // Items
   items: Array<{

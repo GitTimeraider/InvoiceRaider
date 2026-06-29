@@ -197,8 +197,7 @@
             {{#companyAddressLine}}<span>{{companyAddressLine}}</span>{{/companyAddressLine}}
             {{#companyEmail}}<span>{{companyEmail}}</span>{{/companyEmail}}
             {{#companyPhone}}<span>{{companyPhone}}</span>{{/companyPhone}}
-            {{#companyTaxId}}<span>{{labels.taxIdLabel}}: {{companyTaxId}}{{#companyCompanyId}} | Company ID: {{companyCompanyId}}{{/companyCompanyId}}</span>{{/companyTaxId}}
-            {{^companyTaxId}}{{#companyCompanyId}}<span>Company ID: {{companyCompanyId}}</span>{{/companyCompanyId}}{{/companyTaxId}}
+            {{#companyTaxCompanyIdLine}}<span>{{companyTaxCompanyIdLine}}</span>{{/companyTaxCompanyIdLine}}
           </div>
         </div>
       </div>
@@ -236,8 +235,7 @@
         {{#customerEmail}}<span>{{customerEmail}}</span>{{/customerEmail}}
         {{#customerPhone}}<span>{{customerPhone}}</span>{{/customerPhone}}
         {{#customerAddressLine}}<span>{{customerAddressLine}}</span>{{/customerAddressLine}}
-        {{#customerTaxId}}<span>{{labels.taxIdLabel}}: {{customerTaxId}}{{#customerCompanyId}} | Company ID: {{customerCompanyId}}{{/customerCompanyId}}</span>{{/customerTaxId}}
-        {{^customerTaxId}}{{#customerCompanyId}}<span>Company ID: {{customerCompanyId}}</span>{{/customerCompanyId}}{{/customerTaxId}}
+        {{#customerTaxCompanyIdLine}}<span>{{customerTaxCompanyIdLine}}</span>{{/customerTaxCompanyIdLine}}
       </div>
     </div>
   </div>
