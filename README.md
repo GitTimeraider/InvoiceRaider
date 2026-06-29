@@ -1,5 +1,6 @@
 ## Fork for personal use
 - Fixing the editing button and allowing more changes afterwards
+- Addition of company ID (visible on Invoices) and Customer notes (Not visible on Invoices)
 - Adding sending mails from within the software (different setups/profiles can be created) and using specific company mails for it. Also allows for adding additional attachments to the mail.
 - Small adjustments to default templates
 - Some small GUI changes
