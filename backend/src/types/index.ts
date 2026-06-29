@@ -216,7 +216,6 @@ export interface User {
   updatedAt: Date;
 }
 
-  companyId?: string;
 export interface UserWithPermissions extends User {
   permissions: Permission[];
 }
