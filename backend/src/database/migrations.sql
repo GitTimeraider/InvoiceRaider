@@ -11,6 +11,7 @@ INSERT OR IGNORE INTO settings (key, value) VALUES
   ('companyEmail', 'contact@yourcompany.com'),
   ('companyPhone', '+1 (555) 123-4567'),
   ('companyTaxId', 'TAX123456789'),
+  ('companyCompanyId', ''),
   ('companyCountryCode', 'US'),
   ('currency', 'USD'),
   ('logo', ''),
@@ -40,6 +41,7 @@ CREATE TABLE customers (
   address TEXT,
   country_code TEXT,
   tax_id TEXT,
+  company_id TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

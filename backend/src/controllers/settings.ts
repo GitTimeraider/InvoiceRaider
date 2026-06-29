@@ -18,6 +18,7 @@ export const updateSettings = (data: Record<string, string>) => {
     // Treat explicit empty strings for certain keys as clearing the setting
     const shouldClear = [
       "companyTaxId",
+      "companyCompanyId",
       "taxId", // alias that may slip through
       "companyPhone",
       "phone", // alias

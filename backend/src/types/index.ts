@@ -216,6 +216,7 @@ export interface User {
   updatedAt: Date;
 }
 
+  companyId?: string;
 export interface UserWithPermissions extends User {
   permissions: Permission[];
 }
@@ -297,6 +298,7 @@ export interface CreateCustomerRequest {
   postalCode?: string;
   countryCode?: string; // ISO alpha-2
   taxId?: string;
+  companyId?: string;
   notes?: string;
 }
 
@@ -338,7 +340,7 @@ export interface TemplateContext {
   companyPostalCode?: string;
   companyPostalCity?: string;
   companyAddressLine?: string;
-  companyCompanyId?: string;
+  companyCompanyId?: string; // Added Company ID field
   companyEmail: string;
   companyPhone: string;
   companyTaxId?: string;
@@ -361,7 +363,7 @@ export interface TemplateContext {
   customerCountryCode?: string;
   customerPostalCity?: string;
   customerAddressLine?: string;
-  customerCompanyId?: string;
+  customerCompanyId?: string; // Added Customer ID field
   customerTaxId?: string;
 
   // Items
