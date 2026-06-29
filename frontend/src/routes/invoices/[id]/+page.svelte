@@ -557,10 +557,16 @@
       </div>
 
       <div class="flex flex-wrap gap-1 text-xs opacity-60">
-        {t("Tax rate")}: {invoice.taxRate}% -
-        {t("Prices include tax")}: {invoice.pricesIncludeTax ? t("Yes") : t("No")} -
-        {t("Rounding")}: {t("Round per line")} -
-        {t("Tax mode")}: {invoice.taxes?.length ? t("Per line") : t("Invoice total")}
+        {#if invoice.taxes?.length}
+          {t("Prices include tax")}: {invoice.pricesIncludeTax ? t("Yes") : t("No")} -
+          {t("Rounding")}: {t("Round per line")} -
+          {t("Tax mode")}: {t("Per line")}
+        {:else}
+          {t("Tax rate")}: {invoice.taxRate}% -
+          {t("Prices include tax")}: {invoice.pricesIncludeTax ? t("Yes") : t("No")} -
+          {t("Rounding")}: {t("Round per line")} -
+          {t("Tax mode")}: {t("Invoice total")}
+        {/if}
       </div>
 
       <div class="mt-4">
