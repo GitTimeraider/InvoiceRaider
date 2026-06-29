@@ -4,7 +4,7 @@
 - Small adjustments to default templates
 - Some small GUI changes
 ------
-Below information might not reflext current status anymore.
+Below information might not reflext current status anymore
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/kittendevv/Invio/refs/heads/main/assets/banner-default.png" alt="Invio" width="100%" />

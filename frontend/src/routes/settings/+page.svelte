@@ -505,11 +505,17 @@
               </label>
               <label class="form-control"
                 ><div class="label">
-                  <span class="label-text">{t("Country Code")}</span>
+                  <span class="label-text">{t("Company ID")}</span>
                 </div>
-                <input type="text" class="input input-bordered w-full" bind:value={settings.companyCountryCode} disabled={!canUpdateSettings} placeholder="US" />
+                <input type="text" class="input input-bordered w-full" bind:value={settings.companyCompanyId} disabled={!canUpdateSettings} />
               </label>
             </div>
+            <label class="form-control"
+              ><div class="label">
+                <span class="label-text">{t("Country Code")}</span>
+              </div>
+              <input type="text" class="input input-bordered w-full" bind:value={settings.companyCountryCode} disabled={!canUpdateSettings} placeholder="US" />
+            </label>
           </div>
         {:else if section === "branding"}
           <BrandingManager {settings} templates={data.templates} {canUpdateSettings} />

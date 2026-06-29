@@ -75,24 +75,51 @@ function formatPostalCityLine(
 ): string | undefined {
   const postal = (postalCode || "").trim();
   const place = (city || "").trim();
-  if (!postal && !place) return undefined;
-  if (!postal) return place;
-  if (!place) return postal;
-
+  const country = (countryCode || "").trim().toUpperCase();
+  
+  if (!postal && !place) return country || undefined;
+  
+  let line = "";
   const normalizedFormat = normalizePostalCityFormat(format);
   if (normalizedFormat === "city-postal") {
     // City + Postal formats frequently expect a comma for readable locality. Example: Boston, 02110
-    return `${place}, ${postal}`;
+    line = postal ? `${place}, ${postal}` : place;
+  } else if (normalizedFormat === "postal-city") {
+    line = postal ? `${postal} ${place}` : place;
+  } else {
+    if (CITY_FIRST_POSTAL_COUNTRIES.has(country)) {
+      line = postal ? `${place} ${postal}` : place;
+    } else {
+      line = postal ? `${postal} ${place}` : place;
+    }
   }
-  if (normalizedFormat === "postal-city") {
-    return `${postal} ${place}`;
-  }
+  
+  return country ? `${line}, ${country}` : (line || undefined);
+}
 
-  const country = (countryCode || "").trim().toUpperCase();
-  if (CITY_FIRST_POSTAL_COUNTRIES.has(country)) {
-    return `${place} ${postal}`;
-  }
-  return `${postal} ${place}`;
+function formatAddressLine(
+  address?: string,
+  postalCityCountry?: string,
+): string | undefined {
+  const addr = (address || "").trim();
+  const postal = (postalCityCountry || "").trim();
+  if (!addr && !postal) return undefined;
+  if (!addr) return postal;
+  if (!postal) return addr;
+  return `${addr}, ${postal}`;
+}
+
+function formatTaxCompanyIdLine(
+  taxId?: string,
+  companyId?: string,
+  taxLabel: string = "Tax ID",
+): string | undefined {
+  const tax = (taxId || "").trim();
+  const company = (companyId || "").trim();
+  if (tax && company) return `${taxLabel}: ${tax} || Company ID: ${company}`;
+  if (tax) return `${taxLabel}: ${tax}`;
+  if (company) return `Company ID: ${company}`;
+  return undefined;
 }
 
 const BLOCKED_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
@@ -339,9 +366,19 @@ function buildContext(
     companyCity: (settings?.companyCity || "").trim() || undefined,
     companyPostalCode: (settings?.companyPostalCode || "").trim() || undefined,
     companyPostalCity,
+    companyAddressLine: formatAddressLine(
+      settings?.companyAddress || "",
+      companyPostalCity,
+    ),
+    companyCompanyId: (settings?.companyCompanyId || "").trim() || undefined,
     companyEmail: settings?.companyEmail || "",
     companyPhone: settings?.companyPhone || "",
     companyTaxId: settings?.companyTaxId || "",
+    companyTaxCompanyIdLine: formatTaxCompanyIdLine(
+      settings?.companyTaxId,
+      settings?.companyCompanyId,
+      labels.taxIdLabel,
+    ),
 
     // Invoice
     invoiceNumber: invoice.invoiceNumber,
@@ -365,7 +402,22 @@ function buildContext(
       invoice.customer.countryCode,
       settings?.postalCityFormat,
     ),
+    customerAddressLine: formatAddressLine(
+      invoice.customer.address,
+      formatPostalCityLine(
+        invoice.customer.postalCode,
+        invoice.customer.city,
+        invoice.customer.countryCode,
+        settings?.postalCityFormat,
+      ),
+    ),
+    customerCompanyId: (invoice.customer.companyId || "").trim() || undefined,
     customerTaxId: invoice.customer.taxId,
+    customerTaxCompanyIdLine: formatTaxCompanyIdLine(
+      invoice.customer.taxId,
+      invoice.customer.companyId,
+      labels.taxIdLabel,
+    ),
 
     // Items
     items: invoice.items.map((i) => ({

@@ -83,11 +83,15 @@
         <div class="mb-1 text-sm opacity-70">
           {t("City")} / {t("Postal Code")}
         </div>
-        <div class="font-medium">{formatPostalCityLine(c.city, c.postalCode, c.countryCode, getLoc()?.postalCityFormat) || "-"}</div>
+        <div class="font-medium">{formatPostalCityLine(c.city, c.postalCode, undefined, getLoc()?.postalCityFormat) || "-"}</div>
       </div>
       <div>
         <div class="mb-1 text-sm opacity-70">{t("Tax ID")}</div>
         <div class="font-medium">{c.taxId || "-"}</div>
+      </div>
+      <div>
+        <div class="mb-1 text-sm opacity-70">{t("Company ID")}</div>
+        <div class="font-medium">{c.companyId || "-"}</div>
       </div>
       <div>
         <div class="mb-1 text-sm opacity-70">{t("Country Code")}</div>

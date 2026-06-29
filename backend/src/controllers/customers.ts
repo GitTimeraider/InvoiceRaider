@@ -2,7 +2,7 @@ import { getDatabase } from "../database/init.ts";
 import { CreateCustomerRequest, Customer } from "../types/index.ts";
 import { generateUUID } from "../utils/uuid.ts";
 
-const mapRowToCustomer = (row: unknown[]): Customer => ({
+const mapLatestCustomerRow = (row: unknown[]): Customer => ({
   id: row[0] as string,
   name: row[1] as string,
   contactName: (row[2] ?? undefined) as string | undefined,
@@ -12,11 +12,38 @@ const mapRowToCustomer = (row: unknown[]): Customer => ({
   countryCode: (row[6] ?? undefined) as string | undefined,
   taxId: (row[7] ?? undefined) as string | undefined,
   createdAt: new Date(row[8] as string),
-  // Optional city/postal_code columns if present at the end
   city: (row[9] ?? undefined) as string | undefined,
   postalCode: (row[10] ?? undefined) as string | undefined,
   paymentEmail: (row[11] ?? undefined) as string | undefined,
   notes: (row[12] ?? undefined) as string | undefined,
+  companyId: (row[13] ?? undefined) as string | undefined,
+});
+
+const mapLegacyCustomerRow = (row: unknown[]): Customer => ({
+  id: row[0] as string,
+  name: row[1] as string,
+  contactName: (row[2] ?? undefined) as string | undefined,
+  email: (row[3] ?? undefined) as string | undefined,
+  phone: (row[4] ?? undefined) as string | undefined,
+  address: (row[5] ?? undefined) as string | undefined,
+  countryCode: (row[6] ?? undefined) as string | undefined,
+  taxId: (row[7] ?? undefined) as string | undefined,
+  createdAt: new Date(row[8] as string),
+  city: (row[9] ?? undefined) as string | undefined,
+  postalCode: (row[10] ?? undefined) as string | undefined,
+  paymentEmail: (row[11] ?? undefined) as string | undefined,
+  notes: (row[12] ?? undefined) as string | undefined,
+});
+
+const mapOldCustomerRow = (row: unknown[]): Customer => ({
+  id: row[0] as string,
+  name: row[1] as string,
+  email: (row[2] ?? undefined) as string | undefined,
+  phone: (row[3] ?? undefined) as string | undefined,
+  address: (row[4] ?? undefined) as string | undefined,
+  countryCode: (row[5] ?? undefined) as string | undefined,
+  taxId: (row[6] ?? undefined) as string | undefined,
+  createdAt: new Date(row[7] as string),
 });
 
 export const getCustomers = () => {
@@ -25,7 +52,7 @@ export const getCustomers = () => {
   let results: unknown[][] = [];
   try {
     results = db.query(
-      "SELECT id, name, contact_name, email, phone, address, country_code, tax_id, created_at, city, postal_code, payment_email, notes FROM customers ORDER BY created_at DESC",
+      "SELECT id, name, contact_name, email, phone, address, country_code, tax_id, created_at, city, postal_code, payment_email, notes, company_id FROM customers ORDER BY created_at DESC",
     ) as unknown[][];
   } catch (_e) {
     // fallback older schema
@@ -39,7 +66,11 @@ export const getCustomers = () => {
       ) as unknown[][];
     }
   }
-  return results.map((row: unknown[]) => mapRowToCustomer(row));
+  return results.map((row: unknown[]) => {
+    if (row.length >= 14) return mapLatestCustomerRow(row);
+    if (row.length >= 13) return mapLegacyCustomerRow(row);
+    return mapOldCustomerRow(row);
+  });
 };
 
 export const getCustomerById = (id: string): Customer | null => {
@@ -47,7 +78,7 @@ export const getCustomerById = (id: string): Customer | null => {
   let results: unknown[][] = [];
   try {
     results = db.query(
-      "SELECT id, name, contact_name, email, phone, address, country_code, tax_id, created_at, city, postal_code, payment_email, notes FROM customers WHERE id = ?",
+      "SELECT id, name, contact_name, email, phone, address, country_code, tax_id, created_at, city, postal_code, payment_email, notes, company_id FROM customers WHERE id = ?",
       [id],
     ) as unknown[][];
   } catch (_e) {
@@ -64,7 +95,10 @@ export const getCustomerById = (id: string): Customer | null => {
     }
   }
   if (results.length === 0) return null;
-  return mapRowToCustomer(results[0] as unknown[]);
+  const row = results[0] as unknown[];
+  if (row.length >= 14) return mapLatestCustomerRow(row);
+  if (row.length >= 13) return mapLegacyCustomerRow(row);
+  return mapOldCustomerRow(row);
 };
 
 const toNullable = (v?: string): string | null => {
@@ -88,13 +122,14 @@ export const createCustomer = (data: CreateCustomerRequest): Customer => {
   const city = toNullable((data as { city?: string }).city);
   const postal = toNullable((data as { postalCode?: string }).postalCode);
   const taxId = toNullable(data.taxId);
+  const companyId = toNullable(data.companyId);
   const notes = toNullable(data.notes);
 
   try {
     db.query(
       `
-      INSERT INTO customers (id, name, contact_name, email, phone, address, country_code, tax_id, created_at, city, postal_code, payment_email, notes)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO customers (id, name, contact_name, email, phone, address, country_code, tax_id, created_at, city, postal_code, payment_email, notes, company_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
       [
         customerId,
@@ -110,6 +145,7 @@ export const createCustomer = (data: CreateCustomerRequest): Customer => {
         postal,
         paymentEmail,
         notes,
+        companyId,
       ],
     );
   } catch (_e) {
@@ -155,6 +191,7 @@ export const createCustomer = (data: CreateCustomerRequest): Customer => {
     address: address ?? undefined,
     countryCode: countryCode ?? undefined,
     taxId: taxId ?? undefined,
+    companyId: companyId ?? undefined,
     createdAt: now,
     city: city ?? undefined,
     postalCode: postal ?? undefined,
@@ -210,6 +247,10 @@ export const updateCustomer = (
     data.taxId !== undefined
       ? toNullable(data.taxId)
       : (existing.taxId ?? null);
+  const companyId =
+    data.companyId !== undefined
+      ? toNullable(data.companyId)
+      : (existing.companyId ?? null);
   const city =
     (data as { city?: string }).city !== undefined
       ? toNullable((data as { city?: string }).city)
@@ -227,7 +268,7 @@ export const updateCustomer = (
     db.query(
       `
       UPDATE customers SET
-        name = ?, contact_name = ?, email = ?, phone = ?, address = ?, country_code = ?, tax_id = ?, city = ?, postal_code = ?, payment_email = ?, notes = ?
+        name = ?, contact_name = ?, email = ?, phone = ?, address = ?, country_code = ?, tax_id = ?, city = ?, postal_code = ?, payment_email = ?, notes = ?, company_id = ?
       WHERE id = ?
     `,
       [
@@ -242,6 +283,7 @@ export const updateCustomer = (
         postal,
         paymentEmail,
         notes,
+        companyId,
         id,
       ],
     );

@@ -194,11 +194,10 @@
         {{#logoUrl}}<img class="logo" src="{{logoUrl}}" alt="{{companyName}}">{{/logoUrl}}
         <div class="co-name">{{companyName}}</div>
         <div class="co-detail">
-          {{#companyAddress}}<span>{{{companyAddress}}}</span>{{/companyAddress}}
-          {{#companyPostalCity}}<span>{{companyPostalCity}}</span>{{/companyPostalCity}}
+          {{#companyAddressLine}}<span>{{companyAddressLine}}</span>{{/companyAddressLine}}
           {{#companyEmail}}<span>{{companyEmail}}</span>{{/companyEmail}}
           {{#companyPhone}}<span>{{companyPhone}}</span>{{/companyPhone}}
-          {{#companyTaxId}}<span>{{labels.taxIdLabel}}: {{companyTaxId}}</span>{{/companyTaxId}}
+          {{#companyTaxCompanyIdLine}}<span>{{companyTaxCompanyIdLine}}</span>{{/companyTaxCompanyIdLine}}
         </div>
       </div>
 
@@ -235,15 +234,13 @@
           {{#customerContactName}}<span>{{customerContactName}}</span>{{/customerContactName}}
           {{#customerEmail}}<span>{{customerEmail}}</span>{{/customerEmail}}
           {{#customerPhone}}<span>{{customerPhone}}</span>{{/customerPhone}}
-          {{#customerAddress}}<span>{{{customerAddress}}}</span>{{/customerAddress}}
-          {{#customerPostalCity}}<span>{{customerPostalCity}}</span>{{/customerPostalCity}}
-          {{#customerCountryCode}}<span>{{customerCountryCode}}</span>{{/customerCountryCode}}
-          {{#customerTaxId}}<span>{{labels.taxIdLabel}}: {{customerTaxId}}</span>{{/customerTaxId}}
+          {{#customerAddressLine}}<span>{{customerAddressLine}}</span>{{/customerAddressLine}}
+          {{#customerTaxCompanyIdLine}}<span>{{customerTaxCompanyIdLine}}</span>{{/customerTaxCompanyIdLine}}
         </div>
       </div>
     </div>
 
-    <!-- Items -->
+    <!-- Line items -->
     <table class="items">
       <thead>
         <tr>

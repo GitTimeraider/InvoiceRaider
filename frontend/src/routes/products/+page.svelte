@@ -6,6 +6,7 @@
   let t = getContext("i18n") as (key: string) => string;
 
   let numberFormat = $derived(data.localization?.numberFormat || "comma");
+  let currency = $derived(data.localization?.currency || "USD");
   let user = $derived(data.user);
   let canCreate = $derived(user?.isAdmin || user?.permissions?.some((p) => p.resource === "products" && p.action === "create"));
   let products = $derived(data.products || []);
@@ -14,16 +15,15 @@
     return Number(p.unitPrice ?? p.unit_price ?? p.price ?? 0);
   }
 
-  function fmtMoney(cur: string | undefined, n: number) {
-    if (!cur) cur = "USD";
+  function fmtMoney(n: number) {
     try {
       const locale = numberFormat === "period" ? "de-DE" : "en-US";
       return new Intl.NumberFormat(locale, {
         style: "currency",
-        currency: cur,
+        currency: currency,
       }).format(n || 0);
     } catch {
-      return `${cur} ${Number(n || 0).toFixed(2)}`;
+      return `${currency} ${Number(n || 0).toFixed(2)}`;
     }
   }
 </script>
@@ -52,7 +52,7 @@
         <div class="mb-2 flex items-start justify-between">
           <div class="line-clamp-2 pr-2 font-semibold">{p.name || p.id}</div>
           <div class="font-medium whitespace-nowrap">
-            {fmtMoney(p.currency, getProductPrice(p))}
+            {fmtMoney(getProductPrice(p))}
           </div>
         </div>
         {#if p.description}
@@ -90,7 +90,7 @@
             <a class="link" href={`/products/${p.id}`}>{p.name || p.id}</a>
           </td>
           <td class="max-w-[20rem] truncate opacity-70">{p.description || ""}</td>
-          <td class="pr-4 text-right font-medium">{fmtMoney(p.currency, getProductPrice(p))}</td>
+          <td class="pr-4 text-right font-medium">{fmtMoney(getProductPrice(p))}</td>
         </tr>
       {/each}
       {#if products.length === 0}

@@ -10,6 +10,7 @@ export interface Customer {
   postalCode?: string;
   countryCode?: string; // ISO 3166-1 alpha-2
   taxId?: string;
+  companyId?: string;
   reference?: string; // BuyerReference or order ref
   notes?: string; // Internal notes, not shown on invoices
   createdAt: Date;
@@ -112,6 +113,7 @@ export interface BusinessSettings {
   companyEmail?: string;
   companyPhone?: string;
   companyTaxId?: string;
+  companyCompanyId?: string;
   companyCountryCode?: string; // ISO alpha-2
   currency: string;
   taxLabel?: string; // e.g. "GST", "VAT", "Sales tax"
@@ -295,6 +297,7 @@ export interface CreateCustomerRequest {
   postalCode?: string;
   countryCode?: string; // ISO alpha-2
   taxId?: string;
+  companyId?: string;
   notes?: string;
 }
 
@@ -335,9 +338,12 @@ export interface TemplateContext {
   companyCity?: string;
   companyPostalCode?: string;
   companyPostalCity?: string;
+  companyAddressLine?: string;
+  companyCompanyId?: string; // Added Company ID field
   companyEmail: string;
   companyPhone: string;
   companyTaxId?: string;
+  companyTaxCompanyIdLine?: string;
 
   // Invoice info
   invoiceNumber: string;
@@ -356,7 +362,10 @@ export interface TemplateContext {
   customerPostalCode?: string;
   customerCountryCode?: string;
   customerPostalCity?: string;
+  customerAddressLine?: string;
+  customerCompanyId?: string; // Added Customer ID field
   customerTaxId?: string;
+  customerTaxCompanyIdLine?: string;
 
   // Items
   items: Array<{

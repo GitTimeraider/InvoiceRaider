@@ -162,6 +162,22 @@ function ensureCustomerColumns(database: DB): void {
   addColumnIfMissing(database, "customers", "postal_code", "TEXT");
   addColumnIfMissing(database, "customers", "payment_email", "TEXT");
   addColumnIfMissing(database, "customers", "notes", "TEXT");
+  addColumnIfMissing(database, "customers", "company_id", "TEXT");
+}
+
+function ensureCompanyIdSettings(database: DB): void {
+  try {
+    const rows = database.query(
+      "SELECT value FROM settings WHERE key = 'companyCompanyId' LIMIT 1",
+    );
+    if (rows.length === 0) {
+      database.query(
+        "INSERT INTO settings (key, value) VALUES ('companyCompanyId', '')",
+      );
+    }
+  } catch {
+    /* ignore */
+  }
 }
 
 function ensureInvoiceColumns(database: DB): void {
@@ -482,6 +498,7 @@ function ensureEmailConfigsTable(database: DB): void {
 function ensureSchemaUpgrades(database: DB): void {
   try {
     ensureCustomerColumns(database);
+    ensureCompanyIdSettings(database);
     ensureInvoiceColumns(database);
     ensureTaxTables(database);
     ensureProductTables(database);
