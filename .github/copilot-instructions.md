@@ -1,4 +1,4 @@
-# Copilot instructions for Invio
+# Copilot instructions for InvoiceRaider
 
 ## Build, test, and lint commands
 

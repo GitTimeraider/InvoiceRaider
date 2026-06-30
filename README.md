@@ -8,68 +8,68 @@
 Below information might not reflext current status anymore
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/kittendevv/Invio/refs/heads/main/assets/banner-default.png" alt="Invio" width="100%" />
+  <img src="https://raw.githubusercontent.com/GitTimeraider/InvoiceRaider/refs/heads/main/assets/banner-default.png" alt="InvoiceRaider" width="100%" />
 </p>
 <p align="center"><b>Selfhosted invoicing without the bloat.</b></p>
 <p align="center">
-  <a href="https://invio.dev">Website</a> •
-  <a href="https://demo.invio.dev">Live Demo</a> •
-  <a href="https://github.com/kittendevv/Invio/wiki">Documentation</a> •
+  <a href="https://invoiceraider.dev">Website</a> •
+  <a href="https://demo.invoiceraider.dev">Live Demo</a> •
+  <a href="https://github.com/GitTimeraider/InvoiceRaider/wiki">Documentation</a> •
   <a href="https://ko-fi.com/codingkitten">Support</a>
 </p>
 <p align="center">
-  <img src="https://hackatime-badge.hackclub.com/U080TNHKK32/Invio" alt="Hacktime Badge" style="height: 30px;" height="30">
+  <img src="https://hackatime-badge.hackclub.com/U080TNHKK32/InvoiceRaider" alt="Hacktime Badge" style="height: 30px;" height="30">
 </p>
 
 ------
 
-## 🌟 Why Invio?
+## 🌟 Why InvoiceRaider?
 
 - Zero Bloat - Create an invoice, share a link, get paid. No menus to dig through, no setup wizards, no fluff.
 - Fully Selfhosted - Your data, stays your data. Host it on your own hardware and never worry about what happens when a SaaS company changes its pricing or shuts down.
 - Client Friendly - Skip the 'how do I log in?' emails. Just send a secure link, no account needed.
-- Free. Forever. - No subscription, no per-invoice charges, no hidden fees. Invio is fully free and open source. Good tools shouldn't cost a fortune.
+- Free. Forever. - No subscription, no per-invoice charges, no hidden fees. InvoiceRaider is fully free and open source. Good tools shouldn't cost a fortune.
 
 ## 🚀 Quick Start
 
-Check out the [Quick Start guide](https://github.com/kittendevv/Invio/wiki/Quick-Start) in the documentation to get up and running.
+Check out the [Quick Start guide](https://github.com/GitTimeraider/InvoiceRaider/wiki/Quick-Start) in the documentation to get up and running.
 
 ## 🖼️ Screenshots
 
 <details>
 <summary>Dashboard</summary>
   
-<img src="https://cdn.hackclub.com/019c2a41-c03a-7dc0-be72-df477fdb13e1/screenshot_2026-02-04_210324.png" alt="Invio Dashboard" width="100%" />
+<img src="https://cdn.hackclub.com/019c2a41-c03a-7dc0-be72-df477fdb13e1/screenshot_2026-02-04_210324.png" alt="InvoiceRaider Dashboard" width="100%" />
   
 </details>
 
 <details>
 <summary>Invoice Creation</summary>
   
-<img src="https://cdn.hackclub.com/019c2a43-426b-7edd-943b-f0f807897527/screenshot_2026-02-04_210545.png" alt="Invio Dashboard" width="100%" />
+<img src="https://cdn.hackclub.com/019c2a43-426b-7edd-943b-f0f807897527/screenshot_2026-02-04_210545.png" alt="InvoiceRaider Dashboard" width="100%" />
   
 </details>
 
 <details>
 <summary>Settings</summary>
   
-<img src="https://cdn.hackclub.com/019c2a49-aed5-7242-994e-900eebc628ed/Screenshot%202026-02-04%20211257.png" alt="Invio Dashboard" width="100%" />
+<img src="https://cdn.hackclub.com/019c2a49-aed5-7242-994e-900eebc628ed/Screenshot%202026-02-04%20211257.png" alt="InvoiceRaider Dashboard" width="100%" />
   
 </details>
 
 <details>
 <summary>Invoices</summary>
   
-<img src="https://cdn.hackclub.com/019c2573-a8ee-7fe4-bba1-2824ed37430d/5ac9f89da2a86332583027f70630bb772f652836_invoices.png" alt="Invio Dashboard" width="100%" />
+<img src="https://cdn.hackclub.com/019c2573-a8ee-7fe4-bba1-2824ed37430d/5ac9f89da2a86332583027f70630bb772f652836_invoices.png" alt="InvoiceRaider Dashboard" width="100%" />
   
 </details>
 
 ## 💖 Contributors
 
-Invio is made possible by your contributions!
+InvoiceRaider is made possible by your contributions!
 
-<a href="https://github.com/kittendevv/Invio/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=kittendevv/Invio" />
+<a href="https://github.com/GitTimeraider/InvoiceRaider/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=GitTimeraider/InvoiceRaider" />
 </a>
 
 ## 🤝 Contributing
@@ -80,8 +80,8 @@ Invio is made possible by your contributions!
 
 ## ☕ Support me
 
-If you like Invio and want to support development:
+If you like InvoiceRaider and want to support development:
 - Buy me a coffee: https://ko-fi.com/codingkitten
 
 ---
-Made with 💖 by <a href="https://github.com/kittendevv">kittendevv</a> and contributors - if you find this useful, please ⭐️ the repo!
+Made with 💖 by <a href="https://github.com/GitTimeraider">GitTimeraider</a> and contributors - if you find this useful, please ⭐️ the repo!
