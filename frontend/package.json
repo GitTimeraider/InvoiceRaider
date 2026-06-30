@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "bun run copy-version && vite build",
+    "build": "bun run copy-name && vite build",
     "preview": "vite preview",
     "prepare": "svelte-kit sync || echo ''",
     "sync-keys": " bun extract-i18n-keys.js",
-    "copy-version": "cp ../VERSION ./static/VERSION 2>/dev/null || cp VERSION ./static/VERSION 2>/dev/null || echo 'VERSION file not found'",
+    "copy-name": "cp ../NAME ./static/NAME 2>/dev/null || cp NAME ./static/NAME 2>/dev/null || echo 'NAME file not found'",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check . && eslint .",

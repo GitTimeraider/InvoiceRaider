@@ -79,9 +79,7 @@ import { generateUBLInvoiceXML } from "../utils/ubl.ts"; // legacy direct import
 import { generateInvoiceXML, listXMLProfiles } from "../utils/xmlProfiles.ts";
 import { availableInvoiceLocales } from "../i18n/translations.ts";
 
-import { resetDatabaseFromDemo } from "../database/init.ts";
 import { getNextInvoiceNumber } from "../database/init.ts";
-import { isDemoMode } from "../utils/env.ts";
 import {
   normalizeStoredLogoReference,
   saveDataUrlLogo,
@@ -305,9 +303,6 @@ function normalizeInvoiceProtectionSettingsPayload(
     : "false";
 }
 
-// Demo mode flag (mutations allowed; periodic resets handle reverting state)
-const DEMO_MODE = isDemoMode();
-
 adminRoutes.use("/invoices/*", requireAdminAuth);
 
 adminRoutes.use("/customers/*", requireAdminAuth);
@@ -334,17 +329,6 @@ adminRoutes.use("/admin/*", requireAdminAuth);
 
 // Protect export routes
 adminRoutes.use("/export/*", requireAdminAuth);
-
-// Demo helper: trigger an immediate reset (only effective when DEMO_MODE=true)
-adminRoutes.post("/admin/demo/reset", async (c) => {
-  if (!DEMO_MODE) return c.json({ error: "Demo mode is not enabled" }, 400);
-  try {
-    await resetDatabaseFromDemo();
-    return c.json({ ok: true });
-  } catch (e) {
-    return c.json({ error: String(e) }, 500);
-  }
-});
 
 // Invoice routes
 adminRoutes.get(
@@ -928,8 +912,6 @@ adminRoutes.get("/settings", async (c) => {
   if (!map.allowProtectedInvoiceChanges) {
     map.allowProtectedInvoiceChanges = "false";
   }
-  // Expose demo mode to frontend UI
-  (map as Record<string, unknown>).demoMode = DEMO_MODE ? "true" : "false";
   return c.json(map);
 });
 
@@ -1068,8 +1050,6 @@ adminRoutes.get("/admin/settings", async (c) => {
   if (!map.allowProtectedInvoiceChanges) {
     map.allowProtectedInvoiceChanges = "false";
   }
-  // Expose demo mode to frontend UI for admin-prefixed route as well
-  (map as Record<string, unknown>).demoMode = DEMO_MODE ? "true" : "false";
   return c.json(map);
 });
 
@@ -2189,9 +2169,6 @@ adminRoutes.get("/users/me", (c) => {
 });
 
 adminRoutes.post("/users/me/2fa/setup", (c) => {
-  if (DEMO_MODE) {
-    return c.json({ error: "2FA is not available in demo mode" }, 403);
-  }
   const user = getAuthUser(c);
   if (!user) return c.json({ error: "Not authenticated" }, 401);
   const setup = createPendingTwoFactorSetup(user.id, user.username);
@@ -2202,9 +2179,6 @@ adminRoutes.post("/users/me/2fa/setup", (c) => {
 });
 
 adminRoutes.post("/users/me/2fa/verify", async (c) => {
-  if (DEMO_MODE) {
-    return c.json({ error: "2FA is not available in demo mode" }, 403);
-  }
   const user = getAuthUser(c);
   if (!user) return c.json({ error: "Not authenticated" }, 401);
   let token: string | undefined;
@@ -2231,9 +2205,6 @@ adminRoutes.post("/users/me/2fa/verify", async (c) => {
 });
 
 adminRoutes.delete("/users/me/2fa", async (c) => {
-  if (DEMO_MODE) {
-    return c.json({ error: "2FA is not available in demo mode" }, 403);
-  }
   const user = getAuthUser(c);
   if (!user) return c.json({ error: "Not authenticated" }, 401);
 

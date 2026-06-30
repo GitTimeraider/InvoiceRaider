@@ -11,7 +11,7 @@
 # node_modules in any folder
 **/node_modules
 
-/frontend/VERSION
+/frontend/NAME
 /frontend/build
 /frontend/.svelte-kit
 

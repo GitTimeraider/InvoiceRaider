@@ -21,7 +21,6 @@ import {
   resetRateLimit,
 } from "../middleware/rateLimiter.ts";
 import { generateUUID } from "../utils/uuid.ts";
-import { isDemoMode } from "../utils/env.ts";
 import {
   buildAuthorizationUrl,
   exchangeAndVerify,
@@ -37,7 +36,6 @@ function getSessionTtlSeconds(): number {
 }
 
 const TWO_FACTOR_CHALLENGE_TTL_SECONDS = 5 * 60;
-const DEMO_MODE = isDemoMode();
 
 type PendingLoginChallenge = {
   userId: string;
@@ -174,7 +172,7 @@ authRoutes.post("/auth/login", async (c) => {
   // Successful login: reset rate limit counters
   resetRateLimit(clientIp, username);
 
-  if (user.twoFactorEnabled && !DEMO_MODE) {
+  if (user.twoFactorEnabled) {
     const state = getUserTwoFactorState(user.id);
     if (!state?.enabled || !state.encryptedSecret) {
       return c.json(
@@ -199,10 +197,6 @@ authRoutes.post("/auth/login", async (c) => {
 });
 
 authRoutes.post("/auth/verify-2fa", async (c) => {
-  if (DEMO_MODE) {
-    return c.json({ error: "2FA is not available in demo mode" }, 403);
-  }
-
   const config = getRateLimitConfig();
   const clientIp = getClientIp(c.req.raw.headers, config.trustProxy);
 
@@ -259,10 +253,6 @@ authRoutes.post("/auth/verify-2fa", async (c) => {
 });
 
 authRoutes.post("/auth/recover-2fa", async (c) => {
-  if (DEMO_MODE) {
-    return c.json({ error: "2FA is not available in demo mode" }, 403);
-  }
-
   const config = getRateLimitConfig();
   const clientIp = getClientIp(c.req.raw.headers, config.trustProxy);
 
