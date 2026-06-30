@@ -1766,9 +1766,9 @@ adminRoutes.post("/email-configs/:id/test", requirePermission("settings", "updat
   try {
     await sendEmailWithConfig(config, {
       to: [testTo],
-      subject: "Invio: Test Email",
-      htmlBody: "<p>This is a test email from Invio. Your email configuration is working correctly.</p>",
-      textBody: "This is a test email from Invio. Your email configuration is working correctly.",
+      subject: "InvoiceRaider: Test Email",
+      htmlBody: "<p>This is a test email from InvoiceRaider. Your email configuration is working correctly.</p>",
+      textBody: "This is a test email from InvoiceRaider. Your email configuration is working correctly.",
     });
     return c.json({ sent: true, to: testTo });
   } catch (e) {

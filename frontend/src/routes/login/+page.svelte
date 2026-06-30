@@ -16,12 +16,12 @@
     <div class="card bg-base-100 border-base-300 w-full shrink-0 border shadow-xl">
       <div class="card-body">
         <h2 class="mb-2 text-center text-2xl font-semibold">
-          {t("Welcome to Invio")}
+          {t("Welcome to InvoiceRaider")}
         </h2>
         {#if page.data.demoMode == true}
           <div role="alert" class="alert alert-info">
             <span class="text-center">
-              Invio is running in demo mode, log in using the following username and password:
+              InvoiceRaider is running in demo mode, log in using the following username and password:
               <br class="mb-2" />
               Username: <span class="font-medium">demo</span>
               <br />

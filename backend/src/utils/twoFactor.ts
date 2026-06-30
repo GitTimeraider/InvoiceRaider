@@ -77,7 +77,7 @@ async function getRecoveryHashPepper(): Promise<string> {
 
 function createTotp(secretBase32: string, username: string): OTPAuth.TOTP {
   return new OTPAuth.TOTP({
-    issuer: "Invio",
+    issuer: "InvoiceRaider",
     label: username,
     algorithm: "SHA1",
     digits: 6,

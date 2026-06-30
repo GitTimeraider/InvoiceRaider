@@ -20,7 +20,7 @@ function unauthorized(message = "Unauthorized"): Response {
   return new Response(message, {
     status: 401,
     headers: {
-      "WWW-Authenticate": 'Bearer realm="Invio"',
+      "WWW-Authenticate": 'Bearer realm="InvoiceRaider"',
     },
   });
 }

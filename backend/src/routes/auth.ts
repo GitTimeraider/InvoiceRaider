@@ -376,7 +376,7 @@ authRoutes.post("/auth/oidc/callback", async (c) => {
   if (rows.length === 0) {
     if (!oidc.autoProvision) {
       return c.json(
-        { error: "No matching Invio account. Contact an administrator." },
+        { error: "No matching InvoiceRaider account. Contact an administrator." },
         403,
       );
     }

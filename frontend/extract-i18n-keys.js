@@ -188,7 +188,7 @@ function extractAndSync() {
     console.log("\n✨ All translation files updated!");
     if (missingKeys.length > 0) {
       console.log(
-        '\n💡 Tip: Search for "[NEEDS TRANSLATION]" in de.json, nl.json, and pt-br.json',
+        '\n💡 Tip: Additional locale files will be updated automatically if you add them under src/lib/i18n/locales/',
       );
     }
   } else {

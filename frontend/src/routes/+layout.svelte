@@ -74,7 +74,7 @@
                   stroke-linejoin="round"
                 />
               </svg>
-              <span>{t("Invio")}</span>
+              <span>{t("InvoiceRaider")}</span>
             </span>
           </a>
         </div>
