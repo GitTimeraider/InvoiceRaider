@@ -67,10 +67,6 @@ export function getJwtSecret(): string {
   return secret;
 }
 
-export function isDemoMode(): boolean {
-  return (getEnv("DEMO_MODE", "false") || "false").toLowerCase() === "true";
-}
-
 export function getNumberEnv(key: string, fallback: number): number {
   const raw = getEnv(key);
   if (!raw) return fallback;

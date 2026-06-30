@@ -1,5 +1,5 @@
 import { DB } from "sqlite";
-import { getAdminCredentials, getEnv, isDemoMode } from "../utils/env.ts";
+import { getAdminCredentials, getEnv } from "../utils/env.ts";
 import { hashPassword } from "../utils/password.ts";
 import { generateUUID } from "../utils/uuid.ts";
 import { RESOURCE_ACTIONS } from "../types/index.ts";
@@ -661,68 +661,6 @@ export async function initDatabase(): Promise<void> {
   storeSchemaVersion(db);
 
   console.log("Database initialized successfully");
-}
-
-export async function resetDatabaseFromDemo(): Promise<void> {
-  if (!isDemoMode()) return;
-  const demoDb = getEnv("DEMO_DB_PATH");
-  const activePath = resolvePath(getEnv("DATABASE_PATH", "./invio.db")!);
-  if (!demoDb) {
-    throw new Error("DEMO_MODE is true but DEMO_DB_PATH is not set.");
-  }
-  const demoPath = resolvePath(demoDb);
-  const tempPath =
-    `${activePath}.demo-reset-${Date.now()}-${crypto.randomUUID()}.tmp`;
-
-  try {
-    closeDatabase();
-  } catch (error) {
-    throw new Error(
-      `Failed to close current database before demo reset: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
-    );
-  }
-
-  let resetError: unknown = undefined;
-  try {
-    Deno.statSync(demoPath);
-    ensureDir(simpleDirname(activePath));
-
-    Deno.copyFileSync(demoPath, tempPath);
-    try {
-      Deno.renameSync(tempPath, activePath);
-    } catch {
-      try {
-        Deno.removeSync(activePath);
-      } catch (error) {
-        if (!(error instanceof Deno.errors.NotFound)) {
-          throw error;
-        }
-      }
-      Deno.renameSync(tempPath, activePath);
-    }
-    console.log("  Demo database reset from DEMO_DB_PATH.");
-  } catch (e) {
-    resetError = e;
-  } finally {
-    try {
-      Deno.removeSync(tempPath);
-    } catch (error) {
-      if (!(error instanceof Deno.errors.NotFound)) {
-        console.warn("Could not remove temporary demo reset file:", error);
-      }
-    }
-    await initDatabase();
-  }
-
-  if (resetError) {
-    throw new Error(
-      `Failed to reset demo database: ${
-        resetError instanceof Error ? resetError.message : String(resetError)
-      }`,
-    );
-  }
 }
 
 export function getDatabase(): DB {

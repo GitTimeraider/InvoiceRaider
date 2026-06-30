@@ -4,7 +4,6 @@
   import { LayoutDashboard, LogOut, Ellipsis, Package, ReceiptText, Settings, UserCog, Users } from "lucide-svelte";
   import Breadcrumbs from "$lib/components/Breadcrumbs.svelte";
   import "./layout.css";
-  import DemoAlert from "$lib/components/DemoAlert.svelte";
   import { setContext } from "svelte";
   import { createTranslator } from "$lib/i18n/mod";
   let { data, children } = $props();
@@ -18,7 +17,6 @@
   setContext("i18n", (key: string, params?: Record<string, string | number>) => t(key, params));
   setContext("localization", () => localizationData);
 
-  let demoMode = false;
   let isAdmin = $derived(authUser?.isAdmin ?? false);
 
   function hasPermission(resource: string, action: string) {
@@ -59,7 +57,7 @@
   </main>
 {:else}
   <div class="bg-base-200 min-h-screen">
-    <div class="navbar bg-base-100 border-base-300 border-b px-3 sm:px-4" data-demo={demoMode ? "true" : "false"}>
+    <div class="navbar bg-base-100 border-base-300 border-b px-3 sm:px-4">
       <div class="container mx-auto flex items-center">
         <div class="navbar-start flex-1">
           <a href="/" class="btn btn-ghost text-lg sm:text-xl">
@@ -213,7 +211,6 @@
     </div>
     <main class={"container mx-auto px-3 py-4 sm:px-4 sm:py-6 " + (wide ? "max-w-screen-2xl" : "")}>
       {#if authed}
-        <DemoAlert data={page.data} />
         <Breadcrumbs {t} />
       {/if}
       {@render children()}

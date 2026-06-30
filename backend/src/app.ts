@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import type { Context } from "hono";
 import { cors } from "hono/cors";
-import { initDatabase, resetDatabaseFromDemo } from "./database/init.ts";
+import { initDatabase } from "./database/init.ts";
 import { adminRoutes } from "./routes/admin.ts";
 import { publicRoutes } from "./routes/public.ts";
 import { authRoutes } from "./routes/auth.ts";
@@ -40,32 +40,6 @@ try {
 await initDatabase();
 
 await logWeasyPrintAvailability();
-
-// In demo mode, schedule a periodic reset of the database from DEMO_DB_PATH.
-// Writes are allowed between resets.
-try {
-  const demoMode = (Deno.env.get("DEMO_MODE") || "").toLowerCase() === "true";
-  if (demoMode) {
-    const hours = Number(Deno.env.get("DEMO_RESET_HOURS") || "3");
-    const initial =
-      (Deno.env.get("DEMO_RESET_ON_START") || "true").toLowerCase() !== "false";
-    if (initial) {
-      // Perform a reset at startup to ensure a pristine state
-      await resetDatabaseFromDemo();
-    }
-    const ms = Math.max(1, Math.floor(hours * 60 * 60 * 1000));
-    setInterval(async () => {
-      try {
-        await resetDatabaseFromDemo();
-      } catch (e) {
-        console.error("Periodic demo reset failed:", e);
-      }
-    }, ms);
-    console.log(`Demo mode: periodic DB reset scheduled every ${hours}h`);
-  }
-} catch (e) {
-  console.warn("Demo reset scheduler could not be started:", e);
-}
 
 // Middleware
 app.use(

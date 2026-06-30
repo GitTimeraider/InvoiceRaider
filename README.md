@@ -18,7 +18,6 @@ A modern, self-hosted invoice management platform for freelancers and small to m
 - **Multi-Currency & Tax** — Per-invoice currency, per-line tax rates, inclusive/exclusive pricing, flexible rounding
 - **Internationalization** — Multi-language UI, locale-aware date/number/address formatting
 - **Themes** — Light and dark themes via daisyUI
-- **Demo Mode** — Read-only demo with automatic database resets
 
 ---
 
@@ -33,23 +32,6 @@ A modern, self-hosted invoice management platform for freelancers and small to m
 | PDF generation | WeasyPrint |
 | Auth | JWT + TOTP |
 | Packaging | Docker + Supervisord |
-
----
-
-## Architecture
-
-```
-Browser
-  └── SvelteKit (SSR, port 8000)
-        └── /api/[...path] proxy (injects Authorization header)
-              └── Hono API (port 3000, /api/v1/*)
-                    ├── /auth/*         — Login, OIDC, 2FA
-                    ├── /admin/*        — Protected CRUD (JWT required)
-                    └── /public/*       — Share-token invoice access
-                          └── SQLite (/app/data/app.db)
-```
-
-All processes run in a single container managed by **Supervisord**.
 
 ---
 
@@ -90,54 +72,9 @@ Then open [http://localhost:8000](http://localhost:8000) and log in with your co
 | `ADMIN_PASS` | Yes | — | Initial admin password |
 | `BACKEND_PORT` / `PORT` | No | `3000` | Internal backend port |
 | `SESSION_TTL_SECONDS` | No | `3600` | JWT session lifetime (300–43200 s) |
-| `DEMO_MODE` | No | `false` | Enable read-only demo mode |
-| `DEMO_RESET_HOURS` | No | `3` | Auto-reset demo database every N hours |
-| `DEMO_RESET_ON_START` | No | `true` | Reset demo database on container start |
 | `SECURE_HEADERS_DISABLED` | No | `false` | Disable security headers (not recommended) |
 | `ENABLE_HSTS` | No | `false` | Send HSTS header (enable when behind HTTPS) |
 | `CONTENT_SECURITY_POLICY` | No | built-in | Override the default CSP header |
-
----
-
-## Local Development
-
-### Prerequisites
-
-- [Deno](https://deno.land/) ≥ 2.6
-- [Bun](https://bun.sh/) ≥ 1.x
-
-### Backend
-
-```bash
-cd backend
-deno task dev       # Watch mode
-# or
-deno task start     # Single run
-```
-
-### Frontend
-
-```bash
-cd frontend
-bun install
-bun run dev         # Dev server on http://localhost:5173
-```
-
-### Other frontend commands
-
-```bash
-bun run build       # Production build
-bun run check       # Type check (svelte-kit sync + svelte-check)
-bun run lint        # Prettier + ESLint
-```
-
-### Dev with Docker Compose
-
-```bash
-docker compose -f docker-compose-dev.yml up -d
-```
-
-This builds images from source instead of pulling pre-built ones.
 
 ---
 
@@ -153,22 +90,6 @@ All application data is stored under `/app/data/` inside the container:
 | `/app/data/backups/` | Automatic DB backups on schema upgrade |
 
 Mount a named volume at `/app/data` to persist data across container restarts.
-
----
-
-## Permissions Model
-
-Access to API resources is controlled by a resource × action matrix enforced via the `requirePermission(resource, action)` middleware.
-
-| Resource | Actions |
-|---|---|
-| `invoices` | read, create, update, delete, publish, void, export |
-| `customers` | read, create, update, delete |
-| `products` | read, create, update, delete |
-| `templates` | read, create, update, delete, install |
-| `settings` | read, update |
-| `tax_definitions` | read, create, update, delete |
-| `users` | read, create, update, delete |
 
 ---
 
@@ -202,14 +123,3 @@ Example: `INV-{YYYY}-{MM}-{RAND4}` → `INV-2025-06-A3F9`
 ## License
 
 This software is released into the **public domain** under the [Unlicense](LICENSE). You are free to use, copy, modify, and distribute it for any purpose without restriction.
-
----
-
-## Contributing
-
-Contributions are welcome. Please follow the existing code style:
-
-- Backend: `deno fmt` and `deno lint`
-- Frontend: `bun run lint` (Prettier + ESLint)
-
-Translations live in `frontend/src/lib/i18n/locales/`. Run `bun run sync-keys` after adding new translation keys.

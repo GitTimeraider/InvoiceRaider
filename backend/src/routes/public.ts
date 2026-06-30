@@ -19,24 +19,6 @@ function isSafeTemplateIdentifier(value: string): boolean {
   return /^[a-z0-9][a-z0-9._-]{0,63}$/i.test(value);
 }
 
-// Expose a lightweight public endpoint so unauthenticated clients can
-// detect whether the backend is running in demo (read-only) mode.
-const DEMO_MODE = (Deno.env.get("DEMO_MODE") || "").toLowerCase() === "true";
-const DEMO_RESET_HOURS = parseFloat(Deno.env.get("DEMO_RESET_HOURS") || "0.5");
-
-publicRoutes.get("/demo-mode", (c) => {
-  // Janky function I wrote at night. 0.5 -> 30 min is the main idea
-  if (DEMO_MODE == true) {
-    const resetMinutes = DEMO_RESET_HOURS * 60;
-    return c.json({
-      demoMode: DEMO_MODE,
-      demoResetMinutes: resetMinutes,
-    });
-  } else {
-    return c.json({ demoMode: DEMO_MODE });
-  }
-});
-
 publicRoutes.get("/public/assets/logos/:file", async (c) => {
   const file = c.req.param("file") || "";
   const fsPath = resolveLogoFsPathFromPublicPath(
