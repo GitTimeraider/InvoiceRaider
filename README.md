@@ -20,7 +20,6 @@ A modern, self-hosted invoice management platform for freelancers and small to m
 - **OpenID Connect** — Optional OIDC integration for SSO
 - **Email Sending** — Send invoices via SMTP with PDF attachments; supports multiple email configurations
 - **Multi-Currency & Tax** — Per-invoice currency, per-line tax rates, inclusive/exclusive pricing, flexible rounding
-- **Internationalization** — Multi-language UI, locale-aware date/number/address formatting
 - **Themes** — Light and dark themes via daisyUI
 
 ---
