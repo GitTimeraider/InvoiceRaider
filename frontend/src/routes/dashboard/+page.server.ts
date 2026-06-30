@@ -8,6 +8,7 @@ type Invoice = {
   invoiceNumber: string;
   customer?: { name?: string };
   issueDate?: string | Date;
+  dueDate?: string | Date;
   updatedAt?: string | Date;
   currency?: string;
   status?: "draft" | "sent" | "complete" | "paid" | "overdue" | "voided";
@@ -74,6 +75,119 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
       )
       .slice(0, 5);
 
+    const now = new Date();
+    const monthStarts = Array.from({ length: 6 }, (_v, idx) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - (5 - idx), 1);
+      return d;
+    });
+    const monthIndex = new Map<string, number>(
+      monthStarts.map((d, idx) => [
+        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`,
+        idx,
+      ]),
+    );
+    const trend = monthStarts.map((d) => ({
+      key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`,
+      label: d.toLocaleString("en-US", { month: "short" }),
+      amount: 0,
+      count: 0,
+    }));
+    for (const inv of invoices) {
+      const date = new Date(inv.issueDate || inv.updatedAt || 0);
+      if (Number.isNaN(date.getTime())) continue;
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+      const idx = monthIndex.get(key);
+      if (idx == null) continue;
+      trend[idx].amount += Number(inv.total || 0);
+      trend[idx].count += 1;
+    }
+
+    const aging = {
+      current: 0,
+      d1_30: 0,
+      d31_60: 0,
+      d61_plus: 0,
+    };
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    for (const inv of invoices) {
+      if (inv.status !== "sent" && inv.status !== "overdue") continue;
+      const amount = Number(inv.total || 0);
+      if (amount <= 0) continue;
+      const due = new Date(inv.dueDate || inv.issueDate || 0);
+      if (Number.isNaN(due.getTime())) {
+        aging.current += amount;
+        continue;
+      }
+      const dueDay = new Date(due.getFullYear(), due.getMonth(), due.getDate());
+      const diffDays = Math.floor(
+        (startOfToday.getTime() - dueDay.getTime()) / (1000 * 60 * 60 * 24),
+      );
+      if (diffDays <= 0) {
+        aging.current += amount;
+      } else if (diffDays <= 30) {
+        aging.d1_30 += amount;
+      } else if (diffDays <= 60) {
+        aging.d31_60 += amount;
+      } else {
+        aging.d61_plus += amount;
+      }
+    }
+
+    const topCustomerMap = new Map<string, { name: string; total: number; count: number }>();
+    for (const inv of invoices) {
+      const name = inv.customer?.name || "Unknown";
+      const existing = topCustomerMap.get(name) || { name, total: 0, count: 0 };
+      existing.total += Number(inv.total || 0);
+      existing.count += 1;
+      topCustomerMap.set(name, existing);
+    }
+    const topCustomers = Array.from(topCustomerMap.values())
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 5);
+
+    const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    const previousMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+    let billedCurrentMonth = 0;
+    let billedPreviousMonth = 0;
+    let outstandingCurrentMonth = 0;
+    let outstandingPreviousMonth = 0;
+
+    for (const inv of invoices) {
+      const date = new Date(inv.issueDate || inv.updatedAt || 0);
+      if (Number.isNaN(date.getTime())) continue;
+      const amount = Number(inv.total || 0);
+      const isOutstanding = inv.status === "sent" || inv.status === "overdue";
+
+      if (date >= currentMonthStart && date < nextMonthStart) {
+        billedCurrentMonth += amount;
+        if (isOutstanding) outstandingCurrentMonth += amount;
+      } else if (date >= previousMonthStart && date < currentMonthStart) {
+        billedPreviousMonth += amount;
+        if (isOutstanding) outstandingPreviousMonth += amount;
+      }
+    }
+
+    function toDelta(current: number, previous: number) {
+      if (previous <= 0) {
+        if (current > 0) return { change: current, percent: 100, direction: "up" as const };
+        return { change: 0, percent: 0, direction: "flat" as const };
+      }
+      const change = current - previous;
+      const percent = (change / previous) * 100;
+      return {
+        change,
+        percent,
+        direction: change > 0 ? ("up" as const) : change < 0 ? ("down" as const) : ("flat" as const),
+      };
+    }
+
+    const deltas = {
+      billedMoM: toDelta(billedCurrentMonth, billedPreviousMonth),
+      outstandingMoM: toDelta(outstandingCurrentMonth, outstandingPreviousMonth),
+    };
+
     const version = getVersion();
 
     return {
@@ -81,6 +195,10 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
       money: { billed, paid, outstanding, currency },
       status,
       recent,
+      trend,
+      aging,
+      topCustomers,
+      deltas,
       version,
       dateFormat,
     };
