@@ -1,5 +1,9 @@
 # InvoiceRaider
 
+### Disclaimers: 
+#### AI is responsible for over half of the coding. Also keep in mind that this software is mostly developed for personal use by myself and thus might not receive all feature requests desired.
+################################################################
+
 A modern, self-hosted invoice management platform for freelancers and small to medium-sized businesses. Built with a SvelteKit frontend and a Deno/Hono backend, packaged as a single Docker container.
 
 ---
