@@ -6,9 +6,9 @@ COPY frontend/package.json frontend/bun.lock ./
 RUN bun install --frozen-lockfile
 
 COPY frontend .
-COPY VERSION /app/VERSION
+COPY NAME /app/NAME
 
-RUN cp /app/VERSION static/VERSION 2>/dev/null || true
+RUN cp /app/NAME static/NAME 2>/dev/null || true
 RUN bun run build
 
 
@@ -44,7 +44,7 @@ COPY frontend/package.json frontend/bun.lock ./frontend/
 RUN cd /app/frontend && bun install --frozen-lockfile --production
 
 # Shared files
-COPY VERSION ./VERSION
+COPY NAME ./NAME
 
 # Data dir
 RUN mkdir -p /app/data
