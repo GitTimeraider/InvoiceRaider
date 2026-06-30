@@ -168,8 +168,8 @@
         <div class="mt-1 text-3xl font-bold tracking-tight">{(statusCounts.sent || 0) + (statusCounts.overdue || 0)}</div>
       </div>
       <div class="from-info/10 to-base-100 border-info/20 rounded-box border bg-gradient-to-br p-4 sm:p-5">
-        <div class="text-sm opacity-70">{t("Version")}</div>
-        <div class="mt-1 text-3xl font-bold tracking-tight">{data.version}</div>
+        <div class="text-sm opacity-70">{t("Maintainer")}</div>
+        <div class="mt-1 text-3xl font-bold tracking-tight">{data.maintainer}</div>
       </div>
     </div>
   {/if}

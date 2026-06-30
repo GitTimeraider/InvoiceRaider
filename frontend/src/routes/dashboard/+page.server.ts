@@ -1,7 +1,7 @@
 import { redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import { backendGet, SESSION_COOKIE } from "$lib/backend";
-import { getVersion } from "$lib/version";
+import { getMaintainer } from "$lib/version";
 
 type Invoice = {
   id: string;
@@ -188,7 +188,7 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
       outstandingMoM: toDelta(outstandingCurrentMonth, outstandingPreviousMonth),
     };
 
-    const version = getVersion();
+    const maintainer = getMaintainer();
 
     return {
       counts: { invoices: invoices.length, customers: customers.length },
@@ -199,7 +199,7 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
       aging,
       topCustomers,
       deltas,
-      version,
+      maintainer,
       dateFormat,
     };
   } catch (err) {
