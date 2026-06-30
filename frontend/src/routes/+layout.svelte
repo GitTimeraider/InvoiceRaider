@@ -78,7 +78,7 @@
         </div>
         <div class="navbar-end ml-auto items-center justify-end gap-2">
           {#if authed}
-            <ul class="menu menu-horizontal hidden px-1 md:flex">
+            <ul class="menu menu-horizontal hidden px-1 lg:flex">
               <li>
                 <a href="/dashboard">
                   <LayoutDashboard size={16} />
@@ -101,6 +101,14 @@
                   </a>
                 </li>
               {/if}
+              {#if canViewProducts}
+                <li>
+                  <a href="/products">
+                    <Package size={16} />
+                    {t("Products")}
+                  </a>
+                </li>
+              {/if}
               <li>
                 <details bind:this={moreMenuDetails}>
                   <summary>
@@ -108,14 +116,6 @@
                     {t("More")}
                   </summary>
                   <ul class="bg-base-100 rounded-box z-20 w-52 p-2">
-                    {#if canViewProducts}
-                      <li>
-                        <a href="/products">
-                          <Package size={16} />
-                          {t("Products")}
-                        </a>
-                      </li>
-                    {/if}
                     {#if canViewSettings}
                       <li>
                         <a href="/settings">
@@ -143,7 +143,7 @@
               </li>
             </ul>
 
-            <div class="dropdown dropdown-end md:hidden">
+            <div class="dropdown dropdown-end lg:hidden">
               <div tabindex="0" role="button" class="btn btn-ghost">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />

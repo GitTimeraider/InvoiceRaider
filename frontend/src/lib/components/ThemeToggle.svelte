@@ -28,6 +28,15 @@
       id: "violet-light",
     },
     {
+      id: "royal-plum-dark",
+    },
+    {
+      id: "orchid-haze-light",
+    },
+    {
+      id: "lilac-mist-light",
+    },
+    {
       id: "light",
     },
     {
