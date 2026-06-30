@@ -321,27 +321,28 @@
       </button>
     </div>
 
-    <div class="mb-1 hidden flex-row flex-nowrap items-center gap-2 text-xs font-medium opacity-60 lg:flex">
-      <div class="w-6 shrink-0"></div>
-      {#if products.length > 0}
-        <div class="w-44 max-w-xs shrink-0 text-center">{t("Product")}</div>
-      {/if}
-      <div class="min-w-0 flex-1 pl-3">{t("Description")}</div>
-      <div class="w-16 shrink-0 text-center sm:w-20">{t("Quantity")}</div>
-      <div class="w-24 shrink-0 text-center">{t("Unit")}</div>
-      <div class="w-24 shrink-0 text-center">{t("Price")}</div>
-      {#if form.taxMode === "line"}
-        <div class="w-20 shrink-0 text-center">{t("Tax %")}</div>
-      {/if}
-      <div class="w-40 max-w-xs shrink-0 text-center">{t("Notes")}</div>
-      <div class="w-8 shrink-0"></div>
-    </div>
+    <div class="overflow-x-auto pb-1">
+      <div class="mb-1 hidden min-w-[980px] flex-row flex-nowrap items-center gap-2 text-xs font-medium opacity-60 lg:flex">
+        <div class="w-6 shrink-0"></div>
+        {#if products.length > 0}
+          <div class="w-44 max-w-xs shrink-0 text-center">{t("Product")}</div>
+        {/if}
+        <div class="min-w-56 flex-1 pl-3">{t("Description")}</div>
+        <div class="w-16 shrink-0 text-center sm:w-20">{t("Quantity")}</div>
+        <div class="w-24 shrink-0 text-center">{t("Unit")}</div>
+        <div class="w-24 shrink-0 text-center">{t("Price")}</div>
+        {#if form.taxMode === "line"}
+          <div class="w-20 shrink-0 text-center">{t("Tax %")}</div>
+        {/if}
+        <div class="w-40 max-w-xs shrink-0 text-center">{t("Notes")}</div>
+        <div class="w-8 shrink-0"></div>
+      </div>
 
-    <div class="space-y-3" role="list">
+      <div class="space-y-3" role="list">
       {#each items as item, i (item.id)}
         <div
           role="listitem"
-          class="rounded-box flex flex-nowrap items-center gap-2 p-1 transition-colors {draggedId === item.id ? 'opacity-50' : ''} {dragHoverId === item.id ? 'bg-base-200' : ''}"
+          class="rounded-box flex min-w-[980px] flex-nowrap items-center gap-2 p-1 transition-colors {draggedId === item.id ? 'opacity-50' : ''} {dragHoverId === item.id ? 'bg-base-200' : ''}"
           draggable="true"
           ondragstart={(e) => handleDragStart(e, item.id)}
           ondragover={(e) => handleDragOver(e, item.id)}
@@ -362,7 +363,7 @@
             </select>
           {/if}
 
-          <input class="input input-bordered w-full min-w-0" bind:value={item.description} placeholder={t("Description")} required />
+          <input class="input input-bordered min-w-56 flex-1" bind:value={item.description} placeholder={t("Description")} required />
           <input type="number" min="0" step="any" class="input input-bordered w-16 shrink-0 text-center sm:w-20" bind:value={item.quantity} />
           <input class="input input-bordered w-24 shrink-0 text-center" bind:value={item.unit} placeholder={t("Unit")} />
           <input type="number" min="0" step="any" class="input input-bordered w-24 shrink-0 text-center" bind:value={item.unitPrice} />
@@ -374,6 +375,7 @@
           <button type="button" class="btn btn-ghost btn-square btn-sm shrink-0" onclick={() => removeItem(i)} aria-label={t("Remove item")}>&times;</button>
         </div>
       {/each}
+      </div>
     </div>
 
     <div class="mt-6 flex flex-col items-end space-y-2 text-sm">

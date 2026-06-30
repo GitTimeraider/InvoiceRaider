@@ -5,7 +5,7 @@
 }
 
 @plugin "daisyui/theme" {
-  name: "invio-dark";
+  name: "invoiceraider-dark";
   default: false;
   prefersdark: true;
   color-scheme: "dark";
@@ -40,7 +40,7 @@
 }
 
 @plugin "daisyui/theme" {
-  name: "invio-light";
+  name: "invoiceraider-light";
   default: false;
   prefersdark: false;
   color-scheme: "light";
@@ -64,6 +64,76 @@
   --color-warning-content: #17184b;
   --color-error: #b94b5c;
   --color-error-content: #ffffff;
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.21875rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "amethyst-dark";
+  default: false;
+  prefersdark: false;
+  color-scheme: "dark";
+  --color-base-100: #1a0f2e;
+  --color-base-200: #120a21;
+  --color-base-300: #0c0617;
+  --color-base-content: #efe7ff;
+  --color-primary: #d8b4fe;
+  --color-primary-content: #1a0f2e;
+  --color-secondary: #e879f9;
+  --color-secondary-content: #1a0f2e;
+  --color-accent: #c084fc;
+  --color-accent-content: #1a0f2e;
+  --color-neutral: #2a1744;
+  --color-neutral-content: #efe7ff;
+  --color-info: #7dd3fc;
+  --color-info-content: #082f49;
+  --color-success: #86efac;
+  --color-success-content: #052e16;
+  --color-warning: #fcd34d;
+  --color-warning-content: #451a03;
+  --color-error: #fca5a5;
+  --color-error-content: #450a0a;
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.21875rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "violet-light";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: #faf5ff;
+  --color-base-200: #f3e8ff;
+  --color-base-300: #e9d5ff;
+  --color-base-content: #3b0764;
+  --color-primary: #a78bfa;
+  --color-primary-content: #ffffff;
+  --color-secondary: #c4b5fd;
+  --color-secondary-content: #3b0764;
+  --color-accent: #d8b4fe;
+  --color-accent-content: #3b0764;
+  --color-neutral: #ddd6fe;
+  --color-neutral-content: #3b0764;
+  --color-info: #93c5fd;
+  --color-info-content: #1e3a8a;
+  --color-success: #86efac;
+  --color-success-content: #14532d;
+  --color-warning: #fcd34d;
+  --color-warning-content: #78350f;
+  --color-error: #fda4af;
+  --color-error-content: #881337;
   --radius-selector: 0.5rem;
   --radius-field: 0.5rem;
   --radius-box: 1rem;

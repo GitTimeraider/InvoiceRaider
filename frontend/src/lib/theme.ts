@@ -1,9 +1,24 @@
 const THEME_KEY = "theme";
-const DEFAULT_THEME = "invio-dark";
+const DEFAULT_THEME = "invoiceraider-dark";
+
+const LEGACY_THEME_MAP: Record<string, string> = {
+  "invio-dark": "invoiceraider-dark",
+  "invio-light": "invoiceraider-light",
+};
+
+function migrateThemeName(theme: string): string {
+  return LEGACY_THEME_MAP[theme] ?? theme;
+}
 
 function getStoredTheme(): string | null {
   try {
-    return localStorage.getItem(THEME_KEY);
+    const stored = localStorage.getItem(THEME_KEY);
+    if (!stored) return null;
+    const migrated = migrateThemeName(stored);
+    if (migrated !== stored) {
+      localStorage.setItem(THEME_KEY, migrated);
+    }
+    return migrated;
   } catch (_err) {
     return null;
   }

@@ -12,14 +12,22 @@
       (function () {
         try {
           var stored = localStorage.getItem("theme");
+          var legacyMap = {
+            "invio-dark": "invoiceraider-dark",
+            "invio-light": "invoiceraider-light",
+          };
+          if (stored && legacyMap[stored]) {
+            stored = legacyMap[stored];
+            localStorage.setItem("theme", stored);
+          }
           var preferredDark = window.matchMedia(
             "(prefers-color-scheme: dark)",
           ).matches;
-          var fallback = preferredDark ? "invio-dark" : "invio-light";
+          var fallback = preferredDark ? "invoiceraider-dark" : "invoiceraider-light";
           var theme = stored || fallback;
           document.documentElement.setAttribute("data-theme", theme);
         } catch (_err) {
-          document.documentElement.setAttribute("data-theme", "invio-dark");
+          document.documentElement.setAttribute("data-theme", "invoiceraider-dark");
         }
       })();
     </script>

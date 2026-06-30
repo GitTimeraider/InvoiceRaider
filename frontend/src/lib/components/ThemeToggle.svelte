@@ -3,7 +3,7 @@
   import ThemeCard from "$lib/components/ThemeCard.svelte";
   import { getTheme, setTheme } from "$lib/theme";
 
-  let selectedTheme = $state<string>("invio-dark");
+  let selectedTheme = $state<string>("invoiceraider-dark");
 
   onMount(() => {
     selectedTheme = getTheme();
@@ -16,10 +16,16 @@
 
   const themes = [
     {
-      id: "invio-light",
+      id: "invoiceraider-light",
     },
     {
-      id: "invio-dark",
+      id: "invoiceraider-dark",
+    },
+    {
+      id: "amethyst-dark",
+    },
+    {
+      id: "violet-light",
     },
     {
       id: "light",
