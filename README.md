@@ -1,5 +1,8 @@
 # InvoiceRaider
 
+Formerly a fork of https://github.com/kittendevv/Invio, however at this point enough features and functionality has been added and removed to make it its own project.
+No changes made in the Invio project will be introduced in here.
+
 ### Disclaimers: 
 #### AI is responsible for over half of the coding. Also keep in mind that this software is mostly developed for personal use by myself and thus might not receive all feature requests desired.
 ################################################################
