@@ -1,5 +1,8 @@
 # InvoiceRaider
 
+Formerly a fork of https://github.com/kittendevv/Invio, however at this point enough features and functionality has been added and removed to make it its own project.
+No changes made in the Invio project will be introduced in here.
+
 ### Disclaimers: 
 #### AI is responsible for over half of the coding. Also keep in mind that this software is mostly developed for personal use by myself and thus might not receive all feature requests desired.
 ################################################################
@@ -7,6 +10,17 @@
 A modern, self-hosted invoice management platform for freelancers and small to medium-sized businesses. Built with a SvelteKit frontend and a Deno/Hono backend, packaged as a single Docker container.
 
 ---
+
+<details>
+  <summary>📸 Click to show screenshots</summary>
+
+  ![Dashboard](https://github.com/GitTimeraider/Assets/blob/main/InvoiceRaider/img/dashboard.png)
+  ![Invoice](https://github.com/GitTimeraider/Assets/blob/main/InvoiceRaider/img/invoice.png)
+  ![Customer](https://github.com/GitTimeraider/Assets/blob/main/InvoiceRaider/img/customer.png)
+  ![Mail](https://github.com/GitTimeraider/Assets/blob/main/InvoiceRaider/img/mail.png)
+
+</details>
+
 
 ## Features
 
