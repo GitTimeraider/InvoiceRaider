@@ -10,6 +10,9 @@ No changes made in the Invio project will be introduced in here.
 A modern, self-hosted invoice management platform for freelancers and small to medium-sized businesses. Built with a SvelteKit frontend and a Deno/Hono backend, packaged as a single Docker container.
 
 ---
+<p align="center" width="100%">
+    <img width="100%" src="https://github.com/GitTimeraider/Assets/blob/main/InvoiceRaider/img/dashboard.png">
+</p>
 
 ## Features
 
@@ -26,6 +29,9 @@ A modern, self-hosted invoice management platform for freelancers and small to m
 - **Themes** — Light and dark themes via daisyUI
 
 ---
+<p align="center" width="100%">
+    <img width="100%" src="https://github.com/GitTimeraider/Assets/blob/main/InvoiceRaider/img/invoice.png">
+</p>
 
 ## Tech Stack
 
@@ -40,6 +46,9 @@ A modern, self-hosted invoice management platform for freelancers and small to m
 | Packaging | Docker + Supervisord |
 
 ---
+<p align="center" width="100%">
+    <img width="100%" src="https://github.com/GitTimeraider/Assets/blob/main/InvoiceRaider/img/customer.png">
+</p>
 
 ## Quick Start (Docker Compose)
 
@@ -68,6 +77,9 @@ docker compose up -d
 Then open [http://localhost:8000](http://localhost:8000) and log in with your configured admin credentials.
 
 ---
+<p align="center" width="100%">
+    <img width="100%" src="https://github.com/GitTimeraider/Assets/blob/main/InvoiceRaider/img/mail.png">
+</p>
 
 ## Environment Variables
 
