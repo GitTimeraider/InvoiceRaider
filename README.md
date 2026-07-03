@@ -1,5 +1,9 @@
 # InvoiceRaider
 
+<p align="center" width="100%">
+    <img width="33%" src="https://github.com/GitTimeraider/Assets/blob/main/InvoiceRaider/img/invoiceraider_icon_25.png">
+</p>
+
 Formerly a fork of https://github.com/kittendevv/Invio, however at this point enough features and functionality has been added and removed to make it its own project.
 No changes made in the Invio project will be introduced in here.
 
