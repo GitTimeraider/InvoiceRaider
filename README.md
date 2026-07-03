@@ -4,8 +4,9 @@
     <img width="33%" src="https://github.com/GitTimeraider/Assets/blob/main/InvoiceRaider/img/invoiceraider_icon.png">
 </p>
 
-Formerly a fork of https://github.com/kittendevv/Invio, however at this point enough features and functionality has been added and removed to make it its own project.
-No changes made in the Invio project will be introduced in here.
+
+Formerly a fork of https://github.com/kittendevv/Invio, however at this point enough functionality has been added and removed to make it its own project.
+No changes made in the Invio project will be introduced in here anymore and it will go its own way.
 
 ### Disclaimers: 
 #### AI is responsible for over half of the coding. Also keep in mind that this software is mostly developed for personal use by myself and thus might not receive all feature requests desired.
