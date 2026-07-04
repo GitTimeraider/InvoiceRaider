@@ -1,7 +1,7 @@
 # InvoiceRaider
 
 <p align="center" width="100%">
-    <img width="50%" src="https://github.com/GitTimeraider/Assets/blob/main/InvoiceRaider/img/invoiceraider_icon.png">
+    <img width="33%" src="https://github.com/GitTimeraider/Assets/blob/main/InvoiceRaider/img/invoiceraider_icon.png">
 </p>
 
 
