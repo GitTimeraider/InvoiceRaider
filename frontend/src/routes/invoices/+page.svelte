@@ -26,6 +26,9 @@
 
   let invoices = $derived(data.invoices || []);
   let filterStatus = $state("all");
+  let filterInvoiceNo = $state("");
+  let filterCustomer = $state("");
+  let filterDate = $state("");
   let sortKey = $state<"invoiceNumber" | "customer" | "total" | "status" | "issueDate" | "updatedAt">("invoiceNumber");
   let sortDirection = $state<"asc" | "desc">("desc");
 
@@ -56,8 +59,14 @@
 
   let filtered = $derived(
     invoices.filter((i) => {
-      if (filterStatus === "all") return true;
-      return i.status === filterStatus;
+      if (filterStatus !== "all" && i.status !== filterStatus) return false;
+      if (filterInvoiceNo && !String(i.invoiceNumber || "").toLowerCase().includes(filterInvoiceNo.toLowerCase())) return false;
+      if (filterCustomer && !String(i.customer?.name || "").toLowerCase().includes(filterCustomer.toLowerCase())) return false;
+      if (filterDate) {
+        const d = i.issueDate ? new Date(i.issueDate).toISOString().slice(0, 10) : "";
+        if (!d.startsWith(filterDate)) return false;
+      }
+      return true;
     }),
   );
 
@@ -108,14 +117,39 @@
   </div>
 {/if}
 
-<div class="bg-base-100 border-base-300 rounded-box mb-4 overflow-x-auto border p-4">
-  <div class="flex gap-2">
+<div class="bg-base-100 border-base-300 rounded-box mb-4 border p-4 space-y-3">
+  <div class="flex flex-wrap gap-2">
     <button class={`btn btn-sm ${filterStatus === "all" ? "btn-neutral" : "btn-ghost"}`} onclick={() => (filterStatus = "all")}>{t("All")}</button>
     <button class={`btn btn-sm ${filterStatus === "sent" ? "btn-neutral" : "btn-ghost"}`} onclick={() => (filterStatus = "sent")}>{t("Sent")}</button>
     <button class={`btn btn-sm ${filterStatus === "draft" ? "btn-neutral" : "btn-ghost"}`} onclick={() => (filterStatus = "draft")}>{t("Draft")}</button>
     <button class={`btn btn-sm ${filterStatus === "complete" ? "btn-neutral" : "btn-ghost"}`} onclick={() => (filterStatus = "complete")}>{t("Complete")}</button>
     <button class={`btn btn-sm ${filterStatus === "paid" ? "btn-neutral" : "btn-ghost"}`} onclick={() => (filterStatus = "paid")}>{t("Paid")}</button>
     <button class={`btn btn-sm ${filterStatus === "voided" ? "btn-neutral" : "btn-ghost"}`} onclick={() => (filterStatus = "voided")}>{t("Voided")}</button>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <input
+      type="text"
+      class="input input-sm input-bordered w-36"
+      placeholder={t("Invoice No")}
+      bind:value={filterInvoiceNo}
+    />
+    {#if canViewCustomers}
+      <input
+        type="text"
+        class="input input-sm input-bordered w-44"
+        placeholder={t("Customer")}
+        bind:value={filterCustomer}
+      />
+    {/if}
+    <input
+      type="date"
+      class="input input-sm input-bordered w-40"
+      title={t("Issue Date")}
+      bind:value={filterDate}
+    />
+    {#if filterInvoiceNo || filterCustomer || filterDate}
+      <button class="btn btn-sm btn-ghost" onclick={() => { filterInvoiceNo = ""; filterCustomer = ""; filterDate = ""; }}>{t("Clear")}</button>
+    {/if}
   </div>
 </div>
 

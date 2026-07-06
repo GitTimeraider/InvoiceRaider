@@ -6,6 +6,7 @@ import { getMaintainer } from "$lib/version";
 type Invoice = {
   id: string;
   invoiceNumber: string;
+  customerId?: string;
   customer?: { name?: string };
   issueDate?: string | Date;
   dueDate?: string | Date;
@@ -133,10 +134,10 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
       }
     }
 
-    const topCustomerMap = new Map<string, { name: string; total: number; count: number }>();
+    const topCustomerMap = new Map<string, { name: string; customerId?: string; total: number; count: number }>();
     for (const inv of invoices) {
       const name = inv.customer?.name || "Unknown";
-      const existing = topCustomerMap.get(name) || { name, total: 0, count: 0 };
+      const existing = topCustomerMap.get(name) || { name, customerId: inv.customerId, total: 0, count: 0 };
       existing.total += Number(inv.total || 0);
       existing.count += 1;
       topCustomerMap.set(name, existing);
