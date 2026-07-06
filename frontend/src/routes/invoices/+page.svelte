@@ -25,7 +25,23 @@
   }
 
   let invoices = $derived(data.invoices || []);
-  let filterStatus = $state("all");
+  let filterStatuses = $state(new Set<string>(
+    (data.initialStatusFilter || "").split(",").filter((s: string) => s.length > 0)
+  ));
+  let filterInvoiceNo = $state("");
+  let filterCustomer = $state("");
+  let filterDateFrom = $state("");
+  let filterDateTo = $state("");
+
+  function toggleStatus(status: string) {
+    const next = new Set(filterStatuses);
+    if (next.has(status)) {
+      next.delete(status);
+    } else {
+      next.add(status);
+    }
+    filterStatuses = next;
+  }
   let sortKey = $state<"invoiceNumber" | "customer" | "total" | "status" | "issueDate" | "updatedAt">("invoiceNumber");
   let sortDirection = $state<"asc" | "desc">("desc");
 
@@ -56,8 +72,15 @@
 
   let filtered = $derived(
     invoices.filter((i) => {
-      if (filterStatus === "all") return true;
-      return i.status === filterStatus;
+      if (filterStatuses.size > 0 && !filterStatuses.has(i.status)) return false;
+      if (filterInvoiceNo && !String(i.invoiceNumber || "").toLowerCase().includes(filterInvoiceNo.toLowerCase())) return false;
+      if (filterCustomer && !String(i.customer?.name || "").toLowerCase().includes(filterCustomer.toLowerCase())) return false;
+      if (filterDateFrom || filterDateTo) {
+        const d = i.issueDate ? new Date(i.issueDate).toISOString().slice(0, 10) : "";
+        if (filterDateFrom && d < filterDateFrom) return false;
+        if (filterDateTo && d > filterDateTo) return false;
+      }
+      return true;
     }),
   );
 
@@ -108,14 +131,49 @@
   </div>
 {/if}
 
-<div class="bg-base-100 border-base-300 rounded-box mb-4 overflow-x-auto border p-4">
-  <div class="flex gap-2">
-    <button class={`btn btn-sm ${filterStatus === "all" ? "btn-neutral" : "btn-ghost"}`} onclick={() => (filterStatus = "all")}>{t("All")}</button>
-    <button class={`btn btn-sm ${filterStatus === "sent" ? "btn-neutral" : "btn-ghost"}`} onclick={() => (filterStatus = "sent")}>{t("Sent")}</button>
-    <button class={`btn btn-sm ${filterStatus === "draft" ? "btn-neutral" : "btn-ghost"}`} onclick={() => (filterStatus = "draft")}>{t("Draft")}</button>
-    <button class={`btn btn-sm ${filterStatus === "complete" ? "btn-neutral" : "btn-ghost"}`} onclick={() => (filterStatus = "complete")}>{t("Complete")}</button>
-    <button class={`btn btn-sm ${filterStatus === "paid" ? "btn-neutral" : "btn-ghost"}`} onclick={() => (filterStatus = "paid")}>{t("Paid")}</button>
-    <button class={`btn btn-sm ${filterStatus === "voided" ? "btn-neutral" : "btn-ghost"}`} onclick={() => (filterStatus = "voided")}>{t("Voided")}</button>
+<div class="bg-base-100 border-base-300 rounded-box mb-4 border p-4 space-y-3">
+  <div class="flex flex-wrap gap-2">
+    <button class={`btn btn-sm ${filterStatuses.size === 0 ? "btn-neutral" : "btn-ghost"}`} onclick={() => (filterStatuses = new Set())}>{t("All")}</button>
+    <button class={`btn btn-sm ${filterStatuses.has("sent") ? "btn-neutral" : "btn-ghost"}`} onclick={() => toggleStatus("sent")}>{t("Sent")}</button>
+    <button class={`btn btn-sm ${filterStatuses.has("draft") ? "btn-neutral" : "btn-ghost"}`} onclick={() => toggleStatus("draft")}>{t("Draft")}</button>
+    <button class={`btn btn-sm ${filterStatuses.has("complete") ? "btn-neutral" : "btn-ghost"}`} onclick={() => toggleStatus("complete")}>{t("Complete")}</button>
+    <button class={`btn btn-sm ${filterStatuses.has("paid") ? "btn-neutral" : "btn-ghost"}`} onclick={() => toggleStatus("paid")}>{t("Paid")}</button>
+    <button class={`btn btn-sm ${filterStatuses.has("voided") ? "btn-neutral" : "btn-ghost"}`} onclick={() => toggleStatus("voided")}>{t("Voided")}</button>
+    <button class={`btn btn-sm ${filterStatuses.has("overdue") ? "btn-neutral" : "btn-ghost"}`} onclick={() => toggleStatus("overdue")}>{t("Overdue")}</button>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <input
+      type="text"
+      class="input input-sm input-bordered w-36"
+      placeholder={t("Invoice No")}
+      bind:value={filterInvoiceNo}
+    />
+    {#if canViewCustomers}
+      <input
+        type="text"
+        class="input input-sm input-bordered w-44"
+        placeholder={t("Customer")}
+        bind:value={filterCustomer}
+      />
+    {/if}
+    <div class="flex items-center gap-1">
+      <input
+        type="date"
+        class="input input-sm input-bordered w-36"
+        title={t("Issue Date from")}
+        bind:value={filterDateFrom}
+      />
+      <span class="text-xs opacity-50">–</span>
+      <input
+        type="date"
+        class="input input-sm input-bordered w-36"
+        title={t("Issue Date to")}
+        bind:value={filterDateTo}
+      />
+    </div>
+    {#if filterInvoiceNo || filterCustomer || filterDateFrom || filterDateTo || filterStatuses.size > 0}
+      <button class="btn btn-sm btn-ghost" onclick={() => { filterInvoiceNo = ""; filterCustomer = ""; filterDateFrom = ""; filterDateTo = ""; filterStatuses = new Set(); }}>{t("Clear")}</button>
+    {/if}
   </div>
 </div>
 

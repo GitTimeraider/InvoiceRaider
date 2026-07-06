@@ -2,7 +2,7 @@ import { redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import { backendGet, SESSION_COOKIE } from "$lib/backend";
 
-export const load: PageServerLoad = async ({ locals, cookies }) => {
+export const load: PageServerLoad = async ({ locals, cookies, url }) => {
   if (!locals.user) {
     throw redirect(303, "/login");
   }
@@ -28,8 +28,9 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
         new Date(a.updatedAt || a.issueDate || 0).getTime()
       );
     });
-    return { invoices };
+    const initialStatusFilter = url.searchParams.get("status") || "";
+    return { invoices, initialStatusFilter };
   } catch (err) {
-    return { error: String(err), invoices: [] };
+    return { error: String(err), invoices: [], initialStatusFilter: "" };
   }
 };

@@ -9,7 +9,7 @@
   let dateLocale = $derived(data.localization?.locale || "en");
   let statusCounts = $derived((data.status || {}) as Record<string, number>);
   let trend = $derived((data.trend || []) as Array<{ key: string; label: string; amount: number; count: number }>);
-  let topCustomers = $derived((data.topCustomers || []) as Array<{ name: string; total: number; count: number }>);
+  let topCustomers = $derived((data.topCustomers || []) as Array<{ name: string; customerId?: string; total: number; count: number }>);
   let deltas = $derived(
     (data.deltas || {
       billedMoM: { change: 0, percent: 0, direction: "flat" },
@@ -155,18 +155,18 @@
 
   {#if data.counts}
     <div class="dashboard-enter dashboard-enter-delay-1 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-      <div class="from-primary/10 to-base-100 border-primary/20 rounded-box border bg-gradient-to-br p-4 sm:p-5">
+      <a href="/invoices" class="from-primary/10 to-base-100 border-primary/20 rounded-box border bg-gradient-to-br p-4 sm:p-5 transition-opacity hover:opacity-80">
         <div class="text-sm opacity-70">{t("Invoices")}</div>
         <div class="mt-1 text-3xl font-bold tracking-tight">{data.counts.invoices}</div>
-      </div>
-      <div class="from-secondary/10 to-base-100 border-secondary/20 rounded-box border bg-gradient-to-br p-4 sm:p-5">
-        <div class="text-sm opacity-70">{t("Customers")}</div>
-        <div class="mt-1 text-3xl font-bold tracking-tight">{data.counts.customers}</div>
-      </div>
-      <div class="from-warning/10 to-base-100 border-warning/20 rounded-box border bg-gradient-to-br p-4 sm:p-5">
+      </a>
+      <a href="/invoices?status=sent" class="from-warning/10 to-base-100 border-warning/20 rounded-box border bg-gradient-to-br p-4 sm:p-5 transition-opacity hover:opacity-80">
         <div class="text-sm opacity-70">{t("Open Invoices")}</div>
         <div class="mt-1 text-3xl font-bold tracking-tight">{(statusCounts.sent || 0) + (statusCounts.overdue || 0)}</div>
-      </div>
+      </a>
+      <a href="/customers" class="from-secondary/10 to-base-100 border-secondary/20 rounded-box border bg-gradient-to-br p-4 sm:p-5 transition-opacity hover:opacity-80">
+        <div class="text-sm opacity-70">{t("Customers")}</div>
+        <div class="mt-1 text-3xl font-bold tracking-tight">{data.counts.customers}</div>
+      </a>
       <div class="from-info/10 to-base-100 border-info/20 rounded-box border bg-gradient-to-br p-4 sm:p-5">
         <div class="text-sm opacity-70">{t("Maintainer")}</div>
         <div class="mt-1 text-3xl font-bold tracking-tight">{data.maintainer}</div>
@@ -272,7 +272,11 @@
         {#each topCustomers as c (c.name)}
           <div class="bg-base-200 flex items-center justify-between rounded-md px-3 py-2">
             <div class="min-w-0">
-              <div class="truncate font-medium">{c.name}</div>
+              {#if c.customerId && canViewCustomers}
+                <a href={`/customers/${c.customerId}`} class="truncate font-medium hover:underline">{c.name}</a>
+              {:else}
+                <div class="truncate font-medium">{c.name}</div>
+              {/if}
               <div class="text-xs opacity-60">{c.count} {t("invoices")}</div>
             </div>
             <div class="font-semibold tabular-nums">{fmtMoney(c.total)}</div>
