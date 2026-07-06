@@ -159,7 +159,7 @@
         <div class="text-sm opacity-70">{t("Invoices")}</div>
         <div class="mt-1 text-3xl font-bold tracking-tight">{data.counts.invoices}</div>
       </a>
-      <a href="/invoices" class="from-warning/10 to-base-100 border-warning/20 rounded-box border bg-gradient-to-br p-4 sm:p-5 transition-opacity hover:opacity-80">
+      <a href="/invoices?status=sent" class="from-warning/10 to-base-100 border-warning/20 rounded-box border bg-gradient-to-br p-4 sm:p-5 transition-opacity hover:opacity-80">
         <div class="text-sm opacity-70">{t("Open Invoices")}</div>
         <div class="mt-1 text-3xl font-bold tracking-tight">{(statusCounts.sent || 0) + (statusCounts.overdue || 0)}</div>
       </a>
