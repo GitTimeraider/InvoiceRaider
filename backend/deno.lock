@@ -8,7 +8,7 @@
     "jsr:@std/path@^1.1.1": "1.1.2",
     "npm:@tailwindcss/postcss@^4.1.7": "4.1.12",
     "npm:cssnano@^7.0.7": "7.1.1_postcss@8.5.6",
-    "npm:daisyui@^5.6.13": "5.6.13",
+    "npm:daisyui@^5.6.18": "5.6.18",
     "npm:otpauth@^9.5.1": "9.5.1",
     "npm:pdf-lib@^1.17.1": "1.17.1",
     "npm:postcss@^8.5.3": "8.5.6",
@@ -364,8 +364,8 @@
         "css-tree@2.2.1"
       ]
     },
-    "daisyui@5.6.13": {
-      "integrity": "sha512-0UHyNG3TzF7pDIbPcWyLKQfgtGhJcIq2x26jwsDKp7ZhL0GwaqIMZ12+TWfp8p+mE4NNc29SJk63hEXTz3MQkg=="
+    "daisyui@5.6.18": {
+      "integrity": "sha512-6y9rboRQl8fosnusy/5pg11yp+H0LtK3YdtfS4Vf2QVnaYOKasNdYm6hDxeiT6bwZPdl4WRPzVIlIApdo2ssBg=="
     },
     "detect-libc@2.0.4": {
       "integrity": "sha512-3UDv+G9CsCKO1WKMGw9fwq/SWJYbI0c5Y7LU1AXYoDdbhE2AHQ6N6Nb34sG8Fj7T5APy8qXDCKuuIHd1BR0tVA=="
@@ -1146,7 +1146,7 @@
   "workspace": {
     "dependencies": [
       "jsr:@pakornv/fresh-plugin-tailwindcss@^1.0.3",
-      "npm:daisyui@^5.6.13",
+      "npm:daisyui@^5.6.18",
       "npm:otpauth@^9.5.1",
       "npm:pdf-lib@^1.17.1",
       "npm:tailwindcss@^4.3.2"
