@@ -148,7 +148,8 @@ export const actions: Actions = {
           await backendPostFormData(`/api/v1/invoices/${id}/send-email`, locals.authHeader, payload);
           return { emailSent: true, emailRecipients: to };
         } catch (e) {
-          return fail(502, { emailError: `Failed to send: ${String(e)}` });
+          const message = e instanceof Error ? e.message : String(e);
+          return fail(502, { emailError: `Failed to send: ${message}` });
         }
       }
     } catch (e) {

@@ -1769,6 +1769,7 @@ adminRoutes.post(
     let to: string[] = [];
     let subject = "";
     let message = "";
+    let emailMode: "standard" | "reminder" = "standard";
     let parsedEmailConfigId: string | null = null;
     const additionalAttachments: EmailAttachment[] = [];
     const parseRecipients = (raw: string): string[] => raw
@@ -1789,6 +1790,9 @@ adminRoutes.post(
         to = parseRecipients(String(formData.get("to") ?? ""));
         subject = String(formData.get("subject") ?? "").trim();
         message = String(formData.get("message") ?? "").trim();
+        emailMode = String(formData.get("emailMode") ?? "standard").trim() === "reminder"
+          ? "reminder"
+          : "standard";
         const rawEmailConfigId = String(formData.get("emailConfigId") ?? "").trim();
         parsedEmailConfigId = rawEmailConfigId || null;
 
@@ -1824,10 +1828,33 @@ adminRoutes.post(
         }
         subject = typeof body.subject === "string" ? body.subject.trim() : "";
         message = typeof body.message === "string" ? body.message.trim() : "";
+        emailMode = body.emailMode === "reminder" ? "reminder" : "standard";
         parsedEmailConfigId = typeof body.emailConfigId === "string" ? body.emailConfigId : null;
       }
     } catch {
       return c.json({ error: "Invalid request body" }, 400);
+    }
+
+    // Build settings map (same as /pdf route)
+    const settings = await getSettings();
+    const settingsMap = settings.reduce(
+      (acc: Record<string, string>, s) => { acc[s.key] = s.value as string; return acc; },
+      {} as Record<string, string>,
+    );
+    if (!settingsMap.postalCityFormat && settingsMap.postal_city_format) {
+      settingsMap.postalCityFormat = settingsMap.postal_city_format;
+    }
+    if (!settingsMap.logo && settingsMap.logoUrl) {
+      settingsMap.logo = settingsMap.logoUrl;
+    }
+
+    if (emailMode === "reminder") {
+      const configuredReminderSender = String(settingsMap.reminderEmailConfigId ?? "").trim();
+      if (!configuredReminderSender) {
+        return c.json({ error: "No reminder sender is configured. Set one in Settings > Email." }, 400);
+      }
+      // Always enforce the globally configured reminder sender for reminder mode.
+      parsedEmailConfigId = configuredReminderSender;
     }
 
     // Resolve email config
@@ -1849,19 +1876,6 @@ adminRoutes.post(
     }
     if (!subject) {
       return c.json({ error: "Subject is required" }, 400);
-    }
-
-    // Build settings map (same as /pdf route)
-    const settings = await getSettings();
-    const settingsMap = settings.reduce(
-      (acc: Record<string, string>, s) => { acc[s.key] = s.value as string; return acc; },
-      {} as Record<string, string>,
-    );
-    if (!settingsMap.postalCityFormat && settingsMap.postal_city_format) {
-      settingsMap.postalCityFormat = settingsMap.postal_city_format;
-    }
-    if (!settingsMap.logo && settingsMap.logoUrl) {
-      settingsMap.logo = settingsMap.logoUrl;
     }
 
     const businessSettings = {
@@ -2009,7 +2023,10 @@ adminRoutes.post(
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       console.error("Email send failed:", msg);
-      return c.json({ error: "Failed to send email", details: msg }, 502);
+      const source = resolvedDbConfig?.id
+        ? `config:${resolvedDbConfig.id}`
+        : "config:env";
+      return c.json({ error: "Failed to send email", details: `[${source}] ${msg}` }, 502);
     }
 
     return c.json({ sent: true, recipients: to.length });
