@@ -37,7 +37,7 @@ A modern, self-hosted invoice management platform for freelancers and small to m
 - **Multi-User & Permissions** — Role-based access control with a fine-grained resource/action permission matrix
 - **Two-Factor Authentication** — TOTP (authenticator app) with recovery codes
 - **OpenID Connect** — Optional OIDC integration for SSO
-- **Email Sending** — Send invoices via SMTP with PDF attachments; supports multiple email configurations
+- **Email Sending** — Send invoices via SMTP with PDF attachments; supports multiple email configurations, per-config normal/reminder templates, and status-aware reminder emails
 - **Multi-Currency & Tax** — Per-invoice currency, per-line tax rates, inclusive/exclusive pricing, flexible rounding
 - **Themes** — Light and dark themes via daisyUI
 
@@ -139,6 +139,25 @@ Example: `INV-{YYYY}-{MM}-{RAND4}` → `INV-2025-06-A3F9`
 | Factur-X / ZugFeRD | EN 16931 | German/French hybrid PDF+XML |
 | FatturaPA | Italian SDI | Italian electronic invoicing |
 | PEPPOL BIS 3.0 | OpenPEPPOL | Pan-European procurement network |
+
+---
+
+## Email Actions by Invoice Status
+
+InvoiceRaider exposes email actions in the invoice detail view based on invoice status:
+
+- **Draft** — Shows **Send via Email**
+- **Sent** and **Overdue** — Shows **Send Reminder**
+- **Complete** and **Voided** — No email action button is shown
+
+Each email configuration can define separate templates for:
+
+- **Normal invoice emails** — Default Subject and Default Body
+- **Reminder emails** — Reminder Subject and Reminder Body
+
+When a reminder template is not set for a config, InvoiceRaider falls back to that same config's normal Subject/Body.
+
+This behavior helps separate first-send emails from follow-up reminders while still keeping a safe fallback.
 
 ---
 
