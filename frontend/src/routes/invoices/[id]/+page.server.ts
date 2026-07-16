@@ -39,6 +39,7 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
       allowProtectedInvoiceChanges,
       reminderSubject: typeof settings.reminderSubject === "string" ? settings.reminderSubject : null,
       reminderBody: typeof settings.reminderBody === "string" ? settings.reminderBody : null,
+      reminderEmailConfigId: typeof settings.reminderEmailConfigId === "string" ? settings.reminderEmailConfigId : null,
       emailEnabled: emailConfigs.length > 0 || Boolean(env.SMTP_HOST && env.EMAIL_FROM_ADDRESS),
       emailConfigs,
     };
@@ -115,6 +116,7 @@ export const actions: Actions = {
         const toRaw = String(data.get("emailTo") ?? "").trim();
         const subject = String(data.get("emailSubject") ?? "").trim();
         const message = String(data.get("emailMessage") ?? "").trim();
+        const emailMode = String(data.get("emailMode") ?? "standard").trim();
         const emailConfigId = String(data.get("emailConfigId") ?? "").trim() || undefined;
         const attachments = data.getAll("attachments").filter((entry): entry is File => entry instanceof File);
 
@@ -128,6 +130,9 @@ export const actions: Actions = {
         }
         if (!subject) {
           return fail(400, { emailError: "Subject is required." });
+        }
+        if (emailMode === "reminder" && !emailConfigId) {
+          return fail(400, { emailError: "No reminder sender is configured. Please set one in Settings > Email." });
         }
 
         try {

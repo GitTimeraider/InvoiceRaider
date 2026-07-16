@@ -603,6 +603,18 @@
             <p class="text-base-content/70 text-sm">{t("Configure a generic reminder template used for sent and complete invoices, regardless of which SMTP account sends it.")}</p>
             <label class="form-control">
               <div class="label">
+                <span class="label-text">{t("Reminder Sender")}</span>
+                <span class="label-text-alt opacity-60">{t("Used for all reminder emails")}</span>
+              </div>
+              <select class="select select-bordered w-full" bind:value={settings.reminderEmailConfigId} disabled={!canUpdateSettings}>
+                <option value="">{t("Select reminder sender")}</option>
+                {#each ((data as any).emailConfigs || []) as cfg (cfg.id)}
+                  <option value={cfg.id}>{cfg.name} ({cfg.fromAddress})</option>
+                {/each}
+              </select>
+            </label>
+            <label class="form-control">
+              <div class="label">
                 <span class="label-text">{t("Default Reminder Subject")}</span>
                 <span class="label-text-alt opacity-60">{t("Pre-filled when sending a reminder")}</span>
               </div>

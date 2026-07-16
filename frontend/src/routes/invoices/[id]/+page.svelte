@@ -58,6 +58,9 @@
   let emailSubmitLabel = $derived(useReminderEmail ? t("Send Reminder") : t("Send"));
   let reminderSubject = $derived((data as any).reminderSubject as string | null);
   let reminderBody = $derived((data as any).reminderBody as string | null);
+  let reminderEmailConfigId = $derived((data as any).reminderEmailConfigId as string | null);
+  let effectiveEmailConfigId = $derived(useReminderEmail ? (reminderEmailConfigId ?? "") : selectedEmailConfigId);
+  let reminderConfigMissing = $derived(useReminderEmail && !effectiveEmailConfigId);
 
   // When configs load or change, default to first config
   $effect(() => {
@@ -181,9 +184,10 @@
         }}
       >
         <input type="hidden" name="intent" value="send-email" />
-        <input type="hidden" name="emailConfigId" value={selectedEmailConfigId} />
+        <input type="hidden" name="emailMode" value={useReminderEmail ? "reminder" : "standard"} />
+        <input type="hidden" name="emailConfigId" value={effectiveEmailConfigId} />
 
-        {#if emailConfigs.length > 0}
+        {#if !useReminderEmail && emailConfigs.length > 0}
           <div class="form-control mb-3">
             <label class="label pb-1" for="emailConfigSelect">
               <span class="label-text font-medium">{t("Send from")}</span>
@@ -198,6 +202,12 @@
                 <option value={cfg.id}>{cfg.name} ({cfg.fromAddress})</option>
               {/each}
             </select>
+          </div>
+        {/if}
+
+        {#if reminderConfigMissing}
+          <div class="alert alert-warning mb-3 text-sm">
+            <span>{t("No reminder sender is configured. Set one in Settings > Email.")}</span>
           </div>
         {/if}
 
@@ -281,7 +291,7 @@
 
         <div class="modal-action mt-0">
           <button type="button" class="btn btn-ghost" disabled={emailSending} onclick={() => emailDialog?.close()}>{t("Cancel")}</button>
-          <button type="submit" class="btn btn-primary" disabled={emailSending}>
+          <button type="submit" class="btn btn-primary" disabled={emailSending || reminderConfigMissing}>
             {#if emailSending}
               <span class="loading loading-spinner loading-sm"></span>
             {:else}
