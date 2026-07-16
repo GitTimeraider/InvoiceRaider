@@ -50,23 +50,21 @@
     fromAddress: string;
     defaultSubject: string | null;
     defaultBody: string | null;
+    reminderSubject: string | null;
+    reminderBody: string | null;
   };
   let emailConfigs = $derived((data as any).emailConfigs as EmailConfig[] ?? []);
-  let selectedEmailConfigId = $state<string>("");
+  let selectedEmailConfigId = $state<string>((data as any).defaultEmailConfigId ?? "");
   let useReminderEmail = $derived(invoice?.status === "sent" || invoice?.status === "complete");
   let emailDialogTitle = $derived(useReminderEmail ? t("Send Reminder") : t("Send via Email"));
   let emailSubmitLabel = $derived(useReminderEmail ? t("Send Reminder") : t("Send"));
-  let reminderSubject = $derived((data as any).reminderSubject as string | null);
-  let reminderBody = $derived((data as any).reminderBody as string | null);
-  let reminderEmailConfigId = $derived((data as any).reminderEmailConfigId as string | null);
-  let effectiveEmailConfigId = $derived(useReminderEmail ? (reminderEmailConfigId ?? "") : selectedEmailConfigId);
-  let reminderConfigMissing = $derived(useReminderEmail && !effectiveEmailConfigId);
 
-  // When configs load or change, default to first config
+  // When configs load or change, default to configured sender or first config
   $effect(() => {
     const configs = emailConfigs;
-    if (configs.length > 0 && !selectedEmailConfigId) {
-      selectedEmailConfigId = configs[0].id;
+    const preferred = (data as any).defaultEmailConfigId || configs[0]?.id || "";
+    if (!selectedEmailConfigId || !configs.some((cfg) => cfg.id === selectedEmailConfigId)) {
+      selectedEmailConfigId = preferred;
     }
   });
 
@@ -76,12 +74,12 @@
 
   let defaultEmailSubject = $derived(
     useReminderEmail
-      ? (reminderSubject || (invoice ? `Reminder: Invoice #${invoice.invoiceNumber || invoice.id}` : "Reminder"))
+      ? (selectedEmailConfig?.reminderSubject || selectedEmailConfig?.defaultSubject || (invoice ? `Reminder: Invoice #${invoice.invoiceNumber || invoice.id}` : "Reminder"))
       : (selectedEmailConfig?.defaultSubject || (invoice ? `Invoice #${invoice.invoiceNumber || invoice.id}` : "Invoice")),
   );
   let defaultEmailBody = $derived(
     useReminderEmail
-      ? (reminderBody ?? "")
+      ? (selectedEmailConfig?.reminderBody ?? selectedEmailConfig?.defaultBody ?? "")
       : (selectedEmailConfig?.defaultBody ?? "")
   );
   let defaultEmailTo = $derived(
@@ -184,10 +182,9 @@
         }}
       >
         <input type="hidden" name="intent" value="send-email" />
-        <input type="hidden" name="emailMode" value={useReminderEmail ? "reminder" : "standard"} />
-        <input type="hidden" name="emailConfigId" value={effectiveEmailConfigId} />
+        <input type="hidden" name="emailConfigId" value={selectedEmailConfigId} />
 
-        {#if !useReminderEmail && emailConfigs.length > 0}
+        {#if emailConfigs.length > 0}
           <div class="form-control mb-3">
             <label class="label pb-1" for="emailConfigSelect">
               <span class="label-text font-medium">{t("Send from")}</span>
@@ -202,12 +199,6 @@
                 <option value={cfg.id}>{cfg.name} ({cfg.fromAddress})</option>
               {/each}
             </select>
-          </div>
-        {/if}
-
-        {#if reminderConfigMissing}
-          <div class="alert alert-warning mb-3 text-sm">
-            <span>{t("No reminder sender is configured. Set one in Settings > Email.")}</span>
           </div>
         {/if}
 
@@ -291,7 +282,7 @@
 
         <div class="modal-action mt-0">
           <button type="button" class="btn btn-ghost" disabled={emailSending} onclick={() => emailDialog?.close()}>{t("Cancel")}</button>
-          <button type="submit" class="btn btn-primary" disabled={emailSending || reminderConfigMissing}>
+          <button type="submit" class="btn btn-primary" disabled={emailSending}>
             {#if emailSending}
               <span class="loading loading-spinner loading-sm"></span>
             {:else}

@@ -22,6 +22,7 @@
     numberFormat: "comma",
     postalCityFormat: "auto",
     ...initialSettings,
+    defaultEmailConfigId: (initialSettings as Record<string, unknown>).defaultEmailConfigId || (initialSettings as Record<string, unknown>).reminderEmailConfigId || "",
     allowProtectedInvoiceChanges: asBool((initialSettings as Record<string, unknown>).allowProtectedInvoiceChanges),
   } as Record<string, any>);
 
@@ -47,7 +48,7 @@
   let section = $derived(requestedSection === "security" && demoMode ? "company" : requestedSection);
   let canUpdateSettings = $derived(true); // TODO: user permissions
   let availableEmailConfigs = $derived(((data as any).emailConfigs || []) as Array<{ id: string; name: string; fromAddress: string; username?: string | null; hasPassword?: boolean }>);
-  let reminderSender = $derived(availableEmailConfigs.find((cfg) => cfg.id === settings.reminderEmailConfigId));
+  let defaultEmailConfig = $derived(availableEmailConfigs.find((cfg) => cfg.id === settings.defaultEmailConfigId));
 
   // Keep settings synced if data.settings changes from an external invalidation
   $effect(() => {
@@ -601,15 +602,15 @@
           </div>
         {:else if section === "email"}
           <div class="space-y-4">
-            <h2 class="text-xl font-semibold">{t("Reminder Emails")}</h2>
-            <p class="text-base-content/70 text-sm">{t("Configure a generic reminder template used for sent and complete invoices, regardless of which SMTP account sends it.")}</p>
+            <h2 class="text-xl font-semibold">{t("Email Defaults")}</h2>
+            <p class="text-base-content/70 text-sm">{t("Choose the email configuration selected by default when sending an invoice or reminder.")}</p>
             <label class="form-control">
               <div class="label">
-                <span class="label-text">{t("Reminder Sender")}</span>
-                <span class="label-text-alt opacity-60">{t("Used for all reminder emails")}</span>
+                <span class="label-text">{t("Default Email Sender")}</span>
+                <span class="label-text-alt opacity-60">{t("Used as the initial From selection")}</span>
               </div>
-              <select class="select select-bordered w-full" bind:value={settings.reminderEmailConfigId} disabled={!canUpdateSettings}>
-                <option value="">{t("Select reminder sender")}</option>
+              <select class="select select-bordered w-full" bind:value={settings.defaultEmailConfigId} disabled={!canUpdateSettings}>
+                <option value="">{t("Select default email sender")}</option>
                 {#each availableEmailConfigs as cfg (cfg.id)}
                   <option value={cfg.id} disabled={cfg.username && !cfg.hasPassword}>
                     {cfg.name} ({cfg.fromAddress}){cfg.username && !cfg.hasPassword ? ` - ${t("missing password")}` : ""}
@@ -617,44 +618,16 @@
                 {/each}
               </select>
             </label>
-            {#if reminderSender}
+            {#if defaultEmailConfig}
               <p class="text-base-content/70 text-xs">
-                {t("Selected sender ID")}: {reminderSender.id}
+                {t("Selected sender ID")}: {defaultEmailConfig.id}
               </p>
             {/if}
-            {#if reminderSender && reminderSender.username && !reminderSender.hasPassword}
+            {#if defaultEmailConfig && defaultEmailConfig.username && !defaultEmailConfig.hasPassword}
               <div class="alert alert-warning text-sm">
-                <span>{t("Selected reminder sender has no saved SMTP password. Edit that email configuration and enter password.")}</span>
+                <span>{t("Selected default sender has no saved SMTP password. Edit that email configuration and enter password.")}</span>
               </div>
             {/if}
-            <label class="form-control">
-              <div class="label">
-                <span class="label-text">{t("Default Reminder Subject")}</span>
-                <span class="label-text-alt opacity-60">{t("Pre-filled when sending a reminder")}</span>
-              </div>
-              <input
-                type="text"
-                class="input input-bordered w-full"
-                bind:value={settings.reminderSubject}
-                placeholder={t("e.g. Reminder: Invoice #{{invoiceNumber}} from {{companyName}}")}
-                disabled={!canUpdateSettings}
-              />
-            </label>
-            <label class="form-control">
-              <div class="label">
-                <span class="label-text">{t("Default Reminder Message Body")}</span>
-              </div>
-              <textarea
-                class="textarea textarea-bordered w-full"
-                rows="6"
-                bind:value={settings.reminderBody}
-                placeholder={t("e.g. This is a reminder for invoice #{{invoiceNumber}}.")}
-                disabled={!canUpdateSettings}
-              ></textarea>
-            </label>
-            <p class="text-base-content/60 text-xs">
-              {t("Available variables")}: {"{{invoiceNumber}}"}, {"{{companyName}}"}, {"{{issueDate}}"}, {"{{dueDate}}"}, {"{{customerName}}"}
-            </p>
           </div>
         {:else if section === "numbering"}
           <div class="space-y-4">

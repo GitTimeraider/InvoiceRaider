@@ -13,6 +13,8 @@ export interface EmailConfig {
   secure: boolean;
   defaultSubject: string | null;
   defaultBody: string | null;
+  reminderSubject: string | null;
+  reminderBody: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -34,8 +36,10 @@ function rowToConfig(row: unknown[]): EmailConfig {
     secure: Boolean(Number(row[8])),
     defaultSubject: row[9] ? String(row[9]) : null,
     defaultBody: row[10] ? String(row[10]) : null,
-    createdAt: String(row[11]),
-    updatedAt: String(row[12]),
+    reminderSubject: row[11] ? String(row[11]) : null,
+    reminderBody: row[12] ? String(row[12]) : null,
+    createdAt: String(row[13]),
+    updatedAt: String(row[14]),
   };
 }
 
@@ -53,13 +57,15 @@ function rowToConfigWithPassword(row: unknown[]): EmailConfigWithPassword {
     secure: Boolean(Number(row[8])),
     defaultSubject: row[9] ? String(row[9]) : null,
     defaultBody: row[10] ? String(row[10]) : null,
-    createdAt: String(row[11]),
-    updatedAt: String(row[12]),
+    reminderSubject: row[11] ? String(row[11]) : null,
+    reminderBody: row[12] ? String(row[12]) : null,
+    createdAt: String(row[13]),
+    updatedAt: String(row[14]),
   };
 }
 
 const SELECT_COLS =
-  "id, name, host, port, username, password, from_address, from_name, secure, default_subject, default_body, created_at, updated_at";
+  "id, name, host, port, username, password, from_address, from_name, secure, default_subject, default_body, reminder_subject, reminder_body, created_at, updated_at";
 
 export function listEmailConfigs(): EmailConfig[] {
   const db = getDatabase();
@@ -90,13 +96,15 @@ export function createEmailConfig(data: {
   secure: boolean;
   defaultSubject?: string | null;
   defaultBody?: string | null;
+  reminderSubject?: string | null;
+  reminderBody?: string | null;
 }): EmailConfig {
   const db = getDatabase();
   const id = generateUUID();
   const now = new Date().toISOString();
   db.query(
-    `INSERT INTO email_configs (id, name, host, port, username, password, from_address, from_name, secure, default_subject, default_body, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO email_configs (id, name, host, port, username, password, from_address, from_name, secure, default_subject, default_body, reminder_subject, reminder_body, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id,
       data.name,
@@ -109,6 +117,8 @@ export function createEmailConfig(data: {
       data.secure ? 1 : 0,
       data.defaultSubject || null,
       data.defaultBody || null,
+      data.reminderSubject || null,
+      data.reminderBody || null,
       now,
       now,
     ],
@@ -129,6 +139,8 @@ export function updateEmailConfig(
     secure?: boolean;
     defaultSubject?: string | null;
     defaultBody?: string | null;
+    reminderSubject?: string | null;
+    reminderBody?: string | null;
   },
 ): EmailConfig | null {
   const db = getDatabase();
@@ -153,12 +165,18 @@ export function updateEmailConfig(
   const defaultBody = data.defaultBody !== undefined
     ? data.defaultBody
     : existing.defaultBody;
+  const reminderSubject = data.reminderSubject !== undefined
+    ? data.reminderSubject
+    : existing.reminderSubject;
+  const reminderBody = data.reminderBody !== undefined
+    ? data.reminderBody
+    : existing.reminderBody;
 
   db.query(
     `UPDATE email_configs
      SET name = ?, host = ?, port = ?, username = ?, password = ?,
          from_address = ?, from_name = ?, secure = ?,
-         default_subject = ?, default_body = ?, updated_at = ?
+         default_subject = ?, default_body = ?, reminder_subject = ?, reminder_body = ?, updated_at = ?
      WHERE id = ?`,
     [
       name,
@@ -171,6 +189,8 @@ export function updateEmailConfig(
       secure ? 1 : 0,
       defaultSubject,
       defaultBody,
+      reminderSubject,
+      reminderBody,
       now,
       id,
     ],
