@@ -46,6 +46,8 @@
   let requestedSection = $derived(page.url.searchParams.get("section") || "company");
   let section = $derived(requestedSection === "security" && demoMode ? "company" : requestedSection);
   let canUpdateSettings = $derived(true); // TODO: user permissions
+  let availableEmailConfigs = $derived(((data as any).emailConfigs || []) as Array<{ id: string; name: string; fromAddress: string; username?: string | null; hasPassword?: boolean }>);
+  let reminderSender = $derived(availableEmailConfigs.find((cfg) => cfg.id === settings.reminderEmailConfigId));
 
   // Keep settings synced if data.settings changes from an external invalidation
   $effect(() => {
@@ -601,7 +603,6 @@
           <div class="space-y-4">
             <h2 class="text-xl font-semibold">{t("Reminder Emails")}</h2>
             <p class="text-base-content/70 text-sm">{t("Configure a generic reminder template used for sent and complete invoices, regardless of which SMTP account sends it.")}</p>
-            {@const reminderSender = ((data as any).emailConfigs || []).find((cfg: any) => cfg.id === settings.reminderEmailConfigId)}
             <label class="form-control">
               <div class="label">
                 <span class="label-text">{t("Reminder Sender")}</span>
@@ -609,7 +610,7 @@
               </div>
               <select class="select select-bordered w-full" bind:value={settings.reminderEmailConfigId} disabled={!canUpdateSettings}>
                 <option value="">{t("Select reminder sender")}</option>
-                {#each ((data as any).emailConfigs || []) as cfg (cfg.id)}
+                {#each availableEmailConfigs as cfg (cfg.id)}
                   <option value={cfg.id} disabled={cfg.username && !cfg.hasPassword}>
                     {cfg.name} ({cfg.fromAddress}){cfg.username && !cfg.hasPassword ? ` - ${t("missing password")}` : ""}
                   </option>
