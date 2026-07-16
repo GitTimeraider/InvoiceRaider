@@ -18,6 +18,8 @@
     secure: boolean;
     defaultSubject: string | null;
     defaultBody: string | null;
+    reminderSubject: string | null;
+    reminderBody: string | null;
   };
 
   let showForm = $state(false);
@@ -39,6 +41,8 @@
     secure: false,
     defaultSubject: "",
     defaultBody: "",
+    reminderSubject: "",
+    reminderBody: "",
   });
 
   let formData = $state(emptyForm());
@@ -65,6 +69,8 @@
       secure: config.secure,
       defaultSubject: config.defaultSubject ?? "",
       defaultBody: config.defaultBody ?? "",
+      reminderSubject: config.reminderSubject ?? "",
+      reminderBody: config.reminderBody ?? "",
     };
     formError = "";
     showPassword = false;
@@ -97,6 +103,8 @@
         secure: formData.secure,
         defaultSubject: formData.defaultSubject.trim() || null,
         defaultBody: formData.defaultBody.trim() || null,
+        reminderSubject: formData.reminderSubject.trim() || null,
+        reminderBody: formData.reminderBody.trim() || null,
       };
       // Only include password if non-empty (empty = keep existing on edit)
       if (formData.password) {
@@ -330,6 +338,43 @@
           ></textarea>
         </label>
 
+        <p class="text-base-content/60 text-xs">
+          {t("Available variables")}: {"{{invoiceNumber}}"}, {"{{companyName}}"}, {"{{issueDate}}"}, {"{{dueDate}}"}, {"{{customerName}}"}
+        </p>
+
+        <div class="divider">{t("Reminder Template (optional)")}</div>
+
+        <label class="form-control">
+          <div class="label">
+            <span class="label-text">{t("Default Reminder Subject")}</span>
+            <span class="label-text-alt opacity-60">{t("Pre-filled when sending a reminder")}</span>
+          </div>
+          <input
+            type="text"
+            class="input input-bordered w-full"
+            bind:value={formData.reminderSubject}
+            placeholder={t("e.g. Reminder: Invoice #{{invoiceNumber}} from {{companyName}}")}
+            disabled={isSubmitting}
+          />
+        </label>
+
+        <label class="form-control">
+          <div class="label">
+            <span class="label-text">{t("Default Reminder Message Body")}</span>
+          </div>
+          <textarea
+            class="textarea textarea-bordered w-full"
+            rows="5"
+            bind:value={formData.reminderBody}
+            placeholder={t("e.g. This is a reminder that invoice #{{invoiceNumber}} was sent on {{lastSentDate}}.")}
+            disabled={isSubmitting}
+          ></textarea>
+        </label>
+
+        <p class="text-base-content/60 text-xs">
+          {t("Available variables")}: {"{{invoiceNumber}}"}, {"{{companyName}}"}, {"{{issueDate}}"}, {"{{dueDate}}"}, {"{{customerName}}"}, {"{{lastSentDate}}"}
+        </p>
+
         <div class="flex justify-end gap-2 pt-2">
           <button type="button" class="btn btn-ghost" onclick={handleCancel} disabled={isSubmitting}>
             {t("Cancel")}
@@ -373,6 +418,9 @@
             {/if}
             {#if config.defaultSubject}
               <div class="truncate">{t("Subject")}: {config.defaultSubject}</div>
+            {/if}
+            {#if config.reminderSubject}
+              <div class="truncate">{t("Reminder Subject")}: {config.reminderSubject}</div>
             {/if}
           </div>
           {#if testResult?.id === config.id}

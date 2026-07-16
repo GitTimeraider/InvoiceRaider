@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
       settingsRes.status === "fulfilled"
         ? (settingsRes.value as Record<string, unknown>)
         : {};
-    const emailConfigs: Array<{ id: string; name: string; fromAddress: string; defaultSubject: string | null; defaultBody: string | null }> =
+    const emailConfigs: Array<{ id: string; name: string; fromAddress: string; defaultSubject: string | null; defaultBody: string | null; reminderSubject: string | null; reminderBody: string | null }> =
       emailConfigsRes.status === "fulfilled" ? (emailConfigsRes.value as any[]) || [] : [];
     const allowProtectedInvoiceChanges =
       String(settings.allowProtectedInvoiceChanges || "false").toLowerCase() ===
