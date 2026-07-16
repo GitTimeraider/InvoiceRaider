@@ -320,6 +320,7 @@
       <div class="flex-1">
         <div class="font-medium">{useReminderEmail ? t("Reminder sent successfully") : t("Invoice sent successfully")}</div>
         <div class="opacity-80">{t("Sent to")} {(form as any).emailRecipients?.join(", ")}</div>
+        <div class="opacity-70 text-xs">{t("Sender source")}: {(form as any).emailSource}</div>
       </div>
     </div>
   {/if}

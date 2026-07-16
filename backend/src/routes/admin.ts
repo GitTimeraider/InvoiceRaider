@@ -1871,6 +1871,16 @@ adminRoutes.post(
       resolvedDbConfig = getEmailConfigById(dbConfigs[0].id);
     }
 
+    if (resolvedDbConfig?.username && !resolvedDbConfig.password) {
+      return c.json(
+        {
+          error: "Selected email configuration is missing a saved password.",
+          details: `Config '${resolvedDbConfig.name}' has a username but no password. Open Settings > Email, edit this configuration, and enter the SMTP password.`,
+        },
+        400,
+      );
+    }
+
     if (to.length === 0) {
       return c.json({ error: "At least one valid recipient email is required" }, 400);
     }
@@ -2014,6 +2024,10 @@ adminRoutes.post(
       ],
     };
 
+    const senderSource = resolvedDbConfig?.id
+      ? `config:${resolvedDbConfig.id}`
+      : "config:env";
+
     try {
       if (resolvedDbConfig) {
         await sendEmailWithConfig(resolvedDbConfig, emailPayload);
@@ -2029,7 +2043,7 @@ adminRoutes.post(
       return c.json({ error: "Failed to send email", details: `[${source}] ${msg}` }, 502);
     }
 
-    return c.json({ sent: true, recipients: to.length });
+    return c.json({ sent: true, recipients: to.length, source: senderSource });
   },
 );
 

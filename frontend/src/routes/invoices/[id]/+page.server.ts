@@ -145,8 +145,8 @@ export const actions: Actions = {
             if (file.size > 0) payload.append("attachments", file, file.name);
           }
 
-          await backendPostFormData(`/api/v1/invoices/${id}/send-email`, locals.authHeader, payload);
-          return { emailSent: true, emailRecipients: to };
+          const sendResult = await backendPostFormData(`/api/v1/invoices/${id}/send-email`, locals.authHeader, payload) as { source?: string };
+          return { emailSent: true, emailRecipients: to, emailSource: sendResult?.source || "unknown" };
         } catch (e) {
           const message = e instanceof Error ? e.message : String(e);
           return fail(502, { emailError: `Failed to send: ${message}` });

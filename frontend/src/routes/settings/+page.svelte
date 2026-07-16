@@ -601,6 +601,7 @@
           <div class="space-y-4">
             <h2 class="text-xl font-semibold">{t("Reminder Emails")}</h2>
             <p class="text-base-content/70 text-sm">{t("Configure a generic reminder template used for sent and complete invoices, regardless of which SMTP account sends it.")}</p>
+            {@const reminderSender = ((data as any).emailConfigs || []).find((cfg: any) => cfg.id === settings.reminderEmailConfigId)}
             <label class="form-control">
               <div class="label">
                 <span class="label-text">{t("Reminder Sender")}</span>
@@ -609,10 +610,22 @@
               <select class="select select-bordered w-full" bind:value={settings.reminderEmailConfigId} disabled={!canUpdateSettings}>
                 <option value="">{t("Select reminder sender")}</option>
                 {#each ((data as any).emailConfigs || []) as cfg (cfg.id)}
-                  <option value={cfg.id}>{cfg.name} ({cfg.fromAddress})</option>
+                  <option value={cfg.id} disabled={cfg.username && !cfg.hasPassword}>
+                    {cfg.name} ({cfg.fromAddress}){cfg.username && !cfg.hasPassword ? ` - ${t("missing password")}` : ""}
+                  </option>
                 {/each}
               </select>
             </label>
+            {#if reminderSender}
+              <p class="text-base-content/70 text-xs">
+                {t("Selected sender ID")}: {reminderSender.id}
+              </p>
+            {/if}
+            {#if reminderSender && reminderSender.username && !reminderSender.hasPassword}
+              <div class="alert alert-warning text-sm">
+                <span>{t("Selected reminder sender has no saved SMTP password. Edit that email configuration and enter password.")}</span>
+              </div>
+            {/if}
             <label class="form-control">
               <div class="label">
                 <span class="label-text">{t("Default Reminder Subject")}</span>
