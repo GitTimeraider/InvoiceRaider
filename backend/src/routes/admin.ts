@@ -1734,6 +1734,16 @@ adminRoutes.post("/email-configs/:id/test", requirePermission("settings", "updat
   const config = getEmailConfigById(id);
   if (!config) return c.json({ error: "Email configuration not found" }, 404);
 
+  if (config.username && !config.password) {
+    return c.json(
+      {
+        error: "Selected email configuration is missing a saved password.",
+        details: `Config '${config.name}' has a username but no password. Edit this configuration and enter the SMTP password.`,
+      },
+      400,
+    );
+  }
+
   let testTo: string = "";
   try {
     const body = await c.req.json();
@@ -1750,10 +1760,11 @@ adminRoutes.post("/email-configs/:id/test", requirePermission("settings", "updat
       htmlBody: "<p>This is a test email from InvoiceRaider. Your email configuration is working correctly.</p>",
       textBody: "This is a test email from InvoiceRaider. Your email configuration is working correctly.",
     });
-    return c.json({ sent: true, to: testTo });
+    return c.json({ sent: true, to: testTo, source: `config:${config.id}` });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    return c.json({ error: "Test email failed", details: msg }, 502);
+    const source = `config:${config.id} (${config.name}) auth:${config.username ? "user" : "no-user"}/${config.password ? "pass" : "no-pass"}`;
+    return c.json({ error: "Test email failed", details: `[${source}] ${msg}` }, 502);
   }
 });
 
