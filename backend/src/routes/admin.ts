@@ -1676,12 +1676,14 @@ adminRoutes.post("/email-configs", requirePermission("settings", "update"), asyn
   const secure = Boolean(body.secure);
   const defaultSubject = typeof body.defaultSubject === "string" ? body.defaultSubject.trim() || null : null;
   const defaultBody = typeof body.defaultBody === "string" ? body.defaultBody.trim() || null : null;
+  const reminderSubject = typeof body.reminderSubject === "string" ? body.reminderSubject.trim() || null : null;
+  const reminderBody = typeof body.reminderBody === "string" ? body.reminderBody.trim() || null : null;
 
   if (!name) return c.json({ error: "Name is required" }, 400);
   if (!host) return c.json({ error: "Host is required" }, 400);
   if (!fromAddress || !fromAddress.includes("@")) return c.json({ error: "Valid From Address is required" }, 400);
 
-  const config = createEmailConfig({ name, host, port, username, password, fromAddress, fromName, secure, defaultSubject, defaultBody });
+  const config = createEmailConfig({ name, host, port, username, password, fromAddress, fromName, secure, defaultSubject, defaultBody, reminderSubject, reminderBody });
   return c.json(config, 201);
 });
 
@@ -1714,6 +1716,12 @@ adminRoutes.put("/email-configs/:id", requirePermission("settings", "update"), a
   }
   if (Object.prototype.hasOwnProperty.call(body, "defaultBody")) {
     data.defaultBody = typeof body.defaultBody === "string" ? body.defaultBody.trim() || null : null;
+  }
+  if (Object.prototype.hasOwnProperty.call(body, "reminderSubject")) {
+    data.reminderSubject = typeof body.reminderSubject === "string" ? body.reminderSubject.trim() || null : null;
+  }
+  if (Object.prototype.hasOwnProperty.call(body, "reminderBody")) {
+    data.reminderBody = typeof body.reminderBody === "string" ? body.reminderBody.trim() || null : null;
   }
 
   const updated = updateEmailConfig(id, data);

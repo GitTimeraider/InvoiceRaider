@@ -338,7 +338,7 @@
           ></textarea>
         </label>
 
-        <div class="divider">{t("Reminder Template (optional)")}</div>
+        <div class="divider mt-6">{t("Reminder Template (optional)")}</div>
 
         <label class="form-control">
           <div class="label">
