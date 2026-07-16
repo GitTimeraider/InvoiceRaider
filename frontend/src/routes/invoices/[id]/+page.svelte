@@ -55,7 +55,7 @@
   };
   let emailConfigs = $derived((data as any).emailConfigs as EmailConfig[] ?? []);
   let selectedEmailConfigId = $state<string>((data as any).defaultEmailConfigId ?? "");
-  let useReminderEmail = $derived(invoice?.status === "sent" || invoice?.status === "complete");
+  let useReminderEmail = $derived(invoice?.status === "sent" || invoice?.status === "overdue");
   let emailDialogTitle = $derived(useReminderEmail ? t("Send Reminder") : t("Send via Email"));
   let emailSubmitLabel = $derived(useReminderEmail ? t("Send Reminder") : t("Send"));
 
@@ -473,7 +473,7 @@
           </div>
         {/if}
 
-        {#if emailEnabled && canExport && invoice.status !== "voided"}
+        {#if emailEnabled && canExport && (invoice.status === "draft" || invoice.status === "sent" || invoice.status === "overdue")}
           <button type="button" class="btn btn-sm" onclick={openEmailModal}>
             <Mail size={16} />
             <span class="hidden sm:inline">{emailDialogTitle}</span>
