@@ -622,12 +622,12 @@
                 class="textarea textarea-bordered w-full"
                 rows="6"
                 bind:value={settings.reminderBody}
-                placeholder={t("e.g. This is a reminder that invoice #{{invoiceNumber}} was sent on {{lastSentDate}}.")}
+                placeholder={t("e.g. This is a reminder for invoice #{{invoiceNumber}}.")}
                 disabled={!canUpdateSettings}
               ></textarea>
             </label>
             <p class="text-base-content/60 text-xs">
-              {t("Available variables")}: {"{{invoiceNumber}}"}, {"{{companyName}}"}, {"{{issueDate}}"}, {"{{dueDate}}"}, {"{{customerName}}"}, {"{{lastSentDate}}"}
+              {t("Available variables")}: {"{{invoiceNumber}}"}, {"{{companyName}}"}, {"{{issueDate}}"}, {"{{dueDate}}"}, {"{{customerName}}"}
             </p>
           </div>
         {:else if section === "numbering"}

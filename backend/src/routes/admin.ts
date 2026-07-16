@@ -1928,12 +1928,6 @@ adminRoutes.post(
     const dueDate = invoice.dueDate
       ? new Date(invoice.dueDate).toISOString().slice(0, 10)
       : null;
-    const lastSentAt = invoice.statusHistory
-      ?.filter((entry) => entry.status === "sent")
-      .at(-1)?.changedAt;
-    const lastSentDate = lastSentAt instanceof Date && !Number.isNaN(lastSentAt.getTime())
-      ? lastSentAt.toISOString().slice(0, 10)
-      : "";
     const origin = c.req.header("origin") ||
       c.req.header("referer")?.replace(/\/$/, "") || "";
     const shareLink = invoice.shareToken && origin
@@ -1947,7 +1941,6 @@ adminRoutes.post(
         .replace(/\{\{companyName\}\}/g, companyName)
         .replace(/\{\{issueDate\}\}/g, issueDate)
         .replace(/\{\{dueDate\}\}/g, dueDate ?? "")
-        .replace(/\{\{lastSentDate\}\}/g, lastSentDate)
         .replace(/\{\{customerName\}\}/g, invoice.customer?.name ?? "");
     }
 

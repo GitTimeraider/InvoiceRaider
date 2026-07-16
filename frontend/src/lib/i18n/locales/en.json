@@ -338,7 +338,7 @@
   "Pre-filled when sending a reminder": "Pre-filled when sending a reminder",
   "e.g. Reminder: Invoice #{{invoiceNumber}} from {{companyName}}": "e.g. Reminder: Invoice #{{invoiceNumber}} from {{companyName}}",
   "Default Reminder Message Body": "Default Reminder Message Body",
-  "e.g. This is a reminder that invoice #{{invoiceNumber}} was sent on {{lastSentDate}}.": "e.g. This is a reminder that invoice #{{invoiceNumber}} was sent on {{lastSentDate}}.",
+  "e.g. This is a reminder for invoice #{{invoiceNumber}}.": "e.g. This is a reminder for invoice #{{invoiceNumber}}.",
   "Reminder Emails": "Reminder Emails",
   "Configure a generic reminder template used for sent and complete invoices, regardless of which SMTP account sends it.": "Configure a generic reminder template used for sent and complete invoices, regardless of which SMTP account sends it.",
   "No email configurations yet. Add one to enable sending invoices by email.": "No email configurations yet. Add one to enable sending invoices by email.",
