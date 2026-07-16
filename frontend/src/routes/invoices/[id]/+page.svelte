@@ -50,14 +50,14 @@
     fromAddress: string;
     defaultSubject: string | null;
     defaultBody: string | null;
-    reminderSubject: string | null;
-    reminderBody: string | null;
   };
   let emailConfigs = $derived((data as any).emailConfigs as EmailConfig[] ?? []);
   let selectedEmailConfigId = $state<string>("");
   let useReminderEmail = $derived(invoice?.status === "sent" || invoice?.status === "complete");
   let emailDialogTitle = $derived(useReminderEmail ? t("Send Reminder") : t("Send via Email"));
   let emailSubmitLabel = $derived(useReminderEmail ? t("Send Reminder") : t("Send"));
+  let reminderSubject = $derived((data as any).reminderSubject as string | null);
+  let reminderBody = $derived((data as any).reminderBody as string | null);
 
   // When configs load or change, default to first config
   $effect(() => {
@@ -73,12 +73,12 @@
 
   let defaultEmailSubject = $derived(
     useReminderEmail
-      ? (selectedEmailConfig?.reminderSubject || (invoice ? `Reminder: Invoice #${invoice.invoiceNumber || invoice.id}` : "Reminder"))
+      ? (reminderSubject || (invoice ? `Reminder: Invoice #${invoice.invoiceNumber || invoice.id}` : "Reminder"))
       : (selectedEmailConfig?.defaultSubject || (invoice ? `Invoice #${invoice.invoiceNumber || invoice.id}` : "Invoice")),
   );
   let defaultEmailBody = $derived(
     useReminderEmail
-      ? (selectedEmailConfig?.reminderBody ?? "")
+      ? (reminderBody ?? "")
       : (selectedEmailConfig?.defaultBody ?? "")
   );
   let defaultEmailTo = $derived(

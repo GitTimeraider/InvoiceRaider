@@ -493,9 +493,6 @@ function ensureEmailConfigsTable(database: DB): void {
     const msg = e instanceof Error ? e.message : String(e);
     if (!/already exists/i.test(msg)) console.warn("Could not create email_configs table:", msg);
   }
-
-  addColumnIfMissing(database, "email_configs", "reminder_subject", "TEXT");
-  addColumnIfMissing(database, "email_configs", "reminder_body", "TEXT");
 }
 
 function ensureSchemaUpgrades(database: DB): void {

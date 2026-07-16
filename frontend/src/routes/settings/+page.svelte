@@ -317,10 +317,6 @@
       <div class="bg-base-100 rounded-box border-base-200 max-w-4xl border p-6">
         <ProductOptionsManager productCategories={data.productCategories} productUnits={data.productUnits} />
       </div>
-    {:else if section === "email"}
-      <div class="bg-base-100 rounded-box border-base-200 max-w-4xl border p-6">
-        <EmailConfigManager emailConfigs={(data as any).emailConfigs || []} />
-      </div>
     {:else if section === "templates"}
       <div class="bg-base-100 rounded-box border-base-200 max-w-4xl border p-6">
         <TemplateOptionsManager templates={data.templates} />
@@ -601,6 +597,39 @@
               <textarea class="textarea textarea-bordered w-full" bind:value={settings.defaultNotes} disabled={!canUpdateSettings}></textarea>
             </label>
           </div>
+        {:else if section === "email"}
+          <div class="space-y-4">
+            <h2 class="text-xl font-semibold">{t("Reminder Emails")}</h2>
+            <p class="text-base-content/70 text-sm">{t("Configure a generic reminder template used for sent and complete invoices, regardless of which SMTP account sends it.")}</p>
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">{t("Default Reminder Subject")}</span>
+                <span class="label-text-alt opacity-60">{t("Pre-filled when sending a reminder")}</span>
+              </div>
+              <input
+                type="text"
+                class="input input-bordered w-full"
+                bind:value={settings.reminderSubject}
+                placeholder={t("e.g. Reminder: Invoice #{{invoiceNumber}} from {{companyName}}")}
+                disabled={!canUpdateSettings}
+              />
+            </label>
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">{t("Default Reminder Message Body")}</span>
+              </div>
+              <textarea
+                class="textarea textarea-bordered w-full"
+                rows="6"
+                bind:value={settings.reminderBody}
+                placeholder={t("e.g. This is a reminder that invoice #{{invoiceNumber}} was sent on {{lastSentDate}}.")}
+                disabled={!canUpdateSettings}
+              ></textarea>
+            </label>
+            <p class="text-base-content/60 text-xs">
+              {t("Available variables")}: {"{{invoiceNumber}}"}, {"{{companyName}}"}, {"{{issueDate}}"}, {"{{dueDate}}"}, {"{{customerName}}"}, {"{{lastSentDate}}"}
+            </p>
+          </div>
         {:else if section === "numbering"}
           <div class="space-y-4">
             <h2 class="text-xl font-semibold">{t("Numbering")}</h2>
@@ -665,6 +694,12 @@
           </button>
         </div>
       </form>
+
+      {#if section === "email"}
+        <div class="bg-base-100 rounded-box border-base-200 max-w-4xl border p-6">
+          <EmailConfigManager emailConfigs={(data as any).emailConfigs || []} />
+        </div>
+      {/if}
     {/if}
   </section>
 </div>

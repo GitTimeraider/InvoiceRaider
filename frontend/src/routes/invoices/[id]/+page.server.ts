@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
       settingsRes.status === "fulfilled"
         ? (settingsRes.value as Record<string, unknown>)
         : {};
-    const emailConfigs: Array<{ id: string; name: string; fromAddress: string; defaultSubject: string | null; defaultBody: string | null; reminderSubject: string | null; reminderBody: string | null }> =
+    const emailConfigs: Array<{ id: string; name: string; fromAddress: string; defaultSubject: string | null; defaultBody: string | null }> =
       emailConfigsRes.status === "fulfilled" ? (emailConfigsRes.value as any[]) || [] : [];
     const allowProtectedInvoiceChanges =
       String(settings.allowProtectedInvoiceChanges || "false").toLowerCase() ===
@@ -37,6 +37,8 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
       invoice: invoiceRes.value,
       showPublishedBanner,
       allowProtectedInvoiceChanges,
+      reminderSubject: typeof settings.reminderSubject === "string" ? settings.reminderSubject : null,
+      reminderBody: typeof settings.reminderBody === "string" ? settings.reminderBody : null,
       emailEnabled: emailConfigs.length > 0 || Boolean(env.SMTP_HOST && env.EMAIL_FROM_ADDRESS),
       emailConfigs,
     };
