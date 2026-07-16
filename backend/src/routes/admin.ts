@@ -2024,7 +2024,7 @@ adminRoutes.post(
       const msg = e instanceof Error ? e.message : String(e);
       console.error("Email send failed:", msg);
       const source = resolvedDbConfig?.id
-        ? `config:${resolvedDbConfig.id}`
+        ? `config:${resolvedDbConfig.id} (${resolvedDbConfig.name}) auth:${resolvedDbConfig.username ? "user" : "no-user"}/${resolvedDbConfig.password ? "pass" : "no-pass"}`
         : "config:env";
       return c.json({ error: "Failed to send email", details: `[${source}] ${msg}` }, 502);
     }
