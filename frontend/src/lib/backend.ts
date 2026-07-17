@@ -5,11 +5,26 @@ export const BACKEND_URL = env.BACKEND_URL || "http://localhost:3000";
 export const SESSION_COOKIE = "invio_session";
 export const DEFAULT_SESSION_MAX_AGE = 3600;
 
+async function buildBackendError(res: Response): Promise<Error> {
+  let msg = `${res.status} ${res.statusText}`;
+  try {
+    const body = await res.json();
+    if (typeof body?.details === "string" && body.details.trim()) {
+      msg = body.details;
+    } else if (typeof body?.error === "string" && body.error.trim()) {
+      msg = body.error;
+    }
+  } catch {
+    // Ignore non-JSON responses and keep status text fallback.
+  }
+  return new Error(msg);
+}
+
 export async function backendGet(path: string, authHeader: string) {
   const res = await fetch(`${BACKEND_URL}${path}`, {
     headers: { Authorization: authHeader },
   });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  if (!res.ok) throw await buildBackendError(res);
   return await res.json();
 }
 
@@ -28,7 +43,7 @@ export async function backendPost(
     headers,
     body: body ? JSON.stringify(body) : undefined,
   });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  if (!res.ok) throw await buildBackendError(res);
   return await res.json();
 }
 
@@ -45,7 +60,7 @@ export async function backendPostFormData(
     headers,
     body,
   });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  if (!res.ok) throw await buildBackendError(res);
   return await res.json();
 }
 
@@ -57,7 +72,7 @@ export async function backendDelete(path: string, authHeader: string | null) {
     method: "DELETE",
     headers,
   });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  if (!res.ok) throw await buildBackendError(res);
   return await res.json();
 }
 
@@ -76,14 +91,7 @@ export async function backendPut(
     headers,
     body: body ? JSON.stringify(body) : undefined,
   });
-  if (!res.ok) {
-    let msg = `${res.status} ${res.statusText}`;
-    try {
-      const errBody = await res.json();
-      if (errBody.error) msg = errBody.error;
-    } catch (e) {}
-    throw new Error(msg);
-  }
+  if (!res.ok) throw await buildBackendError(res);
   const text = await res.text();
   return text ? JSON.parse(text) : {};
 }

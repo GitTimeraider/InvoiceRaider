@@ -44,15 +44,27 @@
   let emailEnabled = $derived(Boolean(data.emailEnabled));
   let canExport = $derived(hasPermission(user, "invoices", "export"));
 
-  type EmailConfig = { id: string; name: string; fromAddress: string; defaultSubject: string | null; defaultBody: string | null };
+  type EmailConfig = {
+    id: string;
+    name: string;
+    fromAddress: string;
+    defaultSubject: string | null;
+    defaultBody: string | null;
+    reminderSubject: string | null;
+    reminderBody: string | null;
+  };
   let emailConfigs = $derived((data as any).emailConfigs as EmailConfig[] ?? []);
-  let selectedEmailConfigId = $state<string>("");
+  let selectedEmailConfigId = $state<string>((data as any).defaultEmailConfigId ?? "");
+  let useReminderEmail = $derived(invoice?.status === "sent" || invoice?.status === "overdue");
+  let emailDialogTitle = $derived(useReminderEmail ? t("Send Reminder") : t("Send via Email"));
+  let emailSubmitLabel = $derived(useReminderEmail ? t("Send Reminder") : t("Send"));
 
-  // When configs load or change, default to first config
+  // When configs load or change, default to configured sender or first config
   $effect(() => {
     const configs = emailConfigs;
-    if (configs.length > 0 && !selectedEmailConfigId) {
-      selectedEmailConfigId = configs[0].id;
+    const preferred = (data as any).defaultEmailConfigId || configs[0]?.id || "";
+    if (!selectedEmailConfigId || !configs.some((cfg) => cfg.id === selectedEmailConfigId)) {
+      selectedEmailConfigId = preferred;
     }
   });
 
@@ -61,11 +73,14 @@
   );
 
   let defaultEmailSubject = $derived(
-    selectedEmailConfig?.defaultSubject ||
-    (invoice ? `Invoice #${invoice.invoiceNumber || invoice.id}` : "Invoice"),
+    useReminderEmail
+      ? (selectedEmailConfig?.reminderSubject || selectedEmailConfig?.defaultSubject || (invoice ? `Reminder: Invoice #${invoice.invoiceNumber || invoice.id}` : "Reminder"))
+      : (selectedEmailConfig?.defaultSubject || (invoice ? `Invoice #${invoice.invoiceNumber || invoice.id}` : "Invoice")),
   );
   let defaultEmailBody = $derived(
-    selectedEmailConfig?.defaultBody ?? ""
+    useReminderEmail
+      ? (selectedEmailConfig?.reminderBody ?? selectedEmailConfig?.defaultBody ?? "")
+      : (selectedEmailConfig?.defaultBody ?? "")
   );
   let defaultEmailTo = $derived(
     invoice?.customer?.paymentEmail ?? invoice?.customer?.email ?? "",
@@ -143,7 +158,7 @@
     <form method="dialog">
       <button class="btn btn-sm btn-circle btn-ghost absolute right-3 top-3">✕</button>
     </form>
-    <h3 class="mb-4 text-lg font-semibold">{t("Send via Email")}</h3>
+    <h3 class="mb-4 text-lg font-semibold">{emailDialogTitle}</h3>
 
       {#if (form as any)?.emailError}
         <div class="alert alert-error mb-4 text-sm">
@@ -273,7 +288,7 @@
             {:else}
               <Mail size={16} />
             {/if}
-            {t("Send")}
+            {emailSubmitLabel}
           </button>
         </div>
       </form>
@@ -294,8 +309,9 @@
     <div class="alert alert-success mb-4 text-sm shadow sm:text-base">
       <CheckCircle size={18} />
       <div class="flex-1">
-        <div class="font-medium">{t("Invoice sent successfully")}</div>
+        <div class="font-medium">{useReminderEmail ? t("Reminder sent successfully") : t("Invoice sent successfully")}</div>
         <div class="opacity-80">{t("Sent to")} {(form as any).emailRecipients?.join(", ")}</div>
+        <div class="opacity-70 text-xs">{t("Sender source")}: {(form as any).emailSource}</div>
       </div>
     </div>
   {/if}
@@ -457,10 +473,10 @@
           </div>
         {/if}
 
-        {#if emailEnabled && canExport && invoice.status !== "voided"}
+        {#if emailEnabled && canExport && (invoice.status === "draft" || invoice.status === "sent" || invoice.status === "overdue")}
           <button type="button" class="btn btn-sm" onclick={openEmailModal}>
             <Mail size={16} />
-            <span class="hidden sm:inline">{t("Send via Email")}</span>
+            <span class="hidden sm:inline">{emailDialogTitle}</span>
           </button>
         {/if}
 

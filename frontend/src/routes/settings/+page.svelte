@@ -22,6 +22,7 @@
     numberFormat: "comma",
     postalCityFormat: "auto",
     ...initialSettings,
+    defaultEmailConfigId: (initialSettings as Record<string, unknown>).defaultEmailConfigId || (initialSettings as Record<string, unknown>).reminderEmailConfigId || "",
     allowProtectedInvoiceChanges: asBool((initialSettings as Record<string, unknown>).allowProtectedInvoiceChanges),
   } as Record<string, any>);
 
@@ -46,6 +47,8 @@
   let requestedSection = $derived(page.url.searchParams.get("section") || "company");
   let section = $derived(requestedSection === "security" && demoMode ? "company" : requestedSection);
   let canUpdateSettings = $derived(true); // TODO: user permissions
+  let availableEmailConfigs = $derived(((data as any).emailConfigs || []) as Array<{ id: string; name: string; fromAddress: string; username?: string | null; hasPassword?: boolean }>);
+  let defaultEmailConfig = $derived(availableEmailConfigs.find((cfg) => cfg.id === settings.defaultEmailConfigId));
 
   // Keep settings synced if data.settings changes from an external invalidation
   $effect(() => {
@@ -316,10 +319,6 @@
     {:else if section === "products"}
       <div class="bg-base-100 rounded-box border-base-200 max-w-4xl border p-6">
         <ProductOptionsManager productCategories={data.productCategories} productUnits={data.productUnits} />
-      </div>
-    {:else if section === "email"}
-      <div class="bg-base-100 rounded-box border-base-200 max-w-4xl border p-6">
-        <EmailConfigManager emailConfigs={(data as any).emailConfigs || []} />
       </div>
     {:else if section === "templates"}
       <div class="bg-base-100 rounded-box border-base-200 max-w-4xl border p-6">
@@ -601,6 +600,35 @@
               <textarea class="textarea textarea-bordered w-full" bind:value={settings.defaultNotes} disabled={!canUpdateSettings}></textarea>
             </label>
           </div>
+        {:else if section === "email"}
+          <div class="space-y-4">
+            <h2 class="text-xl font-semibold">{t("Email Defaults")}</h2>
+            <p class="text-base-content/70 text-sm">{t("Choose the email configuration selected by default when sending an invoice or reminder.")}</p>
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">{t("Default Email Sender")}</span>
+                <span class="label-text-alt opacity-60">{t("Used as the initial From selection")}</span>
+              </div>
+              <select class="select select-bordered w-full" bind:value={settings.defaultEmailConfigId} disabled={!canUpdateSettings}>
+                <option value="">{t("Select default email sender")}</option>
+                {#each availableEmailConfigs as cfg (cfg.id)}
+                  <option value={cfg.id} disabled={cfg.username && !cfg.hasPassword}>
+                    {cfg.name} ({cfg.fromAddress}){cfg.username && !cfg.hasPassword ? ` - ${t("missing password")}` : ""}
+                  </option>
+                {/each}
+              </select>
+            </label>
+            {#if defaultEmailConfig}
+              <p class="text-base-content/70 text-xs">
+                {t("Selected sender ID")}: {defaultEmailConfig.id}
+              </p>
+            {/if}
+            {#if defaultEmailConfig && defaultEmailConfig.username && !defaultEmailConfig.hasPassword}
+              <div class="alert alert-warning text-sm">
+                <span>{t("Selected default sender has no saved SMTP password. Edit that email configuration and enter password.")}</span>
+              </div>
+            {/if}
+          </div>
         {:else if section === "numbering"}
           <div class="space-y-4">
             <h2 class="text-xl font-semibold">{t("Numbering")}</h2>
@@ -665,6 +693,12 @@
           </button>
         </div>
       </form>
+
+      {#if section === "email"}
+        <div class="bg-base-100 rounded-box border-base-200 max-w-4xl border p-6">
+          <EmailConfigManager emailConfigs={(data as any).emailConfigs || []} />
+        </div>
+      {/if}
     {/if}
   </section>
 </div>
