@@ -37,6 +37,12 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
       invoice: invoiceRes.value,
       showPublishedBanner,
       allowProtectedInvoiceChanges,
+      defaultEmailConfigId:
+        typeof settings.defaultEmailConfigId === "string"
+          ? settings.defaultEmailConfigId
+          : typeof settings.reminderEmailConfigId === "string"
+            ? settings.reminderEmailConfigId
+            : null,
       emailEnabled: emailConfigs.length > 0 || Boolean(env.SMTP_HOST && env.EMAIL_FROM_ADDRESS),
       emailConfigs,
     };
@@ -138,10 +144,11 @@ export const actions: Actions = {
             if (file.size > 0) payload.append("attachments", file, file.name);
           }
 
-          await backendPostFormData(`/api/v1/invoices/${id}/send-email`, locals.authHeader, payload);
-          return { emailSent: true, emailRecipients: to };
+          const sendResult = await backendPostFormData(`/api/v1/invoices/${id}/send-email`, locals.authHeader, payload) as { source?: string };
+          return { emailSent: true, emailRecipients: to, emailSource: sendResult?.source || "unknown" };
         } catch (e) {
-          return fail(502, { emailError: `Failed to send: ${String(e)}` });
+          const message = e instanceof Error ? e.message : String(e);
+          return fail(502, { emailError: `Failed to send: ${message}` });
         }
       }
     } catch (e) {

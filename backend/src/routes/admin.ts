@@ -1676,12 +1676,14 @@ adminRoutes.post("/email-configs", requirePermission("settings", "update"), asyn
   const secure = Boolean(body.secure);
   const defaultSubject = typeof body.defaultSubject === "string" ? body.defaultSubject.trim() || null : null;
   const defaultBody = typeof body.defaultBody === "string" ? body.defaultBody.trim() || null : null;
+  const reminderSubject = typeof body.reminderSubject === "string" ? body.reminderSubject.trim() || null : null;
+  const reminderBody = typeof body.reminderBody === "string" ? body.reminderBody.trim() || null : null;
 
   if (!name) return c.json({ error: "Name is required" }, 400);
   if (!host) return c.json({ error: "Host is required" }, 400);
   if (!fromAddress || !fromAddress.includes("@")) return c.json({ error: "Valid From Address is required" }, 400);
 
-  const config = createEmailConfig({ name, host, port, username, password, fromAddress, fromName, secure, defaultSubject, defaultBody });
+  const config = createEmailConfig({ name, host, port, username, password, fromAddress, fromName, secure, defaultSubject, defaultBody, reminderSubject, reminderBody });
   return c.json(config, 201);
 });
 
@@ -1715,6 +1717,12 @@ adminRoutes.put("/email-configs/:id", requirePermission("settings", "update"), a
   if (Object.prototype.hasOwnProperty.call(body, "defaultBody")) {
     data.defaultBody = typeof body.defaultBody === "string" ? body.defaultBody.trim() || null : null;
   }
+  if (Object.prototype.hasOwnProperty.call(body, "reminderSubject")) {
+    data.reminderSubject = typeof body.reminderSubject === "string" ? body.reminderSubject.trim() || null : null;
+  }
+  if (Object.prototype.hasOwnProperty.call(body, "reminderBody")) {
+    data.reminderBody = typeof body.reminderBody === "string" ? body.reminderBody.trim() || null : null;
+  }
 
   const updated = updateEmailConfig(id, data);
   if (!updated) return c.json({ error: "Email configuration not found" }, 404);
@@ -1734,6 +1742,16 @@ adminRoutes.post("/email-configs/:id/test", requirePermission("settings", "updat
   const config = getEmailConfigById(id);
   if (!config) return c.json({ error: "Email configuration not found" }, 404);
 
+  if (config.username && !config.password) {
+    return c.json(
+      {
+        error: "Selected email configuration is missing a saved password.",
+        details: `Config '${config.name}' has a username but no password. Edit this configuration and enter the SMTP password.`,
+      },
+      400,
+    );
+  }
+
   let testTo: string = "";
   try {
     const body = await c.req.json();
@@ -1750,10 +1768,11 @@ adminRoutes.post("/email-configs/:id/test", requirePermission("settings", "updat
       htmlBody: "<p>This is a test email from InvoiceRaider. Your email configuration is working correctly.</p>",
       textBody: "This is a test email from InvoiceRaider. Your email configuration is working correctly.",
     });
-    return c.json({ sent: true, to: testTo });
+    return c.json({ sent: true, to: testTo, source: `config:${config.id}` });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    return c.json({ error: "Test email failed", details: msg }, 502);
+    const source = `config:${config.id} (${config.name}) auth:${config.username ? "user" : "no-user"}/${config.password ? "pass" : "no-pass"}`;
+    return c.json({ error: "Test email failed", details: `[${source}] ${msg}` }, 502);
   }
 });
 
@@ -1769,6 +1788,7 @@ adminRoutes.post(
     let to: string[] = [];
     let subject = "";
     let message = "";
+    let emailMode: "standard" | "reminder" = "standard";
     let parsedEmailConfigId: string | null = null;
     const additionalAttachments: EmailAttachment[] = [];
     const parseRecipients = (raw: string): string[] => raw
@@ -1789,6 +1809,9 @@ adminRoutes.post(
         to = parseRecipients(String(formData.get("to") ?? ""));
         subject = String(formData.get("subject") ?? "").trim();
         message = String(formData.get("message") ?? "").trim();
+        emailMode = String(formData.get("emailMode") ?? "standard").trim() === "reminder"
+          ? "reminder"
+          : "standard";
         const rawEmailConfigId = String(formData.get("emailConfigId") ?? "").trim();
         parsedEmailConfigId = rawEmailConfigId || null;
 
@@ -1824,10 +1847,33 @@ adminRoutes.post(
         }
         subject = typeof body.subject === "string" ? body.subject.trim() : "";
         message = typeof body.message === "string" ? body.message.trim() : "";
+        emailMode = body.emailMode === "reminder" ? "reminder" : "standard";
         parsedEmailConfigId = typeof body.emailConfigId === "string" ? body.emailConfigId : null;
       }
     } catch {
       return c.json({ error: "Invalid request body" }, 400);
+    }
+
+    // Build settings map (same as /pdf route)
+    const settings = await getSettings();
+    const settingsMap = settings.reduce(
+      (acc: Record<string, string>, s) => { acc[s.key] = s.value as string; return acc; },
+      {} as Record<string, string>,
+    );
+    if (!settingsMap.postalCityFormat && settingsMap.postal_city_format) {
+      settingsMap.postalCityFormat = settingsMap.postal_city_format;
+    }
+    if (!settingsMap.logo && settingsMap.logoUrl) {
+      settingsMap.logo = settingsMap.logoUrl;
+    }
+
+    if (emailMode === "reminder") {
+      const configuredReminderSender = String(settingsMap.reminderEmailConfigId ?? "").trim();
+      if (!configuredReminderSender) {
+        return c.json({ error: "No reminder sender is configured. Set one in Settings > Email." }, 400);
+      }
+      // Always enforce the globally configured reminder sender for reminder mode.
+      parsedEmailConfigId = configuredReminderSender;
     }
 
     // Resolve email config
@@ -1844,24 +1890,21 @@ adminRoutes.post(
       resolvedDbConfig = getEmailConfigById(dbConfigs[0].id);
     }
 
+    if (resolvedDbConfig?.username && !resolvedDbConfig.password) {
+      return c.json(
+        {
+          error: "Selected email configuration is missing a saved password.",
+          details: `Config '${resolvedDbConfig.name}' has a username but no password. Open Settings > Email, edit this configuration, and enter the SMTP password.`,
+        },
+        400,
+      );
+    }
+
     if (to.length === 0) {
       return c.json({ error: "At least one valid recipient email is required" }, 400);
     }
     if (!subject) {
       return c.json({ error: "Subject is required" }, 400);
-    }
-
-    // Build settings map (same as /pdf route)
-    const settings = await getSettings();
-    const settingsMap = settings.reduce(
-      (acc: Record<string, string>, s) => { acc[s.key] = s.value as string; return acc; },
-      {} as Record<string, string>,
-    );
-    if (!settingsMap.postalCityFormat && settingsMap.postal_city_format) {
-      settingsMap.postalCityFormat = settingsMap.postal_city_format;
-    }
-    if (!settingsMap.logo && settingsMap.logoUrl) {
-      settingsMap.logo = settingsMap.logoUrl;
     }
 
     const businessSettings = {
@@ -2000,6 +2043,10 @@ adminRoutes.post(
       ],
     };
 
+    const senderSource = resolvedDbConfig?.id
+      ? `config:${resolvedDbConfig.id}`
+      : "config:env";
+
     try {
       if (resolvedDbConfig) {
         await sendEmailWithConfig(resolvedDbConfig, emailPayload);
@@ -2009,10 +2056,13 @@ adminRoutes.post(
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       console.error("Email send failed:", msg);
-      return c.json({ error: "Failed to send email", details: msg }, 502);
+      const source = resolvedDbConfig?.id
+        ? `config:${resolvedDbConfig.id} (${resolvedDbConfig.name}) auth:${resolvedDbConfig.username ? "user" : "no-user"}/${resolvedDbConfig.password ? "pass" : "no-pass"}`
+        : "config:env";
+      return c.json({ error: "Failed to send email", details: `[${source}] ${msg}` }, 502);
     }
 
-    return c.json({ sent: true, recipients: to.length });
+    return c.json({ sent: true, recipients: to.length, source: senderSource });
   },
 );
 
