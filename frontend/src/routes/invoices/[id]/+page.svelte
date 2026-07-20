@@ -96,6 +96,31 @@
     emailDialog?.showModal();
   }
 
+  let revealedEmailLogIds = $state<Set<string>>(new Set());
+
+  function revealEmailLogRecipients(id: string) {
+    revealedEmailLogIds = new Set(revealedEmailLogIds).add(id);
+  }
+
+  function hideEmailLogRecipients(id: string) {
+    const next = new Set(revealedEmailLogIds);
+    next.delete(id);
+    revealedEmailLogIds = next;
+  }
+
+  function maskEmailAddress(address: string): string {
+    const at = address.indexOf("@");
+    if (at <= 0) return "•••••";
+    const local = address.slice(0, at);
+    const domain = address.slice(at + 1);
+    const maskedLocal = local.length <= 2 ? local[0] + "•" : local[0] + "•".repeat(Math.min(local.length - 2, 6)) + local[local.length - 1];
+    return `${maskedLocal}@${domain}`;
+  }
+
+  function maskRecipients(recipients: string[]): string {
+    return recipients.map(maskEmailAddress).join(", ");
+  }
+
   function onEmailAttachmentsChange(event: Event) {
     const input = event.currentTarget as HTMLInputElement;
     selectedEmailAttachments = input.files ? Array.from(input.files) : [];
@@ -695,4 +720,58 @@
       </ul>
     </div>
   {/if}
+
+  {#if invoice.emailLogs && invoice.emailLogs.length > 0}
+    <div class="mt-8">
+      <h2 class="mb-3 text-base font-semibold opacity-70">{t("Email Log")}</h2>
+      <ul class="border-base-300 space-y-4 border-l-2 pl-4">
+        {#each invoice.emailLogs as entry (entry.id)}
+          <li class="relative">
+            <span
+              class="absolute top-1 -left-[1.3rem] h-3 w-3 rounded-full border-2 border-base-100 {entry.success
+                ? 'bg-success'
+                : 'bg-error'}"
+            ></span>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="badge badge-sm {entry.mode === 'reminder' ? 'badge-warning' : 'badge-info'}">
+                {entry.mode === "reminder" ? t("Reminder") : t("Invoice Email")}
+              </span>
+              {#if !entry.success}
+                <span class="badge badge-sm badge-error">{t("Failed")}</span>
+              {/if}
+              <span class="text-sm opacity-60">{fmtDateTime(new Date(entry.sentAt))}</span>
+            </div>
+            <div class="mt-1 text-sm">
+              <span class="opacity-70">{t("To")}:</span>
+              {#if revealedEmailLogIds.has(entry.id)}
+                <span class="font-medium">{entry.recipients.join(", ")}</span>
+                <button
+                  type="button"
+                  class="link link-hover ml-2 text-xs opacity-60"
+                  onclick={() => hideEmailLogRecipients(entry.id)}
+                >
+                  {t("Hide")}
+                </button>
+              {:else}
+                <button
+                  type="button"
+                  class="link link-hover font-medium"
+                  onclick={() => revealEmailLogRecipients(entry.id)}
+                >
+                  {maskRecipients(entry.recipients)}
+                </button>
+              {/if}
+            </div>
+            {#if entry.subject}
+              <div class="text-xs opacity-60">{entry.subject}</div>
+            {/if}
+            {#if !entry.success && entry.error}
+              <div class="text-error mt-1 text-xs">{entry.error}</div>
+            {/if}
+          </li>
+        {/each}
+      </ul>
+    </div>
+  {/if}
 {/if}
+

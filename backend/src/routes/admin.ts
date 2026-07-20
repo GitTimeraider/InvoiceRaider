@@ -8,6 +8,7 @@ import {
   getInvoices,
   getLatestPaidPaymentMethods,
   publishInvoice,
+  recordEmailLog,
   unpublishInvoice,
   updateInvoice,
   voidInvoice,
@@ -2059,8 +2060,28 @@ adminRoutes.post(
       const source = resolvedDbConfig?.id
         ? `config:${resolvedDbConfig.id} (${resolvedDbConfig.name}) auth:${resolvedDbConfig.username ? "user" : "no-user"}/${resolvedDbConfig.password ? "pass" : "no-pass"}`
         : "config:env";
+      recordEmailLog({
+        invoiceId: id,
+        mode: emailMode,
+        recipients: to,
+        subject: resolvedSubject,
+        senderConfigId: resolvedDbConfig?.id,
+        senderConfigName: resolvedDbConfig?.name,
+        success: false,
+        error: msg,
+      });
       return c.json({ error: "Failed to send email", details: `[${source}] ${msg}` }, 502);
     }
+
+    recordEmailLog({
+      invoiceId: id,
+      mode: emailMode,
+      recipients: to,
+      subject: resolvedSubject,
+      senderConfigId: resolvedDbConfig?.id,
+      senderConfigName: resolvedDbConfig?.name,
+      success: true,
+    });
 
     return c.json({ sent: true, recipients: to.length, source: senderSource });
   },

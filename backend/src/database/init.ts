@@ -261,6 +261,27 @@ function backfillStatusHistory(database: DB): void {
   );
 }
 
+function ensureEmailLogTable(database: DB): void {
+  database.execute(`
+    CREATE TABLE IF NOT EXISTS invoice_email_log (
+      id TEXT PRIMARY KEY,
+      invoice_id TEXT NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
+      mode TEXT NOT NULL,
+      recipients TEXT NOT NULL,
+      subject TEXT,
+      sender_config_id TEXT,
+      sender_config_name TEXT,
+      success BOOLEAN NOT NULL DEFAULT 1,
+      error TEXT,
+      sent_at TEXT NOT NULL
+    )
+  `);
+  database.execute(
+    `CREATE INDEX IF NOT EXISTS idx_invoice_email_log_invoice_id
+     ON invoice_email_log(invoice_id, sent_at)`,
+  );
+}
+
 function ensureTaxTables(database: DB): void {
   database.execute(`
     CREATE TABLE IF NOT EXISTS tax_definitions (
@@ -508,6 +529,7 @@ function ensureSchemaUpgrades(database: DB): void {
     ensureUserColumns(database);
     ensureStatusHistoryTable(database);
     ensureEmailConfigsTable(database);
+    ensureEmailLogTable(database);
   } catch (e) {
     console.warn("Schema upgrade check failed:", e);
   }
