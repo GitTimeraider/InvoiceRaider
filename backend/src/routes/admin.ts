@@ -1790,6 +1790,9 @@ adminRoutes.post(
     const id = c.req.param("id");
     const invoice = getInvoiceById(id);
     if (!invoice) return c.json({ error: "Invoice not found" }, 404);
+    if (invoice.status === "complete" || invoice.status === "voided") {
+      return c.json({ error: "Emailing is not available for complete or voided invoices." }, 400);
+    }
 
     let to: string[] = [];
     let subject = "";

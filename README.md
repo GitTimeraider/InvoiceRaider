@@ -147,8 +147,10 @@ Example: `INV-{YYYY}-{MM}-{RAND4}` → `INV-2025-06-A3F9`
 InvoiceRaider exposes email actions in the invoice detail view based on invoice status:
 
 - **Draft** — Shows **Send via Email**
+- **Paid** — Shows **Resend via Email**
 - **Sent** and **Overdue** — Shows **Send Reminder**
-- **Paid**, **Complete**, and **Voided** — Shows **Send via Email** (same normal send flow as Draft). This is mainly intended for archiving purposes — e.g. forwarding the finalized invoice to an archive mailbox, [paperless-ngx](https://github.com/paperless-ngx/paperless-ngx), or another document/invoice management system — rather than for resending to the customer.
+- **Complete** and **Voided** — No email button; these statuses are final and cannot be emailed.
+
 
 Each email configuration can define separate templates for:
 
