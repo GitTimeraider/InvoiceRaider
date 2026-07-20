@@ -148,7 +148,7 @@ InvoiceRaider exposes email actions in the invoice detail view based on invoice 
 
 - **Draft** — Shows **Send via Email**
 - **Sent** and **Overdue** — Shows **Send Reminder**
-- **Paid**, **Complete**, and **Voided** — Shows **Send via Email** (same normal send flow as Draft, useful for resending a copy after the invoice is settled or cancelled)
+- **Paid**, **Complete**, and **Voided** — Shows **Send via Email** (same normal send flow as Draft). This is mainly intended for archiving purposes — e.g. forwarding the finalized invoice to an archive mailbox, [paperless-ngx](https://github.com/paperless-ngx/paperless-ngx), or another document/invoice management system — rather than for resending to the customer.
 
 Each email configuration can define separate templates for:
 
