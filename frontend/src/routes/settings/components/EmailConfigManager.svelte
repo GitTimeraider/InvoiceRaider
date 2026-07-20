@@ -20,6 +20,7 @@
     defaultBody: string | null;
     reminderSubject: string | null;
     reminderBody: string | null;
+    useAsCompanyEmail: boolean;
   };
 
   let showForm = $state(false);
@@ -43,6 +44,7 @@
     defaultBody: "",
     reminderSubject: "",
     reminderBody: "",
+    useAsCompanyEmail: false,
   });
 
   let formData = $state(emptyForm());
@@ -71,6 +73,7 @@
       defaultBody: config.defaultBody ?? "",
       reminderSubject: config.reminderSubject ?? "",
       reminderBody: config.reminderBody ?? "",
+      useAsCompanyEmail: config.useAsCompanyEmail ?? false,
     };
     formError = "";
     showPassword = false;
@@ -105,6 +108,7 @@
         defaultBody: formData.defaultBody.trim() || null,
         reminderSubject: formData.reminderSubject.trim() || null,
         reminderBody: formData.reminderBody.trim() || null,
+        useAsCompanyEmail: formData.useAsCompanyEmail,
       };
       // Only include password if non-empty (empty = keep existing on edit)
       if (formData.password) {
@@ -309,6 +313,21 @@
           </label>
         </div>
 
+        <label class="label cursor-pointer justify-start gap-4">
+          <input
+            type="checkbox"
+            class="checkbox"
+            bind:checked={formData.useAsCompanyEmail}
+            disabled={isSubmitting}
+          />
+          <div>
+            <span class="label-text font-medium">{t("Use From Address as invoice company email")}</span>
+            <p class="text-base-content/60 text-xs">
+              {t("When enabled, invoices sent with this configuration show this From Address as the company email instead of the Company Information email from Settings.")}
+            </p>
+          </div>
+        </label>
+
         <div class="divider">{t("Email Template (optional)")}</div>
 
         <label class="form-control">
@@ -402,6 +421,9 @@
               <span class="badge badge-success badge-xs">SSL/TLS</span>
             {:else}
               <span class="badge badge-ghost badge-xs">STARTTLS</span>
+            {/if}
+            {#if config.useAsCompanyEmail}
+              <span class="badge badge-info badge-xs">{t("Used as company email")}</span>
             {/if}
           </div>
           <div class="text-base-content/70 mt-1 space-y-0.5 text-sm">

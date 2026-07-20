@@ -15,6 +15,12 @@ export interface EmailConfig {
   defaultBody: string | null;
   reminderSubject: string | null;
   reminderBody: string | null;
+  /**
+   * When true, invoices sent using this configuration display this config's
+   * `fromAddress` as the invoice's company email instead of the global
+   * Company Information email set in Settings.
+   */
+  useAsCompanyEmail: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -38,8 +44,9 @@ function rowToConfig(row: unknown[]): EmailConfig {
     defaultBody: row[10] ? String(row[10]) : null,
     reminderSubject: row[11] ? String(row[11]) : null,
     reminderBody: row[12] ? String(row[12]) : null,
-    createdAt: String(row[13]),
-    updatedAt: String(row[14]),
+    useAsCompanyEmail: Boolean(Number(row[13])),
+    createdAt: String(row[14]),
+    updatedAt: String(row[15]),
   };
 }
 
@@ -59,13 +66,14 @@ function rowToConfigWithPassword(row: unknown[]): EmailConfigWithPassword {
     defaultBody: row[10] ? String(row[10]) : null,
     reminderSubject: row[11] ? String(row[11]) : null,
     reminderBody: row[12] ? String(row[12]) : null,
-    createdAt: String(row[13]),
-    updatedAt: String(row[14]),
+    useAsCompanyEmail: Boolean(Number(row[13])),
+    createdAt: String(row[14]),
+    updatedAt: String(row[15]),
   };
 }
 
 const SELECT_COLS =
-  "id, name, host, port, username, password, from_address, from_name, secure, default_subject, default_body, reminder_subject, reminder_body, created_at, updated_at";
+  "id, name, host, port, username, password, from_address, from_name, secure, default_subject, default_body, reminder_subject, reminder_body, use_as_company_email, created_at, updated_at";
 
 export function listEmailConfigs(): EmailConfig[] {
   const db = getDatabase();
@@ -98,13 +106,14 @@ export function createEmailConfig(data: {
   defaultBody?: string | null;
   reminderSubject?: string | null;
   reminderBody?: string | null;
+  useAsCompanyEmail?: boolean;
 }): EmailConfig {
   const db = getDatabase();
   const id = generateUUID();
   const now = new Date().toISOString();
   db.query(
-    `INSERT INTO email_configs (id, name, host, port, username, password, from_address, from_name, secure, default_subject, default_body, reminder_subject, reminder_body, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO email_configs (id, name, host, port, username, password, from_address, from_name, secure, default_subject, default_body, reminder_subject, reminder_body, use_as_company_email, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id,
       data.name,
@@ -119,6 +128,7 @@ export function createEmailConfig(data: {
       data.defaultBody || null,
       data.reminderSubject || null,
       data.reminderBody || null,
+      data.useAsCompanyEmail ? 1 : 0,
       now,
       now,
     ],
@@ -141,6 +151,7 @@ export function updateEmailConfig(
     defaultBody?: string | null;
     reminderSubject?: string | null;
     reminderBody?: string | null;
+    useAsCompanyEmail?: boolean;
   },
 ): EmailConfig | null {
   const db = getDatabase();
@@ -171,12 +182,16 @@ export function updateEmailConfig(
   const reminderBody = data.reminderBody !== undefined
     ? data.reminderBody
     : existing.reminderBody;
+  const useAsCompanyEmail = data.useAsCompanyEmail !== undefined
+    ? data.useAsCompanyEmail
+    : existing.useAsCompanyEmail;
 
   db.query(
     `UPDATE email_configs
      SET name = ?, host = ?, port = ?, username = ?, password = ?,
          from_address = ?, from_name = ?, secure = ?,
-         default_subject = ?, default_body = ?, reminder_subject = ?, reminder_body = ?, updated_at = ?
+         default_subject = ?, default_body = ?, reminder_subject = ?, reminder_body = ?,
+         use_as_company_email = ?, updated_at = ?
      WHERE id = ?`,
     [
       name,
@@ -191,6 +206,7 @@ export function updateEmailConfig(
       defaultBody,
       reminderSubject,
       reminderBody,
+      useAsCompanyEmail ? 1 : 0,
       now,
       id,
     ],

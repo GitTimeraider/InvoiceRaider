@@ -506,6 +506,9 @@ function ensureEmailConfigsTable(database: DB): void {
         secure INTEGER NOT NULL DEFAULT 0,
         default_subject TEXT,
         default_body TEXT,
+        reminder_subject TEXT,
+        reminder_body TEXT,
+        use_as_company_email INTEGER NOT NULL DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
@@ -514,6 +517,10 @@ function ensureEmailConfigsTable(database: DB): void {
     const msg = e instanceof Error ? e.message : String(e);
     if (!/already exists/i.test(msg)) console.warn("Could not create email_configs table:", msg);
   }
+  // Backfill columns for installs created before these fields existed.
+  addColumnIfMissing(database, "email_configs", "reminder_subject", "TEXT");
+  addColumnIfMissing(database, "email_configs", "reminder_body", "TEXT");
+  addColumnIfMissing(database, "email_configs", "use_as_company_email", "INTEGER NOT NULL DEFAULT 0");
 }
 
 function ensureSchemaUpgrades(database: DB): void {

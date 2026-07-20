@@ -159,7 +159,7 @@ When a reminder template is not set for a config, InvoiceRaider falls back to th
 
 This behavior helps separate first-send emails from follow-up reminders while still keeping a safe fallback.
 
-The company email shown on the invoice PDF attached to an outgoing email is automatically replaced with the actual SMTP "From" address used to send that message, so the recipient always sees an address that matches the sender and can safely reply to it.
+The company email shown on the invoice PDF attached to an outgoing email is automatically replaced with the actual SMTP "From" address used to send that message, so the recipient always sees an address that matches the sender and can safely reply to it. This behavior is opt-in per email configuration via the **Use From Address as invoice company email** setting on that configuration — when disabled (the default), the invoice PDF keeps showing the company email from Settings > Company Information regardless of which configuration sent the message.
 
 Every send attempt (normal or reminder) is recorded in an **Email Log** on the invoice detail page, showing the mode, timestamp, and success/failure. Recipient addresses are masked by default and can be revealed with a click. SMTP servers that silently reject all recipients (e.g. when the "From" address isn't authorized for the authenticated account) are now detected and logged as a failure instead of appearing to succeed.
 
