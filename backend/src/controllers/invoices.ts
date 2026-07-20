@@ -7,6 +7,7 @@ import {
 import { getSetting } from "./settings.ts";
 import {
   CreateInvoiceRequest,
+  EmailLogEntry,
   Invoice,
   InvoiceItem,
   InvoiceWithDetails,
@@ -201,6 +202,68 @@ export function getStatusHistory(invoiceId: string): StatusHistoryEntry[] {
     paymentMethod: r[4] ? String(r[4]) : undefined,
     note: r[5] ? String(r[5]) : undefined,
   }));
+}
+
+export function recordEmailLog(entry: {
+  invoiceId: string;
+  mode: "standard" | "reminder";
+  recipients: string[];
+  subject?: string;
+  senderConfigId?: string;
+  senderConfigName?: string;
+  success: boolean;
+  error?: string;
+}): void {
+  const db = getDatabase();
+  db.query(
+    `INSERT INTO invoice_email_log
+       (id, invoice_id, mode, recipients, subject, sender_config_id, sender_config_name, success, error, sent_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      generateUUID(),
+      entry.invoiceId,
+      entry.mode,
+      JSON.stringify(entry.recipients),
+      entry.subject ?? null,
+      entry.senderConfigId ?? null,
+      entry.senderConfigName ?? null,
+      entry.success ? 1 : 0,
+      entry.error ?? null,
+      new Date().toISOString(),
+    ],
+  );
+}
+
+export function getEmailLogs(invoiceId: string): EmailLogEntry[] {
+  const db = getDatabase();
+  const rows = db.query(
+    `SELECT id, invoice_id, mode, recipients, subject, sender_config_id, sender_config_name, success, error, sent_at
+     FROM invoice_email_log
+     WHERE invoice_id = ?
+     ORDER BY sent_at DESC`,
+    [invoiceId],
+  ) as unknown[][];
+  return rows.map((r) => {
+    let recipients: string[] = [];
+    try {
+      const parsed = JSON.parse(String(r[3]));
+      if (Array.isArray(parsed)) recipients = parsed.map((x) => String(x));
+    } catch {
+      // ignore malformed recipients JSON
+    }
+    return {
+      id: String(r[0]),
+      invoiceId: String(r[1]),
+      mode: (String(r[2]) === "reminder" ? "reminder" : "standard") as "standard" | "reminder",
+      recipients,
+      subject: r[4] ? String(r[4]) : undefined,
+      senderConfigId: r[5] ? String(r[5]) : undefined,
+      senderConfigName: r[6] ? String(r[6]) : undefined,
+      success: Boolean(r[7]),
+      error: r[8] ? String(r[8]) : undefined,
+      sentAt: new Date(String(r[9])),
+    };
+  });
 }
 
 export function getLatestPaidPaymentMethods(
@@ -641,7 +704,8 @@ export const getInvoiceById = (id: string): InvoiceWithDetails | null => {
   }));
 
   const statusHistory = getStatusHistory(id);
-  return { ...invoice, customer, items: itemsWithTaxes, taxes, statusHistory };
+  const emailLogs = getEmailLogs(id);
+  return { ...invoice, customer, items: itemsWithTaxes, taxes, statusHistory, emailLogs };
 };
 
 export const getInvoiceByShareToken = (

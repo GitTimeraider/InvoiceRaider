@@ -261,6 +261,27 @@ function backfillStatusHistory(database: DB): void {
   );
 }
 
+function ensureEmailLogTable(database: DB): void {
+  database.execute(`
+    CREATE TABLE IF NOT EXISTS invoice_email_log (
+      id TEXT PRIMARY KEY,
+      invoice_id TEXT NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
+      mode TEXT NOT NULL,
+      recipients TEXT NOT NULL,
+      subject TEXT,
+      sender_config_id TEXT,
+      sender_config_name TEXT,
+      success BOOLEAN NOT NULL DEFAULT 1,
+      error TEXT,
+      sent_at TEXT NOT NULL
+    )
+  `);
+  database.execute(
+    `CREATE INDEX IF NOT EXISTS idx_invoice_email_log_invoice_id
+     ON invoice_email_log(invoice_id, sent_at)`,
+  );
+}
+
 function ensureTaxTables(database: DB): void {
   database.execute(`
     CREATE TABLE IF NOT EXISTS tax_definitions (
@@ -485,6 +506,9 @@ function ensureEmailConfigsTable(database: DB): void {
         secure INTEGER NOT NULL DEFAULT 0,
         default_subject TEXT,
         default_body TEXT,
+        reminder_subject TEXT,
+        reminder_body TEXT,
+        use_as_company_email INTEGER NOT NULL DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
@@ -493,6 +517,10 @@ function ensureEmailConfigsTable(database: DB): void {
     const msg = e instanceof Error ? e.message : String(e);
     if (!/already exists/i.test(msg)) console.warn("Could not create email_configs table:", msg);
   }
+  // Backfill columns for installs created before these fields existed.
+  addColumnIfMissing(database, "email_configs", "reminder_subject", "TEXT");
+  addColumnIfMissing(database, "email_configs", "reminder_body", "TEXT");
+  addColumnIfMissing(database, "email_configs", "use_as_company_email", "INTEGER NOT NULL DEFAULT 0");
 }
 
 function ensureSchemaUpgrades(database: DB): void {
@@ -508,6 +536,7 @@ function ensureSchemaUpgrades(database: DB): void {
     ensureUserColumns(database);
     ensureStatusHistoryTable(database);
     ensureEmailConfigsTable(database);
+    ensureEmailLogTable(database);
   } catch (e) {
     console.warn("Schema upgrade check failed:", e);
   }

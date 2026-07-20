@@ -320,12 +320,26 @@ export interface StatusHistoryEntry {
   note?: string;
 }
 
+export interface EmailLogEntry {
+  id: string;
+  invoiceId: string;
+  mode: "standard" | "reminder";
+  recipients: string[];
+  subject?: string;
+  senderConfigId?: string;
+  senderConfigName?: string;
+  success: boolean;
+  error?: string;
+  sentAt: Date;
+}
+
 export interface InvoiceWithDetails extends Invoice {
   customer: Customer;
   items: InvoiceItem[];
   attachments?: InvoiceAttachment[];
   taxes?: InvoiceTax[];
   statusHistory?: StatusHistoryEntry[];
+  emailLogs?: EmailLogEntry[];
 }
 
 // Template rendering context

@@ -8,6 +8,7 @@ import {
   getInvoices,
   getLatestPaidPaymentMethods,
   publishInvoice,
+  recordEmailLog,
   unpublishInvoice,
   updateInvoice,
   voidInvoice,
@@ -68,6 +69,7 @@ import {
 import { buildInvoiceHTML, generatePDF } from "../utils/pdf.ts";
 import { isEmailConfigured, sendEmail, sendEmailWithConfig } from "../utils/email.ts";
 import type { EmailAttachment } from "../utils/email.ts";
+import { getEnv } from "../utils/env.ts";
 import {
   createEmailConfig,
   deleteEmailConfig,
@@ -1678,12 +1680,13 @@ adminRoutes.post("/email-configs", requirePermission("settings", "update"), asyn
   const defaultBody = typeof body.defaultBody === "string" ? body.defaultBody.trim() || null : null;
   const reminderSubject = typeof body.reminderSubject === "string" ? body.reminderSubject.trim() || null : null;
   const reminderBody = typeof body.reminderBody === "string" ? body.reminderBody.trim() || null : null;
+  const useAsCompanyEmail = Boolean(body.useAsCompanyEmail);
 
   if (!name) return c.json({ error: "Name is required" }, 400);
   if (!host) return c.json({ error: "Host is required" }, 400);
   if (!fromAddress || !fromAddress.includes("@")) return c.json({ error: "Valid From Address is required" }, 400);
 
-  const config = createEmailConfig({ name, host, port, username, password, fromAddress, fromName, secure, defaultSubject, defaultBody, reminderSubject, reminderBody });
+  const config = createEmailConfig({ name, host, port, username, password, fromAddress, fromName, secure, defaultSubject, defaultBody, reminderSubject, reminderBody, useAsCompanyEmail });
   return c.json(config, 201);
 });
 
@@ -1722,6 +1725,9 @@ adminRoutes.put("/email-configs/:id", requirePermission("settings", "update"), a
   }
   if (Object.prototype.hasOwnProperty.call(body, "reminderBody")) {
     data.reminderBody = typeof body.reminderBody === "string" ? body.reminderBody.trim() || null : null;
+  }
+  if (Object.prototype.hasOwnProperty.call(body, "useAsCompanyEmail")) {
+    data.useAsCompanyEmail = Boolean(body.useAsCompanyEmail);
   }
 
   const updated = updateEmailConfig(id, data);
@@ -1784,6 +1790,9 @@ adminRoutes.post(
     const id = c.req.param("id");
     const invoice = getInvoiceById(id);
     if (!invoice) return c.json({ error: "Invoice not found" }, 404);
+    if (invoice.status === "complete" || invoice.status === "voided") {
+      return c.json({ error: "Emailing is not available for complete or voided invoices." }, 400);
+    }
 
     let to: string[] = [];
     let subject = "";
@@ -1907,6 +1916,16 @@ adminRoutes.post(
       return c.json({ error: "Subject is required" }, 400);
     }
 
+    // Use the actual SMTP "From" address as the invoice's displayed company
+    // email so recipients see a consistent, reply-able address that matches
+    // the account the message was really sent from. This is opt-in per email
+    // configuration (config.useAsCompanyEmail); when disabled (or when no DB
+    // config is used, e.g. legacy env-based SMTP), fall back to the Company
+    // Information email configured in Settings.
+    const effectiveFromAddress = resolvedDbConfig
+      ? (resolvedDbConfig.useAsCompanyEmail ? resolvedDbConfig.fromAddress : "")
+      : (getEnv("EMAIL_FROM_ADDRESS", "") || "");
+
     const businessSettings = {
       companyName: settingsMap.companyName || "Your Company",
       companyAddress: settingsMap.companyAddress || "",
@@ -1914,7 +1933,7 @@ adminRoutes.post(
       companyPostalCode: settingsMap.companyPostalCode || "",
       companyCountryCode: settingsMap.companyCountryCode || "",
       postalCityFormat: settingsMap.postalCityFormat || "auto",
-      companyEmail: settingsMap.companyEmail || "",
+      companyEmail: effectiveFromAddress || settingsMap.companyEmail || "",
       companyPhone: settingsMap.companyPhone || "",
       companyTaxId: settingsMap.companyTaxId || "",
       currency: settingsMap.currency || "USD",
@@ -2059,8 +2078,28 @@ adminRoutes.post(
       const source = resolvedDbConfig?.id
         ? `config:${resolvedDbConfig.id} (${resolvedDbConfig.name}) auth:${resolvedDbConfig.username ? "user" : "no-user"}/${resolvedDbConfig.password ? "pass" : "no-pass"}`
         : "config:env";
+      recordEmailLog({
+        invoiceId: id,
+        mode: emailMode,
+        recipients: to,
+        subject: resolvedSubject,
+        senderConfigId: resolvedDbConfig?.id,
+        senderConfigName: resolvedDbConfig?.name,
+        success: false,
+        error: msg,
+      });
       return c.json({ error: "Failed to send email", details: `[${source}] ${msg}` }, 502);
     }
+
+    recordEmailLog({
+      invoiceId: id,
+      mode: emailMode,
+      recipients: to,
+      subject: resolvedSubject,
+      senderConfigId: resolvedDbConfig?.id,
+      senderConfigName: resolvedDbConfig?.name,
+      success: true,
+    });
 
     return c.json({ sent: true, recipients: to.length, source: senderSource });
   },

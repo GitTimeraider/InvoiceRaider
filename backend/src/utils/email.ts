@@ -77,7 +77,7 @@ async function sendWithSmtp(
     contentType: attachment.mimeType,
   }));
 
-  await transporter.sendMail({
+  const info = await transporter.sendMail({
     from,
     to: opts.to.join(", "),
     subject: opts.subject,
@@ -85,6 +85,23 @@ async function sendWithSmtp(
     text: opts.textBody,
     attachments,
   });
+
+  // Some SMTP servers (notably ones that enforce MAIL FROM / envelope-sender
+  // matching against the authenticated user) accept the SMTP session but
+  // silently reject the recipients at RCPT TO time. nodemailer does not
+  // throw in that case - it resolves with `rejected` populated and
+  // `accepted` empty. Without this check the caller believes the email was
+  // sent even though nothing was delivered.
+  const accepted = Array.isArray(info?.accepted) ? info.accepted : [];
+  const rejected = Array.isArray(info?.rejected) ? info.rejected : [];
+  if (accepted.length === 0 && opts.to.length > 0) {
+    const rejectedList = rejected.length > 0 ? rejected.join(", ") : opts.to.join(", ");
+    const response = info?.response ? ` (${info.response})` : "";
+    throw new Error(
+      `SMTP server rejected all recipients: ${rejectedList}${response}. This often happens when the` +
+        ` "From" address does not match or is not authorized for the authenticated SMTP account.`,
+    );
+  }
 }
 
 export async function sendEmail(opts: SendEmailOptions): Promise<void> {
