@@ -69,6 +69,7 @@ import {
 import { buildInvoiceHTML, generatePDF } from "../utils/pdf.ts";
 import { isEmailConfigured, sendEmail, sendEmailWithConfig } from "../utils/email.ts";
 import type { EmailAttachment } from "../utils/email.ts";
+import { getEnv } from "../utils/env.ts";
 import {
   createEmailConfig,
   deleteEmailConfig,
@@ -1908,6 +1909,11 @@ adminRoutes.post(
       return c.json({ error: "Subject is required" }, 400);
     }
 
+    // Use the actual SMTP "From" address as the invoice's displayed company
+    // email so recipients see a consistent, reply-able address that matches
+    // the account the message was really sent from.
+    const effectiveFromAddress = resolvedDbConfig?.fromAddress || getEnv("EMAIL_FROM_ADDRESS", "") || "";
+
     const businessSettings = {
       companyName: settingsMap.companyName || "Your Company",
       companyAddress: settingsMap.companyAddress || "",
@@ -1915,7 +1921,7 @@ adminRoutes.post(
       companyPostalCode: settingsMap.companyPostalCode || "",
       companyCountryCode: settingsMap.companyCountryCode || "",
       postalCityFormat: settingsMap.postalCityFormat || "auto",
-      companyEmail: settingsMap.companyEmail || "",
+      companyEmail: effectiveFromAddress || settingsMap.companyEmail || "",
       companyPhone: settingsMap.companyPhone || "",
       companyTaxId: settingsMap.companyTaxId || "",
       currency: settingsMap.currency || "USD",

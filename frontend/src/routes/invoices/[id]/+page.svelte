@@ -498,7 +498,7 @@
           </div>
         {/if}
 
-        {#if emailEnabled && canExport && (invoice.status === "draft" || invoice.status === "sent" || invoice.status === "overdue")}
+        {#if emailEnabled && canExport && (invoice.status === "draft" || invoice.status === "sent" || invoice.status === "overdue" || invoice.status === "paid" || invoice.status === "complete" || invoice.status === "voided")}
           <button type="button" class="btn btn-sm" onclick={openEmailModal}>
             <Mail size={16} />
             <span class="hidden sm:inline">{emailDialogTitle}</span>

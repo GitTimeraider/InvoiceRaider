@@ -148,7 +148,7 @@ InvoiceRaider exposes email actions in the invoice detail view based on invoice 
 
 - **Draft** — Shows **Send via Email**
 - **Sent** and **Overdue** — Shows **Send Reminder**
-- **Complete** and **Voided** — No email action button is shown
+- **Paid**, **Complete**, and **Voided** — Shows **Send via Email** (same normal send flow as Draft, useful for resending a copy after the invoice is settled or cancelled)
 
 Each email configuration can define separate templates for:
 
@@ -158,6 +158,10 @@ Each email configuration can define separate templates for:
 When a reminder template is not set for a config, InvoiceRaider falls back to that same config's normal Subject/Body.
 
 This behavior helps separate first-send emails from follow-up reminders while still keeping a safe fallback.
+
+The company email shown on the invoice PDF attached to an outgoing email is automatically replaced with the actual SMTP "From" address used to send that message, so the recipient always sees an address that matches the sender and can safely reply to it.
+
+Every send attempt (normal or reminder) is recorded in an **Email Log** on the invoice detail page, showing the mode, timestamp, and success/failure. Recipient addresses are masked by default and can be revealed with a click. SMTP servers that silently reject all recipients (e.g. when the "From" address isn't authorized for the authenticated account) are now detected and logged as a failure instead of appearing to succeed.
 
 ---
 
