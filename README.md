@@ -4,6 +4,33 @@
     <img width="33%" src="https://github.com/GitTimeraider/Assets/blob/main/InvoiceRaider/img/invoiceraider_icon.png">
 </p>
 
+<details>
+  <summary>Open for sort of CHANGELOGS?</summary>
+
+**V1.04 - Mail additions**
+- From mail field can now be used to send mail from other aliases (as long as its within the same domain as the SMTP account has access to
+- Paid status now has the option to also send mail to allow for sending mails to Paperless-ngx or other software for archiving
+- A new email config setting has been added which enables the usage of the FROM field within the email. To be precise, when turned on it replaces your company email address with the FROM address of the email config selected. This allows for you to send mails to customers ujsing customer-specific mailaddresses which then automatically get added to our invoice based on the mailconfig used.
+
+**V1.03 - Mail configs**
+- Addition of mail configs in the settings menu
+- Addition of using mail configs to send out invoices by mail to customers or archiving purposes
+- Addition of using mail configs to send out reminders/overdue warnings by mail
+- Addition of logging per invoice on when and to who mail has been sent
+
+**V1.02 - Dashboard refresh**
+- Addition of an improved dashboard with clickable elements
+
+**V1.01 - Initial QoL**
+- Alligned specific settings within the page view
+- Fixed the way VAT is shown and calculated in the invoices allow it to switch correctly even when switching between products that have different VATs
+- Addition of an extra customer and company field to add country-specific company registration numbers
+- Changes addresses to be one-liners which might annoy some but in my eyes looks cleaner and is better proportional in a lot of situations
+- Allowed for things like whitelines/enters to work in most text blocks
+- More minor things
+
+</details>
+
 
 Formerly a fork of https://github.com/kittendevv/Invio, however at this point enough functionality has been added and removed to make it its own project.
 No changes made in the Invio project will be introduced in here anymore and it will go its own way.
@@ -15,6 +42,7 @@ No changes made in the Invio project will be introduced in here anymore and it w
 A modern, self-hosted invoice management platform for freelancers and small to medium-sized businesses. Built with a SvelteKit frontend and a Deno/Hono backend, packaged as a single Docker container.
 
 ---
+
 
 <details>
   <summary>📸 Click to show screenshots</summary>
