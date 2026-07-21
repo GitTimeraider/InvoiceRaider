@@ -385,7 +385,7 @@ function buildContext(
     issueDate: formatDate(invoice.issueDate, dateFormat)!,
     dueDate: formatDate(invoice.dueDate, dateFormat),
     currency,
-    status: invoice.status,
+      status: invoice.status === "draft" ? undefined : invoice.status,
 
     // Customer
     customerName: invoice.customer.name,
