@@ -11,6 +11,7 @@
 - From mail field can now be used to send mail from other aliases (as long as its within the same domain as the SMTP account has access to
 - Paid status now has the option to also send mail to allow for sending mails to Paperless-ngx or other software for archiving
 - A new email config setting has been added which enables the usage of the FROM field within the email. To be precise, when turned on it replaces your company email address with the FROM address of the email config selected. This allows for you to send mails to customers ujsing customer-specific mailaddresses which then automatically get added to our invoice based on the mailconfig used.
+- Removed the status line from the invoice when it is in Draft status. As this is mostly the status it is in the moment you send or save the invoice to get it to customers, the status is not needed. All other statusses do show in the invoice as they contribute to making sure the customer or archiving systems understand the status of the invoice when its not "normal"
 
 **V1.03 - Mail configs**
 - Addition of mail configs in the settings menu
