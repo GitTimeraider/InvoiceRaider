@@ -142,6 +142,37 @@ All application data is stored under `/app/data/` inside the container:
 
 Mount a named volume at `/app/data` to persist data across container restarts.
 
+### Running as non-root / hardened containers
+
+The image runs as an unprivileged user (`invoiceraider`, UID/GID `1000:1000`), so it
+works with hardening options such as `--cap-drop=ALL` and
+`--security-opt no-new-privileges`:
+
+```yaml
+services:
+  invoiceraider:
+    # ...
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+```
+
+The data directory must be writable by UID `1000`. New named volumes get this
+automatically. When **upgrading** from an older image (which ran as root), or when
+using a **bind mount**, fix ownership once:
+
+```bash
+# named volume (replace invoiceraider_data with your volume name, see `docker volume ls`)
+docker run --rm -v invoiceraider_data:/data debian:13-slim chown -R 1000:1000 /data
+
+# bind mount (run on the Docker host)
+sudo chown -R 1000:1000 /path/to/your/data
+```
+
+To run as a different UID, either build with `--build-arg APP_UID=... --build-arg APP_GID=...`
+or set `user: "UID:GID"` in compose and make sure the data directory is owned by that UID.
+
 ---
 
 ## Invoice Number Patterns

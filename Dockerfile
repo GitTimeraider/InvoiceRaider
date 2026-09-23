@@ -46,13 +46,29 @@ RUN cd /app/frontend && bun install --frozen-lockfile --production
 # Shared files
 COPY NAME ./NAME
 
-# Data dir
-RUN mkdir -p /app/data
+# Pre-fetch backend dependencies at build time so the container never needs
+# to download or write into its module cache at runtime.
+ENV DENO_DIR=/app/.deno
+RUN cd /app/backend && deno cache src/app.ts
+
+# Unprivileged runtime user. Running as non-root means the app works with
+# `--cap-drop=ALL` (root without CAP_DAC_OVERRIDE cannot open files it does not
+# own, which is what breaks a root container under cap-drop).
+ARG APP_UID=1000
+ARG APP_GID=1000
+RUN groupadd --gid ${APP_GID} invoiceraider \
+  && useradd --uid ${APP_UID} --gid ${APP_GID} --create-home --shell /usr/sbin/nologin invoiceraider \
+  && mkdir -p /app/data \
+  && chown -R ${APP_UID}:${APP_GID} /app/data /app/.deno
+ENV HOME=/home/invoiceraider
+VOLUME ["/app/data"]
 
 
 # ---------- Config ----------
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 EXPOSE 8000
+
+USER ${APP_UID}:${APP_GID}
 
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
