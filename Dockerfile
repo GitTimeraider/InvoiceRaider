@@ -23,6 +23,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 \
     libcairo2 libglib2.0-0 libexpat1 \
     supervisor \
+  && (command -v setpriv || apt-get install -y --no-install-recommends setpriv) \
+  && command -v setpriv \
   && rm -rf /var/lib/apt/lists/*
 
 # Install Deno
@@ -63,15 +65,18 @@ RUN groupadd --gid ${APP_GID} invoiceraider \
   && chmod -R a+rX /app/.deno
 # Caches (fontconfig, etc.) go to /tmp so any UID passed via `--user` works.
 ENV HOME=/home/invoiceraider \
-    XDG_CACHE_HOME=/tmp/.cache
+    XDG_CACHE_HOME=/tmp/.cache \
+    DATABASE_PATH=/app/data/invio.db
 VOLUME ["/app/data"]
 
 
 # ---------- Config ----------
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY --chmod=755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 8000
 
 USER ${APP_UID}:${APP_GID}
 
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

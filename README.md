@@ -135,7 +135,7 @@ All application data is stored under `/app/data/` inside the container:
 
 | Path | Contents |
 |---|---|
-| `/app/data/app.db` | SQLite database |
+| `/app/data/invio.db` | SQLite database (override with `DATABASE_PATH`) |
 | `/app/data/logos/` | Company logo uploads |
 | `/app/data/templates/` | Custom invoice templates |
 | `/app/data/backups/` | Automatic DB backups on schema upgrade |
@@ -172,9 +172,21 @@ sudo chown -R 1000:1000 /path/to/your/data
 
 ### Running with a custom UID/GID (e.g. Unraid `99:100`)
 
-The container can run as any UID/GID. Only the data directory has to be owned by it.
-Classic `PUID`/`PGID` entrypoint scripts need root and `CAP_CHOWN`/`CAP_SETUID`, which
-`--cap-drop=ALL` removes. So this image uses Docker's own `user:` option instead.
+The container can run as any UID/GID, as long as the data directory is owned by it.
+There are two ways to set it:
+
+| | Option A: `user:` / `--user` (recommended) | Option B: `PUID` / `PGID` env vars |
+|---|---|---|
+| Works with `--cap-drop=ALL` alone | Yes | No, needs `CHOWN`, `SETUID`, `SETGID` added back |
+| Fixes data ownership for you | No, `chown` once (step 2) | Yes, on every start |
+| Container starts as | the given UID | root, then drops to `PUID:PGID` |
+
+Setting only `PUID`/`PGID` as environment variables does **nothing** unless the container
+also starts as root (option B). With the default image user you then get a
+`Permission denied ... invio.db` error; the container log shows an `[entrypoint]` warning
+explaining this.
+
+#### Option A: `user:` / `--user`
 
 1. Set the IDs in `.env` (the provided `docker-compose.yml` reads them):
 
@@ -206,6 +218,35 @@ Classic `PUID`/`PGID` entrypoint scripts need root and `CAP_CHOWN`/`CAP_SETUID`,
    ```
 
 3. `docker compose up -d`
+
+#### Option B: `PUID` / `PGID` (Unraid-style)
+
+Start as root with just the capabilities needed to fix ownership and switch user:
+
+```yaml
+services:
+  invoiceraider:
+    user: "0:0"
+    environment:
+      PUID: 99
+      PGID: 100
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+    security_opt:
+      - no-new-privileges:true
+```
+
+`docker run` / Unraid **Extra Parameters**:
+
+```bash
+--user 0:0 -e PUID=99 -e PGID=100 --cap-drop=ALL --cap-add=CHOWN --cap-add=SETUID --cap-add=SETGID
+```
+
+On startup the entrypoint runs `chown -R 99:100` on the data directory, then runs the app as `99:100`.
 
 A **new named volume** is created owned by `1000:1000` (the image default), so step 2 is
 needed for it as well. Alternatively, build your own image with the IDs baked in
