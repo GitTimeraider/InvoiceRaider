@@ -170,8 +170,48 @@ docker run --rm -v invoiceraider_data:/data debian:13-slim chown -R 1000:1000 /d
 sudo chown -R 1000:1000 /path/to/your/data
 ```
 
-To run as a different UID, either build with `--build-arg APP_UID=... --build-arg APP_GID=...`
-or set `user: "UID:GID"` in compose and make sure the data directory is owned by that UID.
+### Running with a custom UID/GID (e.g. Unraid `99:100`)
+
+The container can run as any UID/GID. Only the data directory has to be owned by it.
+Classic `PUID`/`PGID` entrypoint scripts need root and `CAP_CHOWN`/`CAP_SETUID`, which
+`--cap-drop=ALL` removes. So this image uses Docker's own `user:` option instead.
+
+1. Set the IDs in `.env` (the provided `docker-compose.yml` reads them):
+
+   ```env
+   PUID=99
+   PGID=100
+   ```
+
+   Or directly in your compose file / `docker run`:
+
+   ```yaml
+   services:
+     invoiceraider:
+       user: "99:100"
+   ```
+
+   ```bash
+   docker run --user 99:100 --cap-drop=ALL ...
+   ```
+
+2. Give the data directory to that UID/GID once (on the Docker host):
+
+   ```bash
+   # named volume
+   docker run --rm -v invoiceraider_data:/data debian:13-slim chown -R 99:100 /data
+
+   # bind mount, e.g. /mnt/user/appdata/invoiceraider
+   sudo chown -R 99:100 /mnt/user/appdata/invoiceraider
+   ```
+
+3. `docker compose up -d`
+
+A **new named volume** is created owned by `1000:1000` (the image default), so step 2 is
+needed for it as well. Alternatively, build your own image with the IDs baked in
+(`docker build --build-arg APP_UID=99 --build-arg APP_GID=100 .`, which
+`docker-compose-dev.yml` does automatically from `PUID`/`PGID`). A fresh volume then gets the right
+owner automatically.
 
 ---
 

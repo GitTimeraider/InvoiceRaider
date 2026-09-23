@@ -2,9 +2,20 @@ name: invio
 
 services:
   invio:
-    build: .
+    build:
+      context: .
+      args:
+        # Bake the runtime UID:GID into the image so a fresh volume gets the right owner.
+        APP_UID: ${PUID:-1000}
+        APP_GID: ${PGID:-1000}
     env_file:
       - .env
+    # Run as this UID:GID (set PUID/PGID in .env). The data volume must be owned by it.
+    user: "${PUID:-1000}:${PGID:-1000}"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - invio_data:/app/data
     ports:

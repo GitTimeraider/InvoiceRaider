@@ -59,8 +59,11 @@ ARG APP_GID=1000
 RUN groupadd --gid ${APP_GID} invoiceraider \
   && useradd --uid ${APP_UID} --gid ${APP_GID} --create-home --shell /usr/sbin/nologin invoiceraider \
   && mkdir -p /app/data \
-  && chown -R ${APP_UID}:${APP_GID} /app/data /app/.deno
-ENV HOME=/home/invoiceraider
+  && chown -R ${APP_UID}:${APP_GID} /app/data /app/.deno \
+  && chmod -R a+rX /app/.deno
+# Caches (fontconfig, etc.) go to /tmp so any UID passed via `--user` works.
+ENV HOME=/home/invoiceraider \
+    XDG_CACHE_HOME=/tmp/.cache
 VOLUME ["/app/data"]
 
 
