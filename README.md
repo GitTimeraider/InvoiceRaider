@@ -7,6 +7,9 @@
 <details>
   <summary>Open for sort of CHANGELOGS?</summary>
 
+**V1.05 - cap-drop=all**  
+Added the option to make use of --cap-drop=ALL as long as you specify an user in an parameter ( --user xx:xx)
+
 **V1.04 - Mail additions**
 - From mail field can now be used to send mail from other aliases (as long as its within the same domain as the SMTP account has access to
 - Paid status now has the option to also send mail to allow for sending mails to Paperless-ngx or other software for archiving
