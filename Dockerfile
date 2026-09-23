@@ -23,6 +23,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 \
     libcairo2 libglib2.0-0 libexpat1 \
     supervisor \
+  && (command -v setpriv || apt-get install -y --no-install-recommends setpriv) \
+  && command -v setpriv \
   && rm -rf /var/lib/apt/lists/*
 
 # Install Deno
@@ -46,13 +48,35 @@ RUN cd /app/frontend && bun install --frozen-lockfile --production
 # Shared files
 COPY NAME ./NAME
 
-# Data dir
-RUN mkdir -p /app/data
+# Pre-fetch backend dependencies at build time so the container never needs
+# to download or write into its module cache at runtime.
+ENV DENO_DIR=/app/.deno
+RUN cd /app/backend && deno cache src/app.ts
+
+# Unprivileged runtime user. Running as non-root means the app works with
+# `--cap-drop=ALL` (root without CAP_DAC_OVERRIDE cannot open files it does not
+# own, which is what breaks a root container under cap-drop).
+ARG APP_UID=1000
+ARG APP_GID=1000
+RUN groupadd --gid ${APP_GID} invoiceraider \
+  && useradd --uid ${APP_UID} --gid ${APP_GID} --create-home --shell /usr/sbin/nologin invoiceraider \
+  && mkdir -p /app/data \
+  && chown -R ${APP_UID}:${APP_GID} /app/data /app/.deno \
+  && chmod -R a+rX /app/.deno
+# Caches (fontconfig, etc.) go to /tmp so any UID passed via `--user` works.
+ENV HOME=/home/invoiceraider \
+    XDG_CACHE_HOME=/tmp/.cache \
+    DATABASE_PATH=/app/data/invio.db
+VOLUME ["/app/data"]
 
 
 # ---------- Config ----------
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY --chmod=755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 8000
 
+USER ${APP_UID}:${APP_GID}
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

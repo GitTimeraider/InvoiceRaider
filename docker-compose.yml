@@ -5,6 +5,12 @@ services:
     image: ghcr.io/kittendevv/invio:latest
     env_file:
       - .env
+    # Run as this UID:GID (set PUID/PGID in .env). The data volume must be owned by it.
+    user: "${PUID:-1000}:${PGID:-1000}"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - invio_data:/app/data
     ports:

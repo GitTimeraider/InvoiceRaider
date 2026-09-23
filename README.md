@@ -135,12 +135,124 @@ All application data is stored under `/app/data/` inside the container:
 
 | Path | Contents |
 |---|---|
-| `/app/data/app.db` | SQLite database |
+| `/app/data/invio.db` | SQLite database (override with `DATABASE_PATH`) |
 | `/app/data/logos/` | Company logo uploads |
 | `/app/data/templates/` | Custom invoice templates |
 | `/app/data/backups/` | Automatic DB backups on schema upgrade |
 
 Mount a named volume at `/app/data` to persist data across container restarts.
+
+### Running as non-root / hardened containers
+
+The image runs as an unprivileged user (`invoiceraider`, UID/GID `1000:1000`), so it
+works with hardening options such as `--cap-drop=ALL` and
+`--security-opt no-new-privileges`:
+
+```yaml
+services:
+  invoiceraider:
+    # ...
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+```
+
+The data directory must be writable by UID `1000`. New named volumes get this
+automatically. When **upgrading** from an older image (which ran as root), or when
+using a **bind mount**, fix ownership once:
+
+```bash
+# named volume (replace invoiceraider_data with your volume name, see `docker volume ls`)
+docker run --rm -v invoiceraider_data:/data debian:13-slim chown -R 1000:1000 /data
+
+# bind mount (run on the Docker host)
+sudo chown -R 1000:1000 /path/to/your/data
+```
+
+### Running with a custom UID/GID (e.g. Unraid `99:100`)
+
+The container can run as any UID/GID, as long as the data directory is owned by it.
+There are two ways to set it:
+
+| | Option A: `user:` / `--user` (recommended) | Option B: `PUID` / `PGID` env vars |
+|---|---|---|
+| Works with `--cap-drop=ALL` alone | Yes | No, needs `CHOWN`, `SETUID`, `SETGID` added back |
+| Fixes data ownership for you | No, `chown` once (step 2) | Yes, on every start |
+| Container starts as | the given UID | root, then drops to `PUID:PGID` |
+
+Setting only `PUID`/`PGID` as environment variables does **nothing** unless the container
+also starts as root (option B). With the default image user you then get a
+`Permission denied ... invio.db` error; the container log shows an `[entrypoint]` warning
+explaining this.
+
+#### Option A: `user:` / `--user`
+
+1. Set the IDs in `.env` (the provided `docker-compose.yml` reads them):
+
+   ```env
+   PUID=99
+   PGID=100
+   ```
+
+   Or directly in your compose file / `docker run`:
+
+   ```yaml
+   services:
+     invoiceraider:
+       user: "99:100"
+   ```
+
+   ```bash
+   docker run --user 99:100 --cap-drop=ALL ...
+   ```
+
+2. Give the data directory to that UID/GID once (on the Docker host):
+
+   ```bash
+   # named volume
+   docker run --rm -v invoiceraider_data:/data debian:13-slim chown -R 99:100 /data
+
+   # bind mount, e.g. /mnt/user/appdata/invoiceraider
+   sudo chown -R 99:100 /mnt/user/appdata/invoiceraider
+   ```
+
+3. `docker compose up -d`
+
+#### Option B: `PUID` / `PGID` (Unraid-style)
+
+Start as root with just the capabilities needed to fix ownership and switch user:
+
+```yaml
+services:
+  invoiceraider:
+    user: "0:0"
+    environment:
+      PUID: 99
+      PGID: 100
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+    security_opt:
+      - no-new-privileges:true
+```
+
+`docker run` / Unraid **Extra Parameters**:
+
+```bash
+--user 0:0 -e PUID=99 -e PGID=100 --cap-drop=ALL --cap-add=CHOWN --cap-add=SETUID --cap-add=SETGID
+```
+
+On startup the entrypoint runs `chown -R 99:100` on the data directory, then runs the app as `99:100`.
+
+A **new named volume** is created owned by `1000:1000` (the image default), so step 2 is
+needed for it as well. Alternatively, build your own image with the IDs baked in
+(`docker build --build-arg APP_UID=99 --build-arg APP_GID=100 .`, which
+`docker-compose-dev.yml` does automatically from `PUID`/`PGID`). A fresh volume then gets the right
+owner automatically.
 
 ---
 
