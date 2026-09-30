@@ -50,8 +50,13 @@ COPY NAME ./NAME
 
 # Pre-fetch backend dependencies at build time so the container never needs
 # to download or write into its module cache at runtime.
+# bcrypt spawns its hashing worker via `new Worker(new URL("worker.ts", ...))`,
+# which is not part of the static module graph, so cache it explicitly.
+# Otherwise the first login tries to download it into /app/.deno and fails
+# with "Permission denied" when running under a different --user UID.
 ENV DENO_DIR=/app/.deno
-RUN cd /app/backend && deno cache src/app.ts
+RUN cd /app/backend && deno cache src/app.ts \
+    https://deno.land/x/bcrypt@v0.4.1/src/worker.ts
 
 # Unprivileged runtime user. Running as non-root means the app works with
 # `--cap-drop=ALL` (root without CAP_DAC_OVERRIDE cannot open files it does not
