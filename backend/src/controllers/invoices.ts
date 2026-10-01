@@ -770,9 +770,10 @@ export const updateInvoice = async (
     };
     // When editing protection is overridden, also allow reversing finalized statuses
     const allowedOverride: Record<string, string[]> = {
+      sent: ["draft"],
       complete: ["sent", "paid"],
       paid: ["sent", "complete"],
-      overdue: ["sent", "paid"],
+      overdue: ["draft", "sent", "paid"],
     };
     const effectiveAllowed = allowProtectedChanges
       ? [...(allowed[from] || []), ...(allowedOverride[from] || [])]
