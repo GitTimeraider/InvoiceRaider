@@ -265,12 +265,23 @@ Invoice numbers can be customized in Settings using token placeholders:
 
 | Token | Description |
 |---|---|
+| `{SEQ}` | Sequential number, zero-padded to 3 digits (e.g. `001`) |
+| `{SEQ:N}` | Sequential number, zero-padded to N digits (1–15), e.g. `{SEQ:10}` → `0000000001` |
 | `{YYYY}` | Full year (e.g. 2025) |
+| `{YY}` | Two-digit year |
 | `{MM}` | Two-digit month |
 | `{DD}` | Two-digit day |
+| `{DATE}` | Full date as `YYYYMMDD` |
 | `{RAND4}` | 4-character random alphanumeric |
 
-Example: `INV-{YYYY}-{MM}-{RAND4}` → `INV-2025-06-A3F9`
+Examples:
+- `INV-{YYYY}-{SEQ}` → `INV-2025-001`
+- `{SEQ:10}` → `0000000001`, `0000000002`, …
+- `INV-{YYYY}-{MM}-{RAND4}` → `INV-2025-06-A3F9`
+
+The sequence continues from the highest existing invoice number that shares the
+text before `{SEQ}`. If the counter outgrows the chosen width, the number simply
+gets longer (it never wraps).
 
 ---
 
