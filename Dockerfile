@@ -12,7 +12,7 @@ RUN cp /app/NAME static/NAME 2>/dev/null || true
 RUN bun run build
 
 
-# ---------- Base runtime (Debian + deps + Deno + Bun + Supervisor) ----------
+# ---------- Base runtime (Debian + deps + Deno + Bun) ----------
 FROM debian:13-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -22,7 +22,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fonts-dejavu fonts-liberation fonts-noto \
     libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 \
     libcairo2 libglib2.0-0 libexpat1 \
-    supervisor \
   && (command -v setpriv || apt-get install -y --no-install-recommends setpriv) \
   && command -v setpriv \
   && rm -rf /var/lib/apt/lists/*
@@ -50,13 +49,10 @@ COPY NAME ./NAME
 
 # Pre-fetch backend dependencies at build time so the container never needs
 # to download or write into its module cache at runtime.
-# bcrypt spawns its hashing worker via `new Worker(new URL("worker.ts", ...))`,
-# which is not part of the static module graph, so cache it explicitly.
-# Otherwise the first login tries to download it into /app/.deno and fails
-# with "Permission denied" when running under a different --user UID.
+# Lazily imported modules (pdf-lib, nodemailer, zip.js) use static
+# `import("...")` specifiers, so `deno cache` still pre-fetches them.
 ENV DENO_DIR=/app/.deno
-RUN cd /app/backend && deno cache src/app.ts \
-    https://deno.land/x/bcrypt@v0.4.1/src/worker.ts
+RUN cd /app/backend && deno cache src/app.ts
 
 # Unprivileged runtime user. Running as non-root means the app works with
 # `--cap-drop=ALL` (root without CAP_DAC_OVERRIDE cannot open files it does not
@@ -72,11 +68,15 @@ RUN groupadd --gid ${APP_GID} invoiceraider \
 ENV HOME=/home/invoiceraider \
     XDG_CACHE_HOME=/tmp/.cache \
     DATABASE_PATH=/app/data/invio.db
+# Lower idle memory: fewer glibc malloc arenas (less fragmentation in the
+# multi-threaded Deno/Bun runtimes) and no Deno upgrade check on startup.
+ENV MALLOC_ARENA_MAX=2 \
+    DENO_NO_UPDATE_CHECK=1
 VOLUME ["/app/data"]
 
 
 # ---------- Config ----------
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY --chmod=755 start.sh /usr/local/bin/start.sh
 COPY --chmod=755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 8000
@@ -84,4 +84,4 @@ EXPOSE 8000
 USER ${APP_UID}:${APP_GID}
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["/usr/local/bin/start.sh"]

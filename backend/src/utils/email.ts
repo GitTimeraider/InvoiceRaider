@@ -1,5 +1,4 @@
 import { getEnv } from "./env.ts";
-import nodemailer from "npm:nodemailer";
 import { Buffer } from "node:buffer";
 
 export interface EmailAttachment {
@@ -53,6 +52,9 @@ async function sendWithSmtp(
   cfg: { host: string; port: number; secure: boolean; user?: string | null; pass?: string | null; fromAddress: string; fromName?: string | null },
   opts: SendEmailOptions,
 ): Promise<void> {
+  // Loaded on demand: nodemailer costs a few MB of heap and is only needed
+  // when an email is actually sent.
+  const { default: nodemailer } = await import("npm:nodemailer");
   const transporter = nodemailer.createTransport({
     host: cfg.host,
     port: cfg.port,
