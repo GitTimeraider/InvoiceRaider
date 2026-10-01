@@ -1,11 +1,4 @@
-import {
-  PDFArray,
-  PDFDict,
-  PDFDocument,
-  PDFName,
-  PDFNumber,
-  PDFString,
-} from "pdf-lib";
+import type { PDFArray, PDFDict } from "pdf-lib";
 import { generateInvoiceXML, XMLProfile } from "./xmlProfiles.ts";
 import { generateZugferdXMP } from "./xmp.ts";
 import { join } from "std/path";
@@ -25,7 +18,9 @@ import {
 } from "../controllers/templates.ts";
 import { getDefaultTemplate } from "../controllers/templates.ts";
 import { getInvoiceLabels } from "../i18n/translations.ts";
-// pdf-lib is used to embed XML attachments and tweak metadata after rendering
+// pdf-lib is used to embed XML attachments and tweak metadata after rendering.
+// It is imported lazily in embedXmlAttachment() so its ~9 MB of heap is only
+// paid when an e-invoice PDF is actually generated, not while the app idles.
 
 // ---- Basic color helpers ----
 function normalizeHex(hex?: string): string | undefined {
@@ -706,6 +701,8 @@ export async function embedXmlAttachment(
   docLang?: string,
   profile?: XMLProfile,
 ): Promise<Uint8Array> {
+  const { PDFArray, PDFDict, PDFDocument, PDFName, PDFNumber, PDFString } =
+    await import("pdf-lib");
   const pdfDoc = await PDFDocument.load(pdfBytes, { updateMetadata: false });
   const context = pdfDoc.context;
   const now = new Date();
