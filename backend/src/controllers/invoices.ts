@@ -3,6 +3,7 @@ import {
   generateDraftInvoiceNumber,
   getDatabase,
   getNextInvoiceNumber,
+  SEQ_TOKEN_RE,
 } from "../database/init.ts";
 import { getSetting } from "./settings.ts";
 import {
@@ -326,7 +327,7 @@ export const createInvoice = (
       );
       if (rows.length > 0) {
         const pattern = String((rows[0] as unknown[])[0] || "").trim();
-        if (pattern && /\{SEQ\}/.test(pattern)) {
+        if (pattern && SEQ_TOKEN_RE.test(pattern)) {
           invoiceNumber = getNextInvoiceNumber();
         } else {
           invoiceNumber = generateDraftInvoiceNumber();

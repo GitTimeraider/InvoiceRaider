@@ -644,7 +644,7 @@
               <div class="mt-2 space-y-1 text-xs opacity-70">
                 <p>{t("Available placeholders")}:</p>
                 <p>
-                  <code>{"{SEQ}"}</code> (sequential, recommended),
+                  <code>{"{SEQ}"}</code> (sequential, recommended; <code>{"{SEQ:10}"}</code> pads to 10 digits, max 15),
                   <code>{"{YYYY}"}</code>, <code>{"{YY}"}</code>,
                   <code>{"{MM}"}</code>, <code>{"{DD}"}</code>,
                   <code>{"{DATE}"}</code>, <code>{"{RAND4}"}</code>

@@ -804,17 +804,28 @@ function expandPatternTokens(pattern: string): string {
     .replace(/\{RAND4\}/g, () => cryptoRandom(4));
 }
 
+/** Matches `{SEQ}` or `{SEQ:N}` where N is the zero-padded width. */
+export const SEQ_TOKEN_RE = /\{SEQ(?::(\d{1,2}))?\}/;
+const SEQ_DEFAULT_WIDTH = 3;
+const SEQ_MAX_WIDTH = 15;
+
 export function getNextInvoiceNumber(): string {
   const cfg = getNumberingSettings();
 
   // Advanced pattern mode (when enabled and configured)
   if (cfg.pattern && cfg.enabled) {
     const expanded = expandPatternTokens(cfg.pattern);
-    if (!/\{SEQ\}/.test(cfg.pattern)) return expanded;
+    const seq = expanded.match(SEQ_TOKEN_RE);
+    if (!seq) return expanded;
 
-    const prefix = expanded.split("{SEQ}")[0];
+    const requested = seq[1] ? parseInt(seq[1], 10) : SEQ_DEFAULT_WIDTH;
+    const width = Math.min(Math.max(requested, 1), SEQ_MAX_WIDTH);
+    const prefix = expanded.slice(0, seq.index);
     const next = findMaxSequence(prefix) + 1;
-    return expanded.replace(/\{SEQ\}/g, String(next).padStart(3, "0"));
+    return expanded.replace(
+      new RegExp(SEQ_TOKEN_RE.source, "g"),
+      String(next).padStart(width, "0"),
+    );
   }
 
   // Legacy mode: PREFIX-YYYY-NNN
