@@ -35,14 +35,11 @@ Added the option to make use of --cap-drop=ALL as long as you specify an user in
 
 </details>
 
+Formerly a fork of https://github.com/kittendevv/Invio
 
-Formerly a fork of https://github.com/kittendevv/Invio, however at this point enough functionality has been added and removed to make it its own project.
-No changes made in the Invio project will be introduced in here anymore and it will go its own way.
-
-### Disclaimers: 
-#### Even though guided and checked, AI is responsible for over half of the coding. 
-Also keep in mind that this software is mostly developed for personal use by myself and thus might not receive all feature requests desired and even be discontinued.
-################################################################
+#### Disclaimer: 
+While guided and checked, AI is responsible for half of the coding. Development is also 100% for own personal use, no promises.
+__________________________________
 
 A modern, self-hosted invoice management platform for freelancers and small to medium-sized businesses. Built with a SvelteKit frontend and a Deno/Hono backend, packaged as a single Docker container.
 
