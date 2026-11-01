@@ -72,7 +72,9 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
-          push: ${{ !github.event.pull_request.head.repo.fork }}
+          # PRs only verify the image builds: no tags are generated for
+          # pull_request events, and buildx refuses to push an untagged image.
+          push: ${{ github.event_name != 'pull_request' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: ${{ steps.metadata.outputs.tags }}
