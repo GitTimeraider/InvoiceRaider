@@ -1,5 +1,7 @@
 # ---------- Frontend build (Bun) ----------
-FROM oven/bun:1 AS frontend-builder
+# Built on the build machine's own platform: the output is plain JavaScript,
+# so it is identical for every target architecture and never needs emulation.
+FROM --platform=$BUILDPLATFORM oven/bun:1 AS frontend-builder
 WORKDIR /app/frontend
 
 COPY frontend/package.json frontend/bun.lock ./
