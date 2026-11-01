@@ -40,6 +40,8 @@ COPY backend ./backend
 
 # Frontend build output
 COPY --from=frontend-builder /app/frontend/build ./frontend/build
+# Entry point that restores runtime ORIGIN support (see frontend/server.js)
+COPY frontend/server.js ./frontend/server.js
 # Frontend runtime manifest for production dependency install
 COPY frontend/package.json frontend/bun.lock ./frontend/
 RUN cd /app/frontend && bun install --frozen-lockfile --production
