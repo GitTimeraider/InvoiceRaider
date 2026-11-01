@@ -1,9 +1,9 @@
 version: 2
 updates:
-  # Minor and patch updates are grouped into a single PR per ecosystem, so
-  # there is only one lockfile change to merge and PRs can't conflict with
-  # each other. Major updates (which may need code changes) still get their
-  # own PR each, so they can be reviewed and tested individually.
+  # Every ecosystem gets exactly ONE grouped PR containing all of its updates
+  # (major, minor and patch). Each PR only touches its own folder's manifest
+  # and lockfile, so the PRs never conflict with each other and can be merged
+  # into develop in any order with a single click.
   - package-ecosystem: "bun"
     directory: "/frontend"
     target-branch: "develop"
@@ -11,8 +11,8 @@ updates:
       interval: "weekly"
       day: "monday"
     groups:
-      frontend-minor-patch:
-        update-types: ["minor", "patch"]
+      frontend:
+        patterns: ["*"]
 
   - package-ecosystem: "deno"
     directory: "/backend"
@@ -21,8 +21,8 @@ updates:
       interval: "weekly"
       day: "monday"
     groups:
-      backend-minor-patch:
-        update-types: ["minor", "patch"]
+      backend:
+        patterns: ["*"]
 
   - package-ecosystem: "docker"
     directory: "/"
@@ -31,5 +31,5 @@ updates:
       interval: "weekly"
       day: "monday"
     groups:
-      docker-minor-patch:
-        update-types: ["minor", "patch"]
+      docker:
+        patterns: ["*"]
