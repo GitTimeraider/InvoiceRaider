@@ -2,7 +2,7 @@
   import { getContext, onMount, untrack } from "svelte";
   import { Plus, GripVertical } from "lucide-svelte";
   import { goto } from "$app/navigation";
-  import { generateId } from "$lib/utils/id";
+  import { generateId } from "#lib/utils/id";
 
   let { data, invoice = null, formId = "invoice-editor-form" } = $props();
   let initInvoice = untrack(() => invoice);

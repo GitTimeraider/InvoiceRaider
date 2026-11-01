@@ -1,6 +1,6 @@
 import type { RequestHandler } from "./$types";
 import { redirect } from "@sveltejs/kit";
-import { BACKEND_URL, SESSION_COOKIE, DEFAULT_SESSION_MAX_AGE } from "$lib/backend";
+import { BACKEND_URL, SESSION_COOKIE, DEFAULT_SESSION_MAX_AGE } from "#lib/backend";
 
 export const GET: RequestHandler = async ({ url, cookies }) => {
   const error = url.searchParams.get("error");

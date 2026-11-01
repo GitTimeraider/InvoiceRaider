@@ -4,10 +4,10 @@ import {
   backendPostFormData,
   backendPut,
   backendDelete,
-} from "$lib/backend";
+} from "#lib/backend";
 import { error, redirect, fail } from "@sveltejs/kit";
 import type { PageServerLoad, Actions } from "./$types";
-import { env } from "$env/dynamic/private";
+import { SMTP_HOST, EMAIL_FROM_ADDRESS } from "$app/env/private";
 
 export const load: PageServerLoad = async ({ params, locals, url }) => {
   if (!locals.authHeader) {
@@ -41,7 +41,7 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
           : typeof settings.reminderEmailConfigId === "string"
             ? settings.reminderEmailConfigId
             : null,
-      emailEnabled: emailConfigs.length > 0 || Boolean(env.SMTP_HOST && env.EMAIL_FROM_ADDRESS),
+      emailEnabled: emailConfigs.length > 0 || Boolean(SMTP_HOST && EMAIL_FROM_ADDRESS),
       emailConfigs,
     };
   } catch (err: any) {

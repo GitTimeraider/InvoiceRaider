@@ -1,5 +1,5 @@
 import { redirect, fail } from "@sveltejs/kit";
-import { backendPost, backendGet } from "$lib/backend";
+import { backendPost, backendGet } from "#lib/backend";
 import type { PageServerLoad, Actions } from "./$types";
 
 type ResourceActions = Record<string, string[]>;

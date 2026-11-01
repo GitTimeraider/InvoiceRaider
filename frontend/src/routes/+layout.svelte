@@ -2,10 +2,10 @@
   import { page } from "$app/state";
   import "@fontsource-variable/inter/wght.css";
   import { LayoutDashboard, LogOut, Ellipsis, Package, ReceiptText, Settings, UserCog, Users } from "lucide-svelte";
-  import Breadcrumbs from "$lib/components/Breadcrumbs.svelte";
+  import Breadcrumbs from "#lib/components/Breadcrumbs.svelte";
   import "./layout.css";
   import { setContext } from "svelte";
-  import { createTranslator } from "$lib/i18n/mod";
+  import { createTranslator } from "#lib/i18n/mod";
   let { data, children } = $props();
 
   let authUser = $derived(data.user);

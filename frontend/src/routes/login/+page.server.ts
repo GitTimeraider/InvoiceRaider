@@ -4,16 +4,16 @@ import {
   BACKEND_URL,
   SESSION_COOKIE,
   DEFAULT_SESSION_MAX_AGE,
-} from "$lib/backend";
-import { getDemoMode } from "$lib/demo";
-import { env } from "$env/dynamic/private";
+} from "#lib/backend";
+import { getDemoMode } from "#lib/demo";
+import { OIDC_ENABLED } from "$app/env/private";
 
 export const load: PageServerLoad = async ({ locals, url }) => {
   if (locals.user) {
     throw redirect(303, "/dashboard");
   }
   const oidcEnabled =
-    (env.OIDC_ENABLED || "false").toLowerCase() === "true";
+    (OIDC_ENABLED || "false").toLowerCase() === "true";
   const urlError = url.searchParams.get("error");
   return {
     oidcEnabled,

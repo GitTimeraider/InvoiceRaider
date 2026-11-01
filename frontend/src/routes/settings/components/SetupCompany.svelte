@@ -1,9 +1,13 @@
 <script lang="ts">
-  let { settings, t, canUpdateSettings } = $props<{
+  let {
+    settings,
+    t,
+    canUpdateSettings,
+  }: {
     settings: any;
     t: any;
     canUpdateSettings: boolean;
-  }>();
+  } = $props();
 </script>
 
 <div class="space-y-4">

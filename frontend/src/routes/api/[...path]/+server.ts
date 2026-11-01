@@ -1,5 +1,5 @@
-import { getAuthHeaderFromCookie } from "$lib/auth";
-import { BACKEND_URL } from "$lib/backend";
+import { getAuthHeaderFromCookie } from "#lib/auth";
+import { BACKEND_URL } from "#lib/backend";
 import type { RequestHandler } from "@sveltejs/kit";
 
 export const fallback: RequestHandler = async ({ request, url, cookies }) => {

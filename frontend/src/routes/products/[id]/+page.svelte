@@ -2,8 +2,8 @@
   import { getContext } from "svelte";
   import { Pencil, Trash2 } from "lucide-svelte";
   import { enhance } from "$app/forms";
-  import type { SubmitFunction } from "@sveltejs/kit";
-  import { hasPermission } from "$lib/types";
+  import type { SubmitFunction } from "$app/forms";
+  import { hasPermission } from "#lib/types";
 
   let { data } = $props();
   let t = getContext("i18n") as (key: string) => string;

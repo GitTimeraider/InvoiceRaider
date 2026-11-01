@@ -2,9 +2,9 @@
   import { getContext } from "svelte";
   import { Save, Trash2 } from "lucide-svelte";
   import { enhance } from "$app/forms";
-  import type { SubmitFunction } from "@sveltejs/kit";
-  import PermissionsGrid from "$lib/components/PermissionsGrid.svelte";
-  import { hasPermission } from "$lib/types";
+  import type { SubmitFunction } from "$app/forms";
+  import PermissionsGrid from "#lib/components/PermissionsGrid.svelte";
+  import { hasPermission } from "#lib/types";
 
   let { data, form } = $props();
   let t = getContext("i18n") as (key: string) => string;

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import ThemeCard from "$lib/components/ThemeCard.svelte";
-  import { getTheme, setTheme } from "$lib/theme";
+  import ThemeCard from "#lib/components/ThemeCard.svelte";
+  import { getTheme, setTheme } from "#lib/theme";
 
   let selectedTheme = $state<string>("invoiceraider-dark");
 

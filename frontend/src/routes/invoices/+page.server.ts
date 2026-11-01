@@ -1,6 +1,6 @@
 import { redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
-import { backendGet, SESSION_COOKIE } from "$lib/backend";
+import { backendGet, SESSION_COOKIE } from "#lib/backend";
 
 export const load: PageServerLoad = async ({ locals, cookies, url }) => {
   if (!locals.user) {

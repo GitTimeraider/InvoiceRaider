@@ -1,7 +1,7 @@
-import type { Handle } from "@sveltejs/kit";
-import { resolveLocalization, DEFAULT_LOCALIZATION } from "$lib/i18n/mod";
-import { getAuthHeaderFromCookie } from "$lib/auth";
-import { backendGet } from "$lib/backend";
+import type { Handle } from "@sveltejs/kit/hooks";
+import { resolveLocalization, DEFAULT_LOCALIZATION } from "#lib/i18n/mod";
+import { getAuthHeaderFromCookie } from "#lib/auth";
+import { backendGet } from "#lib/backend";
 
 export const handle: Handle = async ({ event, resolve }) => {
   const cookieString = event.request.headers.get("cookie");

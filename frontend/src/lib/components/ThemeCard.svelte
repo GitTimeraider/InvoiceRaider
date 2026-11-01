@@ -1,9 +1,13 @@
 <script lang="ts">
-  let { theme, selectedTheme, onSelect } = $props<{
+  let {
+    theme,
+    selectedTheme,
+    onSelect,
+  }: {
     theme: { id: string };
     selectedTheme: string;
     onSelect: (themeId: string) => void;
-  }>();
+  } = $props();
 </script>
 
 {#if selectedTheme === theme.id}
