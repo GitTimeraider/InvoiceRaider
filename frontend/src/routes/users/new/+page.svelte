@@ -2,7 +2,7 @@
   import { getContext } from "svelte";
   import { UserPlus } from "lucide-svelte";
   import { enhance } from "$app/forms";
-  import PermissionsGrid from "$lib/components/PermissionsGrid.svelte";
+  import PermissionsGrid from "#lib/components/PermissionsGrid.svelte";
 
   let { data, form } = $props();
   let t = getContext("i18n") as (key: string) => string;

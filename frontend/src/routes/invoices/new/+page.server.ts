@@ -1,4 +1,4 @@
-import { backendGet } from "$lib/backend";
+import { backendGet } from "#lib/backend";
 import { redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 

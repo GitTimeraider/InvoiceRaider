@@ -1,6 +1,6 @@
-import { env } from "$env/dynamic/private";
+import { BACKEND_URL as BACKEND_URL_ENV } from "$app/env/private";
 
-export const BACKEND_URL = env.BACKEND_URL || "http://localhost:3000";
+export const BACKEND_URL = BACKEND_URL_ENV || "http://localhost:3000";
 
 export async function getDemoMode() {
   const res = await fetch(`${BACKEND_URL}/api/v1/demo-mode`, {});

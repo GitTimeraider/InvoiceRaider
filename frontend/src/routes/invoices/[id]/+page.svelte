@@ -3,10 +3,10 @@
   import { FileText, Download, ArrowLeft, MoreHorizontal, FileCode2, Send, Ban, Trash2, CheckCircle, Check, Pencil, ChevronDown, Mail, Copy } from "lucide-svelte";
   import { enhance } from "$app/forms";
   import { page } from "$app/state";
-  import type { SubmitFunction } from "@sveltejs/kit";
+  import type { SubmitFunction } from "$app/forms";
 
-  import { hasPermission } from "$lib/types";
-  import { formatPostalCityLine } from "$lib/address";
+  import { hasPermission } from "#lib/types";
+  import { formatPostalCityLine } from "#lib/address";
 
   let { data, form } = $props();
   let t = getContext("i18n") as (key: string) => string;

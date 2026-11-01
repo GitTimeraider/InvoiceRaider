@@ -1,5 +1,5 @@
 import { redirect, fail } from "@sveltejs/kit";
-import { backendPost } from "$lib/backend";
+import { backendPost } from "#lib/backend";
 import type { PageServerLoad, Actions } from "./$types";
 
 export const load: PageServerLoad = async ({ locals }) => {

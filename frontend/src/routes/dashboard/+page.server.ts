@@ -1,7 +1,7 @@
 import { redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
-import { backendGet, SESSION_COOKIE } from "$lib/backend";
-import { getMaintainer } from "$lib/version";
+import { backendGet, SESSION_COOKIE } from "#lib/backend";
+import { getMaintainer } from "#lib/version";
 
 type Invoice = {
   id: string;

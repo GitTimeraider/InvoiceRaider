@@ -4,7 +4,7 @@
   import { invalidateAll } from "$app/navigation";
   import { page } from "$app/state";
   import QRCode from "qrcode";
-  import ThemeToggle from "$lib/components/ThemeToggle.svelte";
+  import ThemeToggle from "#lib/components/ThemeToggle.svelte";
   import TaxDefinitionsManager from "./components/TaxDefinitionsManager.svelte";
   import ProductOptionsManager from "./components/ProductOptionsManager.svelte";
   import TemplateOptionsManager from "./components/TemplateOptionsManager.svelte";
@@ -231,7 +231,7 @@
   ];
 
   function getSectionUrl(id: string) {
-    const url = new URL(page.url);
+    const url = new URL(page.url.href);
     url.searchParams.set("section", id);
     return url.toString();
   }

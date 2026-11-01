@@ -29,6 +29,7 @@ WORKDIR /app
 
 # Copy built application from builder
 COPY --from=builder /app/build ./build
+COPY --from=builder /app/server.js ./server.js
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/bun.lock ./
 # Copy NAME file from project root
@@ -45,4 +46,4 @@ ENV PORT=8000
 ENV NODE_ENV=production
 
 # Start the application
-CMD ["bun", "run", "build/index.js"]
+CMD ["bun", "run", "server.js"]

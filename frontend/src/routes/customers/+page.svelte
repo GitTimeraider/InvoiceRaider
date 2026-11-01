@@ -1,7 +1,7 @@
 <script lang="ts">
   import { UserPlus } from "lucide-svelte";
   import { getContext } from "svelte";
-  import { formatPostalCityLine } from "$lib/address";
+  import { formatPostalCityLine } from "#lib/address";
 
   const getLoc = getContext("localization") as () => any;
 

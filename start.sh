@@ -37,7 +37,7 @@ backend=$!
 # PORT/HOST are only for the frontend; the backend also reads PORT.
 supervise frontend /app/frontend \
   env PORT=8000 HOST=0.0.0.0 BODY_SIZE_LIMIT=10M \
-  bun --smol --no-install build/index.js &
+  bun --smol --no-install server.js &
 frontend=$!
 
 trap 'log "stopping"; kill -TERM "$backend" "$frontend" 2>/dev/null; wait; exit 0' TERM INT

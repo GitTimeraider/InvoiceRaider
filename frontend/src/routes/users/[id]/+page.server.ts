@@ -1,5 +1,5 @@
 import { redirect, fail } from "@sveltejs/kit";
-import { backendGet, backendPut, backendDelete } from "$lib/backend";
+import { backendGet, backendPut, backendDelete } from "#lib/backend";
 import type { PageServerLoad, Actions } from "./$types";
 
 type Permission = { resource: string; action: string };

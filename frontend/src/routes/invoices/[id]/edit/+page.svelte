@@ -1,5 +1,5 @@
 ﻿<script lang="ts">
-  import InvoiceEditor from "$lib/components/InvoiceEditor.svelte";
+  import InvoiceEditor from "#lib/components/InvoiceEditor.svelte";
   import { Save } from "lucide-svelte";
   import { getContext } from "svelte";
 

@@ -1,5 +1,5 @@
 import { redirect } from "@sveltejs/kit";
-import { backendGet } from "$lib/backend";
+import { backendGet } from "#lib/backend";
 
 export const load = async ({ locals }) => {
   if (!locals.user) {
