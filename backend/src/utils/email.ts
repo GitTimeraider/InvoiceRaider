@@ -54,7 +54,7 @@ async function sendWithSmtp(
 ): Promise<void> {
   // Loaded on demand: nodemailer costs a few MB of heap and is only needed
   // when an email is actually sent.
-  const { default: nodemailer } = await import("npm:nodemailer");
+  const { default: nodemailer } = await import("nodemailer");
   const transporter = nodemailer.createTransport({
     host: cfg.host,
     port: cfg.port,
