@@ -21,6 +21,9 @@ updates:
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
 
+  # Dependabot only bumps the entries listed in backend/deno.json; packages
+  # pinned only transitively in deno.lock are covered by the image scan
+  # workflow (.github/workflows/image-scan.yml).
   - package-ecosystem: "deno"
     directory: "/backend"
     target-branch: "develop"
@@ -31,6 +34,8 @@ updates:
       backend:
         patterns: ["*"]
 
+  # Base images plus the Deno and Bun binaries. An image is only tracked when
+  # it appears in a `FROM` line, not in an inline `COPY --from=image:tag`.
   - package-ecosystem: "docker"
     directory: "/"
     target-branch: "develop"
@@ -39,4 +44,15 @@ updates:
       day: "monday"
     groups:
       docker:
+        patterns: ["*"]
+
+  # Actions used in .github/workflows (also keeps SHA-pinned actions current)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "develop"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    groups:
+      github-actions:
         patterns: ["*"]

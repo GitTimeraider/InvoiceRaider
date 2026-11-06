@@ -1,3 +1,11 @@
+# ---------- Runtime binaries (Deno, Bun) ----------
+# Kept as their own `FROM` stages (instead of an inline `COPY --from=image:tag`)
+# so Dependabot's docker ecosystem can see and bump them. These use the target
+# platform, so each architecture's image gets a matching binary.
+FROM denoland/deno:bin-2.9.8 AS deno-bin
+FROM oven/bun:1 AS bun-bin
+
+
 # ---------- Frontend build (Bun) ----------
 # Built on the build machine's own platform: the output is plain JavaScript,
 # so it is identical for every target architecture and never needs emulation.
@@ -29,10 +37,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
 # Install Deno
-COPY --from=denoland/deno:bin-2.6.8 /deno /usr/local/bin/deno
+COPY --from=deno-bin /deno /usr/local/bin/deno
 
 # Install Bun
-COPY --from=oven/bun:1 /usr/local/bin/bun /usr/local/bin/bun
+COPY --from=bun-bin /usr/local/bin/bun /usr/local/bin/bun
 
 # ---------- App setup ----------
 WORKDIR /app
