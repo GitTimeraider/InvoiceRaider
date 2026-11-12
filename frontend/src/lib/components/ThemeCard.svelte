@@ -35,7 +35,7 @@
               <div class="text-warning-content text-sm font-bold">A</div>
             </div>
             <div class="bg-error flex aspect-square w-5 items-center justify-center rounded lg:w-6">
-              <div class="text-warning-content text-sm font-bold">A</div>
+              <div class="text-error-content text-sm font-bold">A</div>
             </div>
           </div>
         </div>
@@ -68,7 +68,7 @@
                 <div class="text-warning-content text-sm font-bold">A</div>
               </div>
               <div class="bg-error flex aspect-square w-5 items-center justify-center rounded lg:w-6">
-                <div class="text-warning-content text-sm font-bold">A</div>
+                <div class="text-error-content text-sm font-bold">A</div>
               </div>
             </div>
           </div>

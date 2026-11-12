@@ -37,6 +37,24 @@
       id: "lilac-mist-light",
     },
     {
+      id: "midnight-purple-dark",
+    },
+    {
+      id: "crimson-dark",
+    },
+    {
+      id: "ember-dark",
+    },
+    {
+      id: "scarlet-light",
+    },
+    {
+      id: "deep-ocean-dark",
+    },
+    {
+      id: "forest-moss-dark",
+    },
+    {
       id: "light",
     },
     {
