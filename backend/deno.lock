@@ -1,7 +1,7 @@
 {
   "version": "5",
   "specifiers": {
-    "npm:nodemailer@^10.5.0": "10.6.0",
+    "npm:nodemailer@^10.6.0": "10.6.1",
     "npm:otpauth@^9.6.0": "9.6.0",
     "npm:pdf-lib@^1.17.1": "1.17.1"
   },
@@ -21,8 +21,8 @@
         "pako"
       ]
     },
-    "nodemailer@10.6.0": {
-      "integrity": "sha512-jWanL7D9GD3jvUDYKmoC5rWTiG8MnBgnN2yV68bgMKip1zUJhiSTyz7Eg+18y8sk5OvdVDzws5nZK5arSI4f5Q=="
+    "nodemailer@10.6.1": {
+      "integrity": "sha512-d7kfFfS/tR4Aca+SBvRaQ+MXKNv7d2JiRe5TxaRcFT/kYMh4GGPnW9aKksTIEvyEbA7d/7HYWE4YPDEHxzJj/g=="
     },
     "otpauth@9.6.0": {
       "integrity": "sha512-qQXHTxcXohDhQjF1ZEbUVEpTIssFL2rd+2kHfw/McIVCbTLD6qAsbTCQxpXRLyeyUw6Ipjpykw4dWZL/zfIVqA==",
@@ -346,7 +346,7 @@
   },
   "workspace": {
     "dependencies": [
-      "npm:nodemailer@^10.5.0",
+      "npm:nodemailer@^10.6.0",
       "npm:otpauth@^9.6.0",
       "npm:pdf-lib@^1.17.1"
     ]
